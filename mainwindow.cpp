@@ -17,14 +17,9 @@ MainWindow::MainWindow(QWidget *parent)
 {
     setStyleSheet(R"(
         QMainWindow {
-            background: #0d1117;      /* Space black */
+            background: #1b2432;
             color: #e2e8f0;
             font-family: "Segoe UI", "Roboto", sans-serif;
-        }
-
-        QWidget {
-            background: transparent;
-            color: #e2e8f0;
         }
 
         QChartView {
@@ -32,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
             border: none;
             border-radius: 10px;
             padding: 6px;
-            box-shadow: 0px 2px 8px rgba(0,0,0,0.45);
+            background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3a3f66, stop:1 #2d3250);
         }
 
         QGroupBox {
@@ -42,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
             border-radius: 10px;
             margin-top: 1.4ex;
             padding-top: 14px;
-            box-shadow: 0px 2px 6px rgba(0,0,0,0.45);
+            background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #1b2432, stop:1 #1b2432);
             font-size: 12px;
             font-weight: 500;
         }
@@ -73,7 +68,6 @@ MainWindow::MainWindow(QWidget *parent)
             border-radius: 6px;
             font-weight: 600;
             font-size: 11px;
-            transition: 120ms;
         }
 
         QPushButton:hover {
@@ -82,26 +76,75 @@ MainWindow::MainWindow(QWidget *parent)
         }
 
         QPushButton:pressed {
-            background: #4f3bb8;
-            border: 1px solid #7f5af0;
+            background: #00b4d8;
+            border: 1px solid #00b4d8;
         }
 
-        QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox {
-            background: #121722;       /* deeper black-blue */
-            color: #e2e8f0;
-            border: 1px solid #2d3250;
-            border-radius: 5px;
-            padding: 6px 8px;
-            font-size: 11px;
-            selection-background-color: #7f5af0;
-        }
+QLineEdit, QComboBox {
+    background: #2d3250;
+    color: #e2e8f0;
+    border: 1px solid #2d3250;
+    border-radius: 5px;
+    padding: 6px 8px;
+    font-size: 11px;
+    selection-background-color: #00b4d8;
+}
+
+QSpinBox, QDoubleSpinBox {
+    background: #2d3250;
+    color: #e2e8f0;
+    border: 1px solid #2d3250;
+    border-radius: 5px;
+    padding: 6px 8px;
+    font-size: 11px;
+    selection-background-color: #00b4d8;
+}
+
+/* Style đơn giản cho nút - chỉ đổi màu nền */
+QSpinBox::up-button, QDoubleSpinBox::up-button {
+    background: #3a3f66;
+    border: 1px solid #2d3250;
+    border-top-right-radius: 4px;
+}
+
+QSpinBox::down-button, QDoubleSpinBox::down-button {
+    background: #3a3f66;
+    border: 1px solid #2d3250;
+    border-bottom-right-radius: 4px;
+}
+
+QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover {
+    background: #00b4d8;
+}
+
+QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover {
+    background: #00b4d8;
+}
+
+QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
+    width: 0px;
+    height: 0px;
+    image: none;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid #a6b1e1;
+}
+
+QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
+    width: 0px;
+    height: 0px;
+    image: none;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #a6b1e1;
+}
 
         QLineEdit:focus,
         QComboBox:focus,
         QSpinBox:focus,
         QDoubleSpinBox:focus {
-            border: 1px solid #7f5af0;
-            box-shadow: 0 0 6px rgba(127,90,240,0.45);
+            border: 1px solid #00b4d8;
+            background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #1b2432, stop:1 #1b2432);
         }
 
         QSlider::groove:horizontal {
@@ -140,380 +183,319 @@ MainWindow::MainWindow(QWidget *parent)
             border: 1px solid #2d3250;
             border-radius: 10px;
             padding: 6px;
-            box-shadow: 0px 2px 8px rgba(0,0,0,0.45);
+            background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #1b2432, stop:1 #1b2432);
         }
-    )");
 
-    // Tạo dashboard widget nhỏ cho bên trái
-    auto *miniDashboard = new DashBoardWidget(this);
-    miniDashboard->setFixedSize(260, 260);
-    miniDashboard->setBorderColor(QColor(45, 50, 80));
-    miniDashboard->setBorderWidth(2);
-    miniDashboard->setBorderRadius(10);
-    miniDashboard->setArcColor(QColor(65, 90, 119, 180));
-    miniDashboard->setScaleColor(QColor(166, 177, 225));
-    miniDashboard->setPointerColor(QColor(255, 107, 107));
-    miniDashboard->setValueColor(QColor(226, 232, 240));
-    miniDashboard->setTitleColor(QColor(166, 177, 225));
-    miniDashboard->setBackgroundColor(QColor(13, 17, 23, 100));
-
-    // Tạo biểu đồ chính cho throttle
-    auto *mainChartView = setupMainChart();
-
-    // Tạo các control widgets
-    auto *valueSlider = new QSlider(Qt::Horizontal, this);
-    valueSlider->setRange(0, 100);
-    valueSlider->setValue(0);
-
-    auto *valueSpinBox = new QDoubleSpinBox(this);
-    valueSpinBox->setRange(0, 100);
-    valueSpinBox->setValue(0);
-    valueSpinBox->setDecimals(2);
-
-    auto *minValueLabel = new QLabel(tr("Min Value:"), this);
-    auto *minValueSpinBox = new QDoubleSpinBox(this);
-    minValueSpinBox->setRange(-1000, 1000);
-    minValueSpinBox->setValue(0);
-    minValueSpinBox->setDecimals(2);
-
-    auto *maxValueLabel = new QLabel(tr("Max Value:"), this);
-    auto *maxValueSpinBox = new QDoubleSpinBox(this);
-    maxValueSpinBox->setRange(-1000, 1000);
-    maxValueSpinBox->setValue(100);
-    maxValueSpinBox->setDecimals(2);
-
-    auto *clearPlotButton = new QPushButton(tr("Clear Plot"), this);
-    auto *startPlotButton = new QPushButton(tr("Start Plot"), this);
-    auto *stopPlotButton = new QPushButton(tr("Stop Plot"), this);
-    auto *saveDataButton = new QPushButton(tr("Save Data to CSV"), this);
-
-    // Thêm các widget hiển thị giá trị PWM và Throttle với dark theme
-    auto *pwmValueLabel = new QLabel(tr("PWM: 0"), this);
-    auto *throttleValueLabel = new QLabel(tr("Throttle: 0"), this);
-    pwmValueLabel->setStyleSheet("font-weight: bold; color: #66ccff; font-size: 13px; padding: 6px; background: #1b2432; border: 1px solid #2d3250; border-radius: 4px;");
-    throttleValueLabel->setStyleSheet("font-weight: bold; color: #ff6666; font-size: 13px; padding: 6px; background: #1b2432; border: 1px solid #2d3250; border-radius: 4px;");
-
-    // Tạo log display cho các lệnh UART đã gửi - đặt ở dưới cùng
-    auto *logTextEdit = new QTextEdit(this);
-    logTextEdit->setMaximumHeight(100);
-    logTextEdit->setReadOnly(true);
-
-    auto *mainWidget = new QWidget(this);
-    auto *mainLayout = new QVBoxLayout(mainWidget); // Chuyển sang QVBoxLayout chính
-
-    // Layout trên cùng chứa nội dung chính
-    auto *topContentLayout = new QHBoxLayout();
-
-    // Layout bên trái cho mini dashboard
-    auto *leftPanel = new QWidget(this);
-    auto *leftLayout = new QVBoxLayout(leftPanel);
-    leftLayout->setAlignment(Qt::AlignTop);
-
-    // Layout control panel bên phải
-    auto *controlPanel = new QWidget(this);
-    auto *controlLayout = new QVBoxLayout(controlPanel);
-    controlLayout->setAlignment(Qt::AlignTop);
-
-    // Layout chính cho hiển thị biểu đồ
-    auto *displayLayout = new QVBoxLayout();
-
-    // Biểu đồ chính
-    displayLayout->addWidget(mainChartView);
-
-    // Layout cho các control dưới biểu đồ
-    auto *bottomControlsLayout = new QHBoxLayout();
-
-    auto *valueGroup = new QGroupBox(tr("Value Settings"), this);
-    auto *valueControlLayout = new QGridLayout(valueGroup);
-    valueControlLayout->addWidget(new QLabel(tr("Current Value:")), 0, 0);
-    valueControlLayout->addWidget(valueSlider, 0, 1);
-    valueControlLayout->addWidget(valueSpinBox, 0, 2);
-    valueControlLayout->addWidget(minValueLabel, 1, 0);
-    valueControlLayout->addWidget(minValueSpinBox, 1, 1, 1, 2);
-    valueControlLayout->addWidget(maxValueLabel, 2, 0);
-    valueControlLayout->addWidget(maxValueSpinBox, 2, 1, 1, 2);
-
-    auto *plotControlGroup = new QGroupBox(tr("Plot Control"), this);
-    auto *plotControlLayout = new QGridLayout(plotControlGroup);
-    plotControlLayout->addWidget(startPlotButton, 0, 0);
-    plotControlLayout->addWidget(stopPlotButton, 0, 1);
-    plotControlLayout->addWidget(clearPlotButton, 1, 0);
-    plotControlLayout->addWidget(saveDataButton, 1, 1);
-    plotControlLayout->addWidget(throttleValueLabel, 2, 0, 1, 2);
-    plotControlLayout->addWidget(pwmValueLabel, 3, 0, 1, 2);
-
-    bottomControlsLayout->addWidget(valueGroup, 2);
-    bottomControlsLayout->addWidget(plotControlGroup, 1);
-
-    displayLayout->addLayout(bottomControlsLayout);
-
-    // UART Connection
-    auto *connectionGroup = new QGroupBox(tr("UART Connection"), this);
-    auto *connectionLayout = new QGridLayout(connectionGroup);
-    auto *portComboBox = new QComboBox(this);
-    auto *connectButton = new QPushButton(tr("Connect"), this);
-
-    foreach (auto &port, QSerialPortInfo::availablePorts()) {
-        portComboBox->addItem(port.portName());
-    }
-
-    portComboBox->setStyleSheet(R"(
-        QComboBox {
-            background: #121722 !important;
-            color: #ffffff !important;
-            border: 1px solid #2d3250 !important;
-            padding: 5px;
-            border-radius: 4px;
+        QTabWidget::pane {
+            border: 1px solid #1b2432;
+            border-radius: 8px;
+            background: #1b2432;   /* màu nền panel */
+            padding: 4px;
         }
-        QComboBox::drop-down {
-            border: none;
-            width: 20px;
+
+        QTabWidget::tab-bar {
+            alignment: left;
+            width: 69px;
         }
-        QComboBox::down-arrow {
-            width: 12px;
-            height: 12px;
-            image: none;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-top: 6px solid #ffffff;
+
+        QTabBar {
+            background: #1b2432;
         }
-        QComboBox QAbstractItemView {
-            background: #121722;
+
+        QTabBar::tab {
+            background: #1b2432;
+            color: #a6b1e1;
+            padding: 12px 16px;
+            margin: 4px 2px;
+            border: 1px solid #1b2432;
+            border-radius: 6px;
+            font-weight: 600;
+            width: 30px;
+            text-align: left;
+        }
+
+        QTabBar::tab:selected {
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                      stop:0 #3a3f66, stop:1 #2d3250);
             color: #ffffff;
-            border: 1px solid #2d3250;
-            selection-background-color: #2d3250;
+            border: 1px solid #00b4d8;
+        }
+
+        QTabBar::tab:hover:!selected {
+            background: #2d3250;
+            color: #ffffff;
+        }
+
+        /* Style cho toggle button */
+        QPushButton#toggleTabsBtn {
+            background: #2d3250;
+            color: #a6b1e1;
+            border: none;
+            padding: 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        QPushButton#toggleTabsBtn:hover {
+            background: #3a3f66;
+            color: #ffffff;
+        }
+
+        QWidget#contentArea {
+            background: #2d3250;
+        }
+
+        QWidget#leftPanel {
+            background: #2d3250;
+            border-right: 1px solid #2d3250;
         }
     )");
 
-    connectionLayout->addWidget(new QLabel(tr("Port:")), 0, 0);
-    connectionLayout->addWidget(portComboBox, 0, 1);
-    connectionLayout->addWidget(connectButton, 0, 2);
+    // Tạo main widget với layout ngang
+    auto *mainWidget = new QWidget(this);
+    auto *mainLayout = new QHBoxLayout(mainWidget);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setSpacing(0);
 
-    // UART Command Sending
-    auto *commandGroup = new QGroupBox(tr("UART Command"), this);
-    auto *commandLayout = new QGridLayout(commandGroup);
-    auto *commandEdit = new QLineEdit(this);
-    auto *sendButton = new QPushButton(tr("Send Command"), this);
+    auto *leftPanel = new QWidget(mainWidget);
+    leftPanel->setMinimumWidth(100);
+    leftPanel->setMaximumWidth(200);
+    leftPanel->setObjectName("leftPanel");
+    leftPanel->setStyleSheet("QWidget#leftPanel { background: #2d3250; border-right: 1px solid #2d3250; }");
 
-    commandEdit->setPlaceholderText("Enter command to send via UART...");
-    commandLayout->addWidget(new QLabel(tr("Command:")), 0, 0);
-    commandLayout->addWidget(commandEdit, 0, 1);
-    commandLayout->addWidget(sendButton, 0, 2);
+    auto *leftPanelLayout = new QVBoxLayout(leftPanel);
+    leftPanelLayout->setContentsMargins(3,3,3,3);
+    leftPanelLayout->setSpacing(3);
 
-    auto *modeGroup = new QGroupBox(tr("Signal Generator Mode"), this);
-    auto *modeLayout = new QGridLayout(modeGroup);
+    _tabWidget = new QTabWidget(leftPanel);
+    _tabWidget->setTabPosition(QTabWidget::West); // Tab bên trái
 
-    auto *rampModeButton = new QPushButton(tr("Ramp Mode"), this);
-    auto *sineWaveButton = new QPushButton(tr("Sine Wave Mode"), this);
+    _homeTab = new QWidget();
+    _analyzeTab = new QWidget();
 
-    // Thêm các thông số cho từng mode
-    auto *amplitudeLabel = new QLabel(tr("Amplitude:"), this);
-    auto *amplitudeSpinBox = new QDoubleSpinBox(this);
-    amplitudeSpinBox->setRange(0, 100);
-    amplitudeSpinBox->setValue(50);
-    amplitudeSpinBox->setDecimals(1);
+    _tabWidget->addTab(_homeTab, "🏠");
+    _tabWidget->addTab(_analyzeTab, "📊");
 
-    auto *frequencyLabel = new QLabel(tr("Frequency (Hz):"), this);
-    auto *frequencySpinBox = new QDoubleSpinBox(this);
-    frequencySpinBox->setRange(0.1, 10.0);
-    frequencySpinBox->setValue(1.0);
-    frequencySpinBox->setDecimals(2);
-
-    auto *durationLabel = new QLabel(tr("Duration (s):"), this);
-    auto *durationSpinBox = new QDoubleSpinBox(this);
-    durationSpinBox->setRange(1, 60);
-    durationSpinBox->setValue(10);
-    durationSpinBox->setDecimals(1);
-
-    modeLayout->addWidget(rampModeButton, 0, 0);
-    modeLayout->addWidget(sineWaveButton, 0, 1);
-    modeLayout->addWidget(amplitudeLabel, 1, 0);
-    modeLayout->addWidget(amplitudeSpinBox, 1, 1);
-    modeLayout->addWidget(frequencyLabel, 2, 0);
-    modeLayout->addWidget(frequencySpinBox, 2, 1);
-    modeLayout->addWidget(durationLabel, 3, 0);
-    modeLayout->addWidget(durationSpinBox, 3, 1);
-
-    // Thêm mini dashboard vào panel bên trái
-    auto *dashboardGroup = new QGroupBox(tr("System Dashboard"), this);
-    auto *dashboardLayout = new QVBoxLayout(dashboardGroup);
-    dashboardLayout->addWidget(miniDashboard);
-    dashboardLayout->setAlignment(miniDashboard, Qt::AlignCenter);
-
-    // Thêm các thành phần vào panel trái
-    leftLayout->addWidget(dashboardGroup);
-    leftLayout->addWidget(connectionGroup);
-    leftLayout->addWidget(commandGroup);
-    leftLayout->addWidget(modeGroup);
-
-    // Thêm các thành phần vào panel phải
-    controlLayout->addWidget(valueGroup);
-    controlLayout->addWidget(plotControlGroup);
-
-    // Sắp xếp layout trên cùng
-    topContentLayout->addWidget(leftPanel, 1);
-    topContentLayout->addLayout(displayLayout, 2);
-
-    // UART Log Display - ĐẶT Ở DƯỚI CÙNG
-    auto *logGroup = new QGroupBox(tr("Command Log"), this);
-    auto *logLayout = new QVBoxLayout(logGroup);
-    logLayout->addWidget(logTextEdit);
-
-    // Sắp xếp layout chính: trên cùng là content, dưới cùng là log
-    mainLayout->addLayout(topContentLayout, 4);
-    mainLayout->addWidget(logGroup, 1);
+    mainLayout->addWidget(_tabWidget, 1);
 
     setCentralWidget(mainWidget);
-    resize(1200, 900);
+    resize(1400, 900);
     setWindowTitle(tr("EDF SYSTEM"));
 
-    // [Phần kết nối signals/slots giữ nguyên...]
-    // Kết nối tín hiệu cho dashboard nhỏ
-    connect(valueSlider, &QSlider::valueChanged, this, [miniDashboard, valueSpinBox](int value) {
-        valueSpinBox->blockSignals(true);
-        miniDashboard->setValue(value);
-        valueSpinBox->setValue(value);
-        valueSpinBox->blockSignals(false);
-    });
+    // Biến để theo dõi trạng thái sidebar
+    _sidebarCollapsed = false;
 
-    connect(valueSpinBox,
-            QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-            this,
-            [miniDashboard, valueSlider](double value) {
-                valueSlider->blockSignals(true);
-                miniDashboard->setValue(value);
-                valueSlider->setValue(static_cast<int>(value));
-                valueSlider->blockSignals(false);
-            });
+    setupHomeTab();
+    setupAnalyzeTab();
+}
 
-    // Kết nối valueSlider để tự động gửi UART khi giá trị thay đổi
-    connect(valueSlider, &QSlider::valueChanged, this, [this](int value) {
-        if (_serialPort && _serialPort->isOpen()) {
-            QString command = QString("s:%1\n").arg(value);
-            _serialPort->write(command.toUtf8());
+void MainWindow::updatePlot(double throttle, double pwm)
+{
+    // Tính thời gian từ khi bắt đầu plot
+    double key = _startTime.msecsTo(QTime::currentTime()) / 1000.0;
 
-            // Thêm vào log
-            QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
-            _logTextEdit->append(QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
+    _throttleSeries->append(key, throttle);
+
+    if (_throttleSeries->count() > 500) {
+        _throttleSeries->remove(0);
+    }
+
+    // Cập nhật hiển thị giá trị
+    _throttleLabel->setText(QString("Throttle: %1").arg(throttle, 0, 'f', 1));
+    _pwmLabel->setText(QString("PWM: %1").arg(pwm, 0, 'f', 1));
+
+    // Lưu dữ liệu vào buffer để ghi CSV
+    _dataBuffer.append(DataPoint{key, throttle, pwm});
+
+    // Tự động scroll trục X
+    auto axes = _chart->axes();
+    if (axes.size() >= 2) {
+        auto *axisX = static_cast<QValueAxis*>(axes[0]);
+        if (key > axisX->max()) {
+            axisX->setRange(key - 60, key);
         }
-    });
+    }
+}
 
-    // Kết nối valueSpinBox cũng tương tự
-    connect(valueSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-            this, [this](double value) {
-        if (_serialPort && _serialPort->isOpen()) {
-            QString command = QString("s:%1\n").arg(value, 0, 'f', 2);
-            _serialPort->write(command.toUtf8());
+void MainWindow::saveDataToCSV()
+{
+    QString fileName = QDateTime::currentDateTime().toString("'system_data_'yyyy-MM-dd_hh-mm-ss'.csv'");
+    QFile file(fileName);
 
-            QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
-            _logTextEdit->append(QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream stream(&file);
+
+        // Write header
+        stream << "Timestamp,Throttle,PWM\n";
+
+        // Write data
+        for (auto it = _dataBuffer.begin(); it != _dataBuffer.end(); ++it) {
+            const auto &data = *it;
+            stream << data.timestamp << "," << data.throttle << "," << data.pwm << "\n";
         }
-    });
 
-    // Kết nối các control với dashboard nhỏ
-    connect(minValueSpinBox,
-            QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-            miniDashboard,
-            &DashBoardWidget::setMinValue);
-    connect(maxValueSpinBox,
-            QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-            miniDashboard,
-            &DashBoardWidget::setMaxValue);
+        file.close();
 
-    // Kết nối UART
-    connect(connectButton, &QPushButton::clicked, this, [this, portComboBox]() {
-        _serialPort = new QSerialPort;
-        _serialPort->setPortName(portComboBox->currentText());
-        _serialPort->setBaudRate(QSerialPort::Baud115200);
-        _serialPort->setDataBits(QSerialPort::Data8);
-        _serialPort->setParity(QSerialPort::NoParity);
-        _serialPort->setStopBits(QSerialPort::OneStop);
+        // Thêm vào log
+        QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
+        _logTextEdit->append(QString("[%1] DATA SAVED: %2 (%3 records)").arg(timestamp, fileName, QString::number(_dataBuffer.size())));
 
-        if (_serialPort->open(QIODevice::ReadWrite))
-        {
-            QMessageBox::information(this, "Success", "UART Port Connected Successfully!");
-            connect(_serialPort, &QSerialPort::readyRead, this, &MainWindow::readData);
-        } else {
-            QMessageBox::critical(this, "Error", "Unable to connect to UART port");
+        QMessageBox::information(this, "Success", QString("Data saved to %1\n%2 records written").arg(fileName, QString::number(_dataBuffer.size())));
+    } else {
+        QMessageBox::critical(this, "Error", "Could not save data to file");
+    }
+}
+
+void MainWindow::updateAnalyzeCharts(double key, double throttle)
+{
+    // Tạo dữ liệu giả cho demo (thay thế bằng dữ liệu thực từ UART)
+    double tempValue = throttle * 0.8 + 20 + (rand() % 10 - 5) * 0.1;  // Temperature với nhiễu
+    double voltValue = throttle * 0.24 + 12 + (rand() % 10 - 5) * 0.05; // Voltage với nhiễu
+    double currentValue = throttle * 0.1 + 2 + (rand() % 10 - 5) * 0.02; // Current với nhiễu
+
+    // Thêm dữ liệu vào các series
+    _series1->append(key, tempValue);
+    _series2->append(key, voltValue);
+    _series3->append(key, currentValue);
+
+    // Giới hạn số điểm hiển thị
+    const int MAX_POINTS = 500;
+    if (_series1->count() > MAX_POINTS) {
+        _series1->remove(0);
+        _series2->remove(0);
+        _series3->remove(0);
+    }
+
+    // Tự động scroll cho tất cả biểu đồ trong Analyze Tab
+    auto updateChartAxis = [key](QChart* chart, double windowSize = 60.0) {
+        auto axes = chart->axes();
+        if (axes.size() >= 2) {
+            auto *axisX = static_cast<QValueAxis*>(axes[0]);
+            double currentMax = axisX->max();
+
+            if (key > currentMax) {
+                axisX->setRange(key - windowSize, key);
+            }
         }
-    });
+    };
 
-    // Kết nối gửi command UART
-    connect(sendButton, &QPushButton::clicked, this, [this, commandEdit, logTextEdit]() {
-        if (_serialPort && _serialPort->isOpen()) {
-            QString command = commandEdit->text() + "\n";
-            _serialPort->write(command.toUtf8());
+    // Cập nhật tất cả biểu đồ
+    if (_series1->chart()) updateChartAxis(_series1->chart());
+    if (_series2->chart()) updateChartAxis(_series2->chart());
+    if (_series3->chart()) updateChartAxis(_series3->chart());
+}
 
-            // Thêm vào log
-            QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
-            logTextEdit->append(QString("[%1] SENT: %2").arg(timestamp, command.trimmed()));
+void MainWindow::readData()
+{
+    if (!_serialPort)
+        return;
 
-            qDebug() << "Command sent:" << command;
-            commandEdit->clear();
-        } else {
-            QMessageBox::warning(this, "Warning", "UART port not connected");
+    const QByteArray payload = _serialPort->readAll();
+    QString data = QString::fromUtf8(payload).trimmed();
+
+    QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
+    _logTextEdit->append(QString("[%1] RECV: %2").arg(timestamp, data));
+
+    qDebug() << "UART data:" << data;
+
+    // Phân tích dữ liệu UART
+    bool throttleOk = false, pwmOk = false;
+    double throttleValue = 0.0, pwmValue = 0.0;
+
+    if (data.contains("THROTTLE") && data.contains("PWM")) {
+        QStringList parts = data.split(',');
+        // SỬA: Dùng iterator
+        for (auto it = parts.begin(); it != parts.end(); ++it) {
+            const QString &part = *it;
+            if (part.contains("THROTTLE:")) {
+                QString valueStr = part.split(':')[1];
+                throttleValue = valueStr.toDouble(&throttleOk);
+            } else if (part.contains("PWM:")) {
+                QString valueStr = part.split(':')[1];
+                pwmValue = valueStr.toDouble(&pwmOk);
+            }
         }
-    });
+    } else {
+        throttleValue = data.toDouble(&throttleOk);
+        pwmValue = throttleValue;
+        pwmOk = throttleOk;
+    }
 
-    connect(rampModeButton, &QPushButton::clicked, this, [this, amplitudeSpinBox, durationSpinBox]() {
-        if (_serialPort && _serialPort->isOpen()) {
-            QString command = QString("ramp:%1:%2\n")
-            .arg(amplitudeSpinBox->value(), 0, 'f', 1)
-                .arg(durationSpinBox->value(), 0, 'f', 1);
-            _serialPort->write(command.toUtf8());
+    if (throttleOk && pwmOk) {
+        qDebug() << "Parsed - Throttle:" << throttleValue << "PWM:" << pwmValue;
 
-            QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
-            _logTextEdit->append(QString("[%1] MODE SET: %2").arg(timestamp, command.trimmed()));
+        // Cập nhật biểu đồ nếu đang plot
+        if (_plotting) {
+            double key = _startTime.msecsTo(QTime::currentTime()) / 1000.0;
+
+            // Cập nhật main chart
+            updatePlot(throttleValue, pwmValue);
+
+            // Cập nhật analyze charts
+            updateAnalyzeCharts(key, throttleValue);
         }
-    });
+    }
+}
 
-    connect(sineWaveButton, &QPushButton::clicked, this, [this, amplitudeSpinBox, frequencySpinBox, durationSpinBox]() {
-        if (_serialPort && _serialPort->isOpen()) {
-            QString command = QString("sine:%1:%2:%3\n")
-            .arg(amplitudeSpinBox->value(), 0, 'f', 1)
-                .arg(frequencySpinBox->value(), 0, 'f', 2)
-                .arg(durationSpinBox->value(), 0, 'f', 1);
-            _serialPort->write(command.toUtf8());
+QChartView* MainWindow::createAnalyzeChart(const QString &title, const QString &yTitle, QLineSeries *series)
+{
+    auto *chart = new QChart();
 
-            QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
-            _logTextEdit->append(QString("[%1] MODE SET: %2").arg(timestamp, command.trimmed()));
-        }
-    });
+    QPen pen;
+    if (title.contains("Temperature")) {
+        pen = QPen(QColor(255, 107, 107), 2); // Red for temperature
+    } else if (title.contains("Voltage")) {
+        pen = QPen(QColor(102, 204, 255), 2); // Blue for voltage
+    } else {
+        pen = QPen(QColor(102, 255, 102), 2); // Green for current
+    }
+    pen.setCapStyle(Qt::RoundCap);
+    pen.setJoinStyle(Qt::RoundJoin);
+    series->setPen(pen);
 
-    // Kết nối Enter key để gửi command
-    connect(commandEdit, &QLineEdit::returnPressed, this, [sendButton]() {
-        sendButton->click();
-    });
+    chart->addSeries(series);
+    chart->setTitle(title);
+    chart->setTitleBrush(QBrush(QColor(226, 232, 240)));
+    chart->legend()->setVisible(false);
+    chart->setBackgroundBrush(QBrush(QColor(27, 36, 50)));
+    chart->setTheme(QChart::ChartThemeDark);
 
-    // Kết nối control biểu đồ
-    connect(startPlotButton, &QPushButton::clicked, this, [this]() {
-        _plotting = true;
-        _startTime = QTime::currentTime();
-        qDebug() << "Plotting started";
-    });
+    // Tạo axes
+    auto *axisX = new QValueAxis();
+    auto *axisY = new QValueAxis();
 
-    connect(stopPlotButton, &QPushButton::clicked, this, [this]() {
-        _plotting = false;
-        qDebug() << "Plotting stopped";
-    });
+    axisX->setTitleText("Time (s)");
+    axisY->setTitleText(yTitle);
+    axisX->setRange(0, 60);
 
-    connect(clearPlotButton, &QPushButton::clicked, this, [this, pwmValueLabel, throttleValueLabel]() {
-        _throttleSeries->clear();
-        _startTime = QTime::currentTime();
-        pwmValueLabel->setText("PWM: 0");
-        throttleValueLabel->setText("Throttle: 0");
-        qDebug() << "Plot cleared";
-    });
+    // Set range khác nhau cho từng biểu đồ
+    if (title.contains("Temperature")) {
+        axisY->setRange(0, 100);
+    } else if (title.contains("Voltage")) {
+        axisY->setRange(0, 24);
+    } else {
+        axisY->setRange(0, 10);
+    }
 
-    // Kết nối save data
-    connect(saveDataButton, &QPushButton::clicked, this, &MainWindow::saveDataToCSV);
+    // Thiết lập màu cho axes
+    axisX->setLabelsColor(QColor(166, 177, 225));
+    axisY->setLabelsColor(QColor(166, 177, 225));
+    axisX->setTitleBrush(QBrush(QColor(226, 232, 240)));
+    axisY->setTitleBrush(QBrush(QColor(226, 232, 240)));
+    axisX->setGridLineColor(QColor(45, 50, 80, 100));
+    axisY->setGridLineColor(QColor(45, 50, 80, 100));
 
-    // Lưu con trỏ đến các label để cập nhật giá trị
-    _pwmLabel = pwmValueLabel;
-    _throttleLabel = throttleValueLabel;
-    _logTextEdit = logTextEdit;
+    chart->addAxis(axisX, Qt::AlignBottom);
+    chart->addAxis(axisY, Qt::AlignLeft);
 
-    miniDashboard->setValue(0);
+    series->attachAxis(axisX);
+    series->attachAxis(axisY);
+
+    auto *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+    chartView->setMinimumSize(400, 300);
+
+    return chartView;
 }
 
 QChartView* MainWindow::setupMainChart()
@@ -565,108 +547,463 @@ QChartView* MainWindow::setupMainChart()
     return chartView;
 }
 
-// [Các hàm updatePlot, saveDataToCSV, readData giữ nguyên...]
-void MainWindow::updatePlot(double throttle, double pwm)
+void MainWindow::setupAnalyzeTab()
 {
-    // Tính thời gian từ khi bắt đầu plot
-    double key = _startTime.msecsTo(QTime::currentTime()) / 1000.0;
+    // _analyzeTab->setStyleSheet("background: #1b2432;");
+    auto *analyzeLayout = new QVBoxLayout(_analyzeTab);
+    analyzeLayout->setContentsMargins(10, 10, 10, 10);
+    analyzeLayout->setSpacing(10);
 
-    _throttleSeries->append(key, throttle);
+    // Tạo các series cho analyze tab
+    _series1 = new QLineSeries();
+    _series2 = new QLineSeries();
+    _series3 = new QLineSeries();
 
-    // Giới hạn số điểm hiển thị
-    if (_throttleSeries->count() > 1000) {
-        _throttleSeries->remove(0);
-    }
+    // Tạo các biểu đồ
+    auto *tempChart = createAnalyzeChart("Temperature", "°C", _series1);
+    auto *voltChart = createAnalyzeChart("Voltage", "V", _series2);
+    auto *currentChart = createAnalyzeChart("Current", "A", _series3);
 
-    // Cập nhật hiển thị giá trị
-    _throttleLabel->setText(QString("Throttle: %1").arg(throttle, 0, 'f', 1));
-    _pwmLabel->setText(QString("PWM: %1").arg(pwm, 0, 'f', 1));
+    // Tạo layout lưới cho 3 biểu đồ
+    auto *chartsLayout = new QGridLayout();
+    chartsLayout->addWidget(tempChart, 0, 0);
+    chartsLayout->addWidget(voltChart, 0, 1);
+    chartsLayout->addWidget(currentChart, 1, 0, 1, 2);
 
-    // Lưu dữ liệu vào buffer để ghi CSV
-    _dataBuffer.append(DataPoint{key, throttle, pwm});
+    // Control panel cho analyze tab
+    auto *controlGroup = new QGroupBox("Analyze Controls", _analyzeTab);
+    auto *controlLayout = new QHBoxLayout(controlGroup);
 
-    // Tự động scroll trục X
-    auto axes = _chart->axes();
-    if (axes.size() >= 2) {
-        auto *axisX = static_cast<QValueAxis*>(axes[0]);
-        if (key > axisX->max()) {
-            axisX->setRange(key - 60, key);
-        }
-    }
+    auto *clearChartsBtn = new QPushButton("Clear Charts", controlGroup);
+    auto *exportDataBtn = new QPushButton("Export Data", controlGroup);
+
+    controlLayout->addWidget(clearChartsBtn);
+    controlLayout->addWidget(exportDataBtn);
+    controlLayout->addStretch();
+
+    analyzeLayout->addLayout(chartsLayout, 1);
+    analyzeLayout->addWidget(controlGroup);
+
+    // Kết nối signals
+    connect(clearChartsBtn, &QPushButton::clicked, this, [this]() {
+        _series1->clear();
+        _series2->clear();
+        _series3->clear();
+        _logTextEdit->append("[ANALYZE] Charts cleared");
+    });
+
+    connect(exportDataBtn, &QPushButton::clicked, this, &MainWindow::saveDataToCSV);
 }
 
-void MainWindow::saveDataToCSV()
+void MainWindow::setupHomeTab()
 {
-    QString fileName = QDateTime::currentDateTime().toString("'system_data_'yyyy-MM-dd_hh-mm-ss'.csv'");
-    QFile file(fileName);
+    // _homeTab->setStyleSheet("background: #1b2432;");
+    // Tạo layout chính cho home tab
+    auto *homeLayout = new QVBoxLayout(_homeTab);
+    homeLayout->setContentsMargins(10, 10, 10, 10);
+    homeLayout->setSpacing(10);
 
-    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QTextStream stream(&file);
+    auto *miniDashboard = new DashBoardWidget(_homeTab);
+    miniDashboard->setFixedSize(260, 260);
+    miniDashboard->setBorderColor(QColor(45, 50, 80));
+    miniDashboard->setBorderWidth(2);
+    miniDashboard->setBorderRadius(10);
+    miniDashboard->setArcColor(QColor(65, 90, 119, 180));
+    miniDashboard->setScaleColor(QColor(166, 177, 225));
+    miniDashboard->setPointerColor(QColor(255, 107, 107));
+    miniDashboard->setValueColor(QColor(226, 232, 240));
+    miniDashboard->setTitleColor(QColor(166, 177, 225));
+    miniDashboard->setBackgroundColor(QColor(13, 17, 23, 100));
 
-        // Write header
-        stream << "Timestamp,Throttle,PWM\n";
+    // Tạo biểu đồ chính cho throttle
+    auto *mainChartView = setupMainChart();
 
-        // Write data
-        for (const auto &data : _dataBuffer) {
-            stream << data.timestamp << "," << data.throttle << "," << data.pwm << "\n";
-        }
+    // Tạo các control widgets
+    auto *valueSlider = new QSlider(Qt::Horizontal, _homeTab);
+    valueSlider->setRange(0, 100);
+    valueSlider->setValue(0);
 
-        file.close();
+    auto *valueSpinBox = new QDoubleSpinBox(_homeTab);
+    valueSpinBox->setRange(0, 100);
+    valueSpinBox->setValue(0);
+    valueSpinBox->setDecimals(2);
 
-        // Thêm vào log
-        QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
-        _logTextEdit->append(QString("[%1] DATA SAVED: %2 (%3 records)").arg(timestamp, fileName, QString::number(_dataBuffer.size())));
+    auto *minValueLabel = new QLabel(tr("Min Value:"), _homeTab);
+    auto *minValueSpinBox = new QDoubleSpinBox(_homeTab);
+    minValueSpinBox->setRange(-1000, 1000);
+    minValueSpinBox->setValue(0);
+    minValueSpinBox->setDecimals(2);
 
-        QMessageBox::information(this, "Success", QString("Data saved to %1\n%2 records written").arg(fileName, QString::number(_dataBuffer.size())));
-    } else {
-        QMessageBox::critical(this, "Error", "Could not save data to file");
+    auto *maxValueLabel = new QLabel(tr("Max Value:"), _homeTab);
+    auto *maxValueSpinBox = new QDoubleSpinBox(_homeTab);
+    maxValueSpinBox->setRange(-1000, 1000);
+    maxValueSpinBox->setValue(100);
+    maxValueSpinBox->setDecimals(2);
+
+    auto *clearPlotButton = new QPushButton(tr("Clear Plot"), _homeTab);
+    auto *startPlotButton = new QPushButton(tr("Start Plot"), _homeTab);
+    auto *stopPlotButton = new QPushButton(tr("Stop Plot"), _homeTab);
+    auto *saveDataButton = new QPushButton(tr("Save Data to CSV"), _homeTab);
+
+    auto *pwmValueLabel = new QLabel(tr("PWM: 0"), _homeTab);
+    auto *throttleValueLabel = new QLabel(tr("Throttle: 0"), _homeTab);
+    pwmValueLabel->setStyleSheet("font-weight: bold; color: #66ccff; font-size: 13px; padding: 6px; background: #1b2432; border: 1px solid #2d3250; border-radius: 4px;");
+    throttleValueLabel->setStyleSheet("font-weight: bold; color: #ff6666; font-size: 13px; padding: 6px; background: #1b2432; border: 1px solid #2d3250; border-radius: 4px;");
+
+    auto *logTextEdit = new QTextEdit(_homeTab);
+    logTextEdit->setMaximumHeight(100);
+    logTextEdit->setReadOnly(true);
+
+    auto *topContentLayout = new QHBoxLayout();
+
+    auto *leftPanel = new QWidget(_homeTab);
+    auto *leftLayout = new QVBoxLayout(leftPanel);
+    leftLayout->setAlignment(Qt::AlignTop);
+    leftLayout->setSpacing(10);
+
+    // Layout chính cho hiển thị biểu đồ
+    auto *displayLayout = new QVBoxLayout();
+    displayLayout->setSpacing(10);
+
+    // Biểu đồ chính - THÊM STRETCH FACTOR
+    displayLayout->addWidget(mainChartView, 1);
+
+    // Layout cho các control dưới biểu đồ
+    auto *bottomControlsLayout = new QHBoxLayout();
+    bottomControlsLayout->setSpacing(10);
+
+    auto *valueGroup = new QGroupBox(tr("Value Settings"), _homeTab);
+    auto *valueControlLayout = new QGridLayout(valueGroup);
+    valueControlLayout->addWidget(new QLabel(tr("Current Value:")), 0, 0);
+    valueControlLayout->addWidget(valueSlider, 0, 1);
+    valueControlLayout->addWidget(valueSpinBox, 0, 2);
+    valueControlLayout->addWidget(minValueLabel, 1, 0);
+    valueControlLayout->addWidget(minValueSpinBox, 1, 1, 1, 2);
+    valueControlLayout->addWidget(maxValueLabel, 2, 0);
+    valueControlLayout->addWidget(maxValueSpinBox, 2, 1, 1, 2);
+
+    auto *plotControlGroup = new QGroupBox(tr("Plot Control"), _homeTab);
+    auto *plotControlLayout = new QGridLayout(plotControlGroup);
+    plotControlLayout->addWidget(startPlotButton, 0, 0);
+    plotControlLayout->addWidget(stopPlotButton, 0, 1);
+    plotControlLayout->addWidget(clearPlotButton, 1, 0);
+    plotControlLayout->addWidget(saveDataButton, 1, 1);
+    plotControlLayout->addWidget(throttleValueLabel, 2, 0, 1, 2);
+    plotControlLayout->addWidget(pwmValueLabel, 3, 0, 1, 2);
+
+    bottomControlsLayout->addWidget(valueGroup, 2);
+    bottomControlsLayout->addWidget(plotControlGroup, 1);
+
+    displayLayout->addLayout(bottomControlsLayout);
+
+    // UART Connection
+    auto *connectionGroup = new QGroupBox(tr("UART Connection"), _homeTab);
+    auto *connectionLayout = new QGridLayout(connectionGroup);
+    auto *portComboBox = new QComboBox(_homeTab);
+    auto *connectButton = new QPushButton(tr("Connect"), _homeTab);
+
+    qDebug() << "=== SCANNING SERIAL PORTS ===";
+
+    // Physical ports
+    qDebug() << "Physical ports from QSerialPortInfo:";
+    foreach (auto &port, QSerialPortInfo::availablePorts()) {
+        portComboBox->addItem(port.portName());
+        qDebug() << "  - " << port.portName();
     }
-}
 
-void MainWindow::readData()
-{
-    if (!_serialPort)
-        return;
+// Virtual ports - SỬA FILTER
+#ifdef Q_OS_LINUX
+    qDebug() << "Scanning /dev for virtual ports...";
 
-    const QByteArray payload = _serialPort->readAll();
-    QString data = QString::fromUtf8(payload).trimmed();
+    QDir dir("/dev");
 
-    // Thêm vào log
-    QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
-    _logTextEdit->append(QString("[%1] RECV: %2").arg(timestamp, data));
+    // SỬA: Dùng đúng filter pattern
+    QStringList nameFilters;
+    nameFilters << "pts/*" << "pts[0-9]*" << "pts*"; // Thử nhiều pattern
 
-    qDebug() << "UART data:" << data;
+    QStringList ptsPorts = dir.entryList(nameFilters, QDir::System);
+    qDebug() << "Found pts ports with filter:" << ptsPorts;
 
-    // Phân tích dữ liệu UART
-    bool throttleOk = false, pwmOk = false;
-    double throttleValue = 0.0, pwmValue = 0.0;
+    // THỬ CÁCH KHÁC: QDirIterator
+    qDebug() << "Trying QDirIterator...";
+    QDirIterator it("/dev", QStringList() << "pts*", QDir::System | QDir::Files);
+    int iteratorCount = 0;
+    while (it.hasNext()) {
+        QString port = it.next();
+        qDebug() << "QDirIterator found:" << port;
+        if (portComboBox->findText(port) == -1) {
+            portComboBox->addItem(port);
+        }
+        iteratorCount++;
+    }
+    qDebug() << "QDirIterator found" << iteratorCount << "ports";
 
-    if (data.contains("THROTTLE") && data.contains("PWM")) {
-        QStringList parts = data.split(',');
-        for (const QString &part : parts) {
-            if (part.contains("THROTTLE:")) {
-                QString valueStr = part.split(':')[1];
-                throttleValue = valueStr.toDouble(&throttleOk);
-            } else if (part.contains("PWM:")) {
-                QString valueStr = part.split(':')[1];
-                pwmValue = valueStr.toDouble(&pwmOk);
+    // THỬ CÁCH KHÁC: System command
+    qDebug() << "Trying system command...";
+    QProcess process;
+    process.start("find", QStringList() << "/dev" << "-name" << "pts*");
+    process.waitForFinished();
+    QString output = process.readAllStandardOutput();
+    qDebug() << "find command output:" << output;
+
+    QStringList lines = output.split('\n', Qt::SkipEmptyParts);
+    foreach (QString line, lines) {
+        if (line.startsWith("/dev/pts")) {
+            if (portComboBox->findText(line) == -1) {
+                portComboBox->addItem(line);
+                qDebug() << "Added from find:" << line;
             }
         }
-    } else {
-        // Nếu không có định dạng rõ ràng, thử parse trực tiếp
-        throttleValue = data.toDouble(&throttleOk);
-        pwmValue = throttleValue; // Giả sử cùng giá trị nếu chỉ có 1 số
-        pwmOk = throttleOk;
     }
+#endif
 
-    if (throttleOk && pwmOk) {
-        qDebug() << "Parsed - Throttle:" << throttleValue << "PWM:" << pwmValue;
+    qDebug() << "Final port count:" << portComboBox->count();
 
-        // Cập nhật biểu đồ nếu đang plot
-        if (_plotting) {
-            updatePlot(throttleValue, pwmValue);
+    portComboBox->setStyleSheet(R"(
+        QComboBox {
+            background: #121722 !important;
+            color: #ffffff !important;
+            border: 1px solid #2d3250 !important;
+            padding: 5px;
+            border-radius: 4px;
         }
-    }
+        QComboBox::drop-down {
+            border: none;
+            width: 20px;
+        }
+        QComboBox::down-arrow {
+            width: 12px;
+            height: 12px;
+            image: none;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid #ffffff;
+        }
+        QComboBox QAbstractItemView {
+            background: #121722;
+            color: #ffffff;
+            border: 1px solid #2d3250;
+            selection-background-color: #2d3250;
+        }
+    )");
+
+    connectionLayout->addWidget(new QLabel(tr("Port:")), 0, 0);
+    connectionLayout->addWidget(portComboBox, 0, 1);
+    connectionLayout->addWidget(connectButton, 0, 2);
+
+    // UART Command Sending
+    auto *commandGroup = new QGroupBox(tr("UART Command"), _homeTab);
+    auto *commandLayout = new QGridLayout(commandGroup);
+    auto *commandEdit = new QLineEdit(_homeTab);
+    auto *sendButton = new QPushButton(tr("Send Command"), _homeTab);
+
+    commandEdit->setPlaceholderText("Enter command to send via UART...");
+    commandLayout->addWidget(new QLabel(tr("Command:")), 0, 0);
+    commandLayout->addWidget(commandEdit, 0, 1);
+    commandLayout->addWidget(sendButton, 0, 2);
+
+    auto *modeGroup = new QGroupBox(tr("Signal Generator Mode"), _homeTab);
+    auto *modeLayout = new QGridLayout(modeGroup);
+
+    auto *rampModeButton = new QPushButton(tr("Ramp Mode"), _homeTab);
+    auto *sineWaveButton = new QPushButton(tr("Sine Wave Mode"), _homeTab);
+
+    // Thêm các thông số cho từng mode
+    auto *amplitudeLabel = new QLabel(tr("Amplitude:"), _homeTab);
+    auto *amplitudeSpinBox = new QDoubleSpinBox(_homeTab);
+    amplitudeSpinBox->setRange(0, 100);
+    amplitudeSpinBox->setValue(50);
+    amplitudeSpinBox->setDecimals(1);
+
+    auto *frequencyLabel = new QLabel(tr("Frequency (Hz):"), _homeTab);
+    auto *frequencySpinBox = new QDoubleSpinBox(_homeTab);
+    frequencySpinBox->setRange(0.1, 10.0);
+    frequencySpinBox->setValue(1.0);
+    frequencySpinBox->setDecimals(2);
+
+    auto *durationLabel = new QLabel(tr("Duration (s):"), _homeTab);
+    auto *durationSpinBox = new QDoubleSpinBox(_homeTab);
+    durationSpinBox->setRange(1, 60);
+    durationSpinBox->setValue(10);
+    durationSpinBox->setDecimals(1);
+
+    modeLayout->addWidget(rampModeButton, 0, 0);
+    modeLayout->addWidget(sineWaveButton, 0, 1);
+    modeLayout->addWidget(amplitudeLabel, 1, 0);
+    modeLayout->addWidget(amplitudeSpinBox, 1, 1);
+    modeLayout->addWidget(frequencyLabel, 2, 0);
+    modeLayout->addWidget(frequencySpinBox, 2, 1);
+    modeLayout->addWidget(durationLabel, 3, 0);
+    modeLayout->addWidget(durationSpinBox, 3, 1);
+
+    auto *dashboardGroup = new QGroupBox(tr("Motor Power"), _homeTab);
+    auto *dashboardLayout = new QVBoxLayout(dashboardGroup);
+    dashboardLayout->addWidget(miniDashboard);
+    dashboardLayout->setAlignment(miniDashboard, Qt::AlignCenter);
+
+    // Thêm các thành phần vào panel trái
+    leftLayout->addWidget(dashboardGroup);
+    leftLayout->addWidget(connectionGroup);
+    leftLayout->addWidget(commandGroup);
+    leftLayout->addWidget(modeGroup);
+    leftLayout->addStretch();
+
+    // Sắp xếp layout trên cùng - THÊM STRETCH FACTORS
+    topContentLayout->addWidget(leftPanel, 1);
+    topContentLayout->addLayout(displayLayout, 3);
+
+    // UART Log Display
+    auto *logGroup = new QGroupBox(tr("Command Log"), _homeTab);
+    auto *logLayout = new QVBoxLayout(logGroup);
+    logLayout->addWidget(logTextEdit);
+
+    homeLayout->addLayout(topContentLayout, 1); // Top content chiếm hầu hết không gian
+    homeLayout->addWidget(logGroup);            // Log chiếm phần còn lại
+
+    // Kết nối signals/slots
+    connect(valueSlider, &QSlider::valueChanged, _homeTab, [miniDashboard, valueSpinBox](int value) {
+        valueSpinBox->blockSignals(true);
+        miniDashboard->setValue(value);
+        valueSpinBox->setValue(value);
+        valueSpinBox->blockSignals(false);
+    });
+
+    connect(valueSpinBox,
+            QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+            _homeTab,
+            [miniDashboard, valueSlider](double value) {
+                valueSlider->blockSignals(true);
+                miniDashboard->setValue(value);
+                valueSlider->setValue(static_cast<int>(value));
+                valueSlider->blockSignals(false);
+            });
+
+    // Kết nối valueSlider để tự động gửi UART khi giá trị thay đổi
+    connect(valueSlider, &QSlider::valueChanged, _homeTab, [this](int value) {
+        if (_serialPort && _serialPort->isOpen()) {
+            QString command = QString("s:%1\n").arg(value);
+            _serialPort->write(command.toUtf8());
+
+            QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
+            _logTextEdit->append(QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
+        }
+    });
+
+    // Kết nối valueSpinBox
+    connect(valueSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+            _homeTab, [this](double value) {
+                if (_serialPort && _serialPort->isOpen()) {
+                    QString command = QString("s:%1\n").arg(value, 0, 'f', 2);
+                    _serialPort->write(command.toUtf8());
+
+                    QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
+                    _logTextEdit->append(QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
+                }
+            });
+
+    // Kết nối các control với mini dashboard
+    connect(minValueSpinBox,
+            QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+            miniDashboard,
+            &DashBoardWidget::setMinValue);
+    connect(maxValueSpinBox,
+            QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+            miniDashboard,
+            &DashBoardWidget::setMaxValue);
+
+    // Kết nối UART
+    connect(connectButton, &QPushButton::clicked, _homeTab, [this, portComboBox]() {
+        _serialPort = new QSerialPort;
+        _serialPort->setPortName(portComboBox->currentText());
+        _serialPort->setBaudRate(QSerialPort::Baud115200);
+        _serialPort->setDataBits(QSerialPort::Data8);
+        _serialPort->setParity(QSerialPort::NoParity);
+        _serialPort->setStopBits(QSerialPort::OneStop);
+
+        if (_serialPort->open(QIODevice::ReadWrite))
+        {
+            QMessageBox::information(this, "Success", "UART Port Connected Successfully!");
+            connect(_serialPort, &QSerialPort::readyRead, this, &MainWindow::readData);
+        } else {
+            QMessageBox::critical(this, "Error", "Unable to connect to UART port");
+        }
+    });
+
+    // Kết nối gửi command UART
+    connect(sendButton, &QPushButton::clicked, _homeTab, [this, commandEdit, logTextEdit]() {
+        if (_serialPort && _serialPort->isOpen()) {
+            QString command = commandEdit->text() + "\n";
+            _serialPort->write(command.toUtf8());
+
+            QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
+            logTextEdit->append(QString("[%1] SENT: %2").arg(timestamp, command.trimmed()));
+
+            qDebug() << "Command sent:" << command;
+            commandEdit->clear();
+        } else {
+            QMessageBox::warning(this, "Warning", "UART port not connected");
+        }
+    });
+
+    connect(rampModeButton, &QPushButton::clicked, _homeTab, [this, amplitudeSpinBox, durationSpinBox]() {
+        if (_serialPort && _serialPort->isOpen()) {
+            QString command = QString("ramp:%1:%2\n")
+            .arg(amplitudeSpinBox->value(), 0, 'f', 1)
+                .arg(durationSpinBox->value(), 0, 'f', 1);
+            _serialPort->write(command.toUtf8());
+
+            QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
+            _logTextEdit->append(QString("[%1] MODE SET: %2").arg(timestamp, command.trimmed()));
+        }
+    });
+
+    connect(sineWaveButton, &QPushButton::clicked, _homeTab, [this, amplitudeSpinBox, frequencySpinBox, durationSpinBox]() {
+        if (_serialPort && _serialPort->isOpen()) {
+            QString command = QString("sine:%1:%2:%3\n")
+            .arg(amplitudeSpinBox->value(), 0, 'f', 1)
+                .arg(frequencySpinBox->value(), 0, 'f', 2)
+                .arg(durationSpinBox->value(), 0, 'f', 1);
+            _serialPort->write(command.toUtf8());
+
+            QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
+            _logTextEdit->append(QString("[%1] MODE SET: %2").arg(timestamp, command.trimmed()));
+        }
+    });
+
+    // Kết nối Enter key để gửi command
+    connect(commandEdit, &QLineEdit::returnPressed, _homeTab, [sendButton]() {
+        sendButton->click();
+    });
+
+    // Kết nối control biểu đồ
+    connect(startPlotButton, &QPushButton::clicked, _homeTab, [this]() {
+        _plotting = true;
+        _startTime = QTime::currentTime();
+        qDebug() << "Plotting started";
+    });
+
+    connect(stopPlotButton, &QPushButton::clicked, _homeTab, [this]() {
+        _plotting = false;
+        qDebug() << "Plotting stopped";
+    });
+
+    connect(clearPlotButton, &QPushButton::clicked, _homeTab, [this, pwmValueLabel, throttleValueLabel]() {
+        _throttleSeries->clear();
+        _startTime = QTime::currentTime();
+        pwmValueLabel->setText("PWM: 0");
+        throttleValueLabel->setText("Throttle: 0");
+        qDebug() << "Plot cleared";
+    });
+
+    // Kết nối save data
+    connect(saveDataButton, &QPushButton::clicked, this, &MainWindow::saveDataToCSV);
+
+    // Lưu con trỏ đến các label để cập nhật giá trị
+    _pwmLabel = pwmValueLabel;
+    _throttleLabel = throttleValueLabel;
+    _logTextEdit = logTextEdit;
+
+    miniDashboard->setValue(0);
 }
 
 MainWindow::~MainWindow()

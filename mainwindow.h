@@ -1,5 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
+#define Q_OS_LINUX
 
 #include <QMainWindow>
 #include <QSerialPort>
@@ -47,6 +48,20 @@ private:
 
     QChartView* setupMainChart();
     void updatePlot(double throttle, double pwm);
+    void updateAnalyzeCharts(double key, double throttle);
+
+    QTabWidget *_tabWidget;
+    QWidget *_homeTab;
+    QWidget *_analyzeTab;
+
+    bool _sidebarCollapsed;
+
+    QChart *_analyzeChart1, *_analyzeChart2, *_analyzeChart3;
+    QLineSeries *_series1, *_series2, *_series3;
+
+    void setupHomeTab();
+    void setupAnalyzeTab();
+    QChartView* createAnalyzeChart(const QString &title, const QString &yTitle, QLineSeries *series);
 };
 
 #endif // MAINWANT
