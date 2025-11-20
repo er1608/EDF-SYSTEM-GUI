@@ -80,64 +80,64 @@ MainWindow::MainWindow(QWidget *parent)
             border: 1px solid #00b4d8;
         }
 
-QLineEdit, QComboBox {
-    background: #2d3250;
-    color: #e2e8f0;
-    border: 1px solid #2d3250;
-    border-radius: 5px;
-    padding: 6px 8px;
-    font-size: 11px;
-    selection-background-color: #00b4d8;
-}
+        QLineEdit, QComboBox {
+            background: #2d3250;
+            color: #e2e8f0;
+            border: 1px solid #2d3250;
+            border-radius: 5px;
+            padding: 6px 8px;
+            font-size: 11px;
+            selection-background-color: #00b4d8;
+        }
 
-QSpinBox, QDoubleSpinBox {
-    background: #2d3250;
-    color: #e2e8f0;
-    border: 1px solid #2d3250;
-    border-radius: 5px;
-    padding: 6px 8px;
-    font-size: 11px;
-    selection-background-color: #00b4d8;
-}
+        QSpinBox, QDoubleSpinBox {
+            background: #2d3250;
+            color: #e2e8f0;
+            border: 1px solid #2d3250;
+            border-radius: 5px;
+            padding: 6px 8px;
+            font-size: 11px;
+            selection-background-color: #00b4d8;
+        }
 
-/* Style đơn giản cho nút - chỉ đổi màu nền */
-QSpinBox::up-button, QDoubleSpinBox::up-button {
-    background: #3a3f66;
-    border: 1px solid #2d3250;
-    border-top-right-radius: 4px;
-}
+        /* Style đơn giản cho nút - chỉ đổi màu nền */
+        QSpinBox::up-button, QDoubleSpinBox::up-button {
+            background: #3a3f66;
+            border: 1px solid #2d3250;
+            border-top-right-radius: 4px;
+        }
 
-QSpinBox::down-button, QDoubleSpinBox::down-button {
-    background: #3a3f66;
-    border: 1px solid #2d3250;
-    border-bottom-right-radius: 4px;
-}
+        QSpinBox::down-button, QDoubleSpinBox::down-button {
+            background: #3a3f66;
+            border: 1px solid #2d3250;
+            border-bottom-right-radius: 4px;
+        }
 
-QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover {
-    background: #00b4d8;
-}
+        QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover {
+            background: #00b4d8;
+        }
 
-QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover {
-    background: #00b4d8;
-}
+        QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover {
+            background: #00b4d8;
+        }
 
-QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
-    width: 0px;
-    height: 0px;
-    image: none;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-bottom: 5px solid #a6b1e1;
-}
+        QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
+            width: 0px;
+            height: 0px;
+            image: none;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 5px solid #a6b1e1;
+        }
 
-QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
-    width: 0px;
-    height: 0px;
-    image: none;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 5px solid #a6b1e1;
-}
+        QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
+            width: 0px;
+            height: 0px;
+            image: none;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid #a6b1e1;
+        }
 
         QLineEdit:focus,
         QComboBox:focus,
@@ -189,7 +189,7 @@ QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
         QTabWidget::pane {
             border: 1px solid #1b2432;
             border-radius: 8px;
-            background: #1b2432;   /* màu nền panel */
+            background: #1b2432;
             padding: 4px;
         }
 
@@ -251,7 +251,6 @@ QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
         }
     )");
 
-    // Tạo main widget với layout ngang
     auto *mainWidget = new QWidget(this);
     auto *mainLayout = new QHBoxLayout(mainWidget);
     mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -264,8 +263,8 @@ QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
     leftPanel->setStyleSheet("QWidget#leftPanel { background: #2d3250; border-right: 1px solid #2d3250; }");
 
     auto *leftPanelLayout = new QVBoxLayout(leftPanel);
-    leftPanelLayout->setContentsMargins(3,3,3,3);
-    leftPanelLayout->setSpacing(3);
+    leftPanelLayout->setContentsMargins(0,0,0,0);
+    leftPanelLayout->setSpacing(0);
 
     _tabWidget = new QTabWidget(leftPanel);
     _tabWidget->setTabPosition(QTabWidget::West); // Tab bên trái
@@ -273,8 +272,22 @@ QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
     _homeTab = new QWidget();
     _analyzeTab = new QWidget();
 
-    _tabWidget->addTab(_homeTab, "🏠");
-    _tabWidget->addTab(_analyzeTab, "📊");
+    QLabel *homeLabel = new QLabel("🏠");
+    QPixmap homePixmap("/home/letandat/Dev/EDF_UI/DashBoard/images/CTUAV.png");
+    homeLabel->setFixedSize(50, 35);
+    homeLabel->setPixmap(homePixmap.scaled(homeLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    homeLabel->setAlignment(Qt::AlignCenter);
+
+    QLabel *analyzeLabel = new QLabel("📊");
+    analyzeLabel->setAlignment(Qt::AlignCenter);
+    analyzeLabel->setFixedSize(50, 35);
+    analyzeLabel->setStyleSheet("font-size: 25px;");
+
+    _tabWidget->addTab(_homeTab, "");
+    _tabWidget->addTab(_analyzeTab, "");
+
+    _tabWidget->tabBar()->setTabButton(0, QTabBar::LeftSide, homeLabel);
+    _tabWidget->tabBar()->setTabButton(1, QTabBar::LeftSide, analyzeLabel);
 
     mainLayout->addWidget(_tabWidget, 1);
 
@@ -282,39 +295,10 @@ QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
     resize(1400, 900);
     setWindowTitle(tr("EDF SYSTEM"));
 
-    // Biến để theo dõi trạng thái sidebar
     _sidebarCollapsed = false;
 
     setupHomeTab();
     setupAnalyzeTab();
-}
-
-void MainWindow::updatePlot(double throttle, double pwm)
-{
-    // Tính thời gian từ khi bắt đầu plot
-    double key = _startTime.msecsTo(QTime::currentTime()) / 1000.0;
-
-    _throttleSeries->append(key, throttle);
-
-    if (_throttleSeries->count() > 500) {
-        _throttleSeries->remove(0);
-    }
-
-    // Cập nhật hiển thị giá trị
-    _throttleLabel->setText(QString("Throttle: %1").arg(throttle, 0, 'f', 1));
-    _pwmLabel->setText(QString("PWM: %1").arg(pwm, 0, 'f', 1));
-
-    // Lưu dữ liệu vào buffer để ghi CSV
-    _dataBuffer.append(DataPoint{key, throttle, pwm});
-
-    // Tự động scroll trục X
-    auto axes = _chart->axes();
-    if (axes.size() >= 2) {
-        auto *axisX = static_cast<QValueAxis*>(axes[0]);
-        if (key > axisX->max()) {
-            axisX->setRange(key - 60, key);
-        }
-    }
 }
 
 void MainWindow::saveDataToCSV()
@@ -348,17 +332,22 @@ void MainWindow::saveDataToCSV()
 
 void MainWindow::updateAnalyzeCharts(double key, double throttle)
 {
-    // Tạo dữ liệu giả cho demo (thay thế bằng dữ liệu thực từ UART)
-    double tempValue = throttle * 0.8 + 20 + (rand() % 10 - 5) * 0.1;  // Temperature với nhiễu
-    double voltValue = throttle * 0.24 + 12 + (rand() % 10 - 5) * 0.05; // Voltage với nhiễu
-    double currentValue = throttle * 0.1 + 2 + (rand() % 10 - 5) * 0.02; // Current với nhiễu
+    // Tạo dữ liệu giả cho demo
+    double tempValue = throttle * 0.8 + 20 + (rand() % 10 - 5) * 0.1;
+    double voltValue = throttle * 0.24 + 12 + (rand() % 10 - 5) * 0.05;
+    double currentValue = throttle * 0.1 + 2 + (rand() % 10 - 5) * 0.02;
 
-    // Thêm dữ liệu vào các series
+    _tempMin = std::min(_tempMin, tempValue);
+    _tempMax = std::max(_tempMax, tempValue);
+    _voltMin = std::min(_voltMin, voltValue);
+    _voltMax = std::max(_voltMax, voltValue);
+    _currentMin = std::min(_currentMin, currentValue);
+    _currentMax = std::max(_currentMax, currentValue);
+
     _series1->append(key, tempValue);
     _series2->append(key, voltValue);
     _series3->append(key, currentValue);
 
-    // Giới hạn số điểm hiển thị
     const int MAX_POINTS = 500;
     if (_series1->count() > MAX_POINTS) {
         _series1->remove(0);
@@ -366,23 +355,68 @@ void MainWindow::updateAnalyzeCharts(double key, double throttle)
         _series3->remove(0);
     }
 
-    // Tự động scroll cho tất cả biểu đồ trong Analyze Tab
-    auto updateChartAxis = [key](QChart* chart, double windowSize = 60.0) {
+    auto updateChartAxis = [key](QChart* chart, double minY, double maxY, int stopFlag) {
         auto axes = chart->axes();
         if (axes.size() >= 2) {
             auto *axisX = static_cast<QValueAxis*>(axes[0]);
-            double currentMax = axisX->max();
+            auto *axisY = static_cast<QValueAxis*>(axes[1]);
 
-            if (key > currentMax) {
-                axisX->setRange(key - windowSize, key);
+            if (stopFlag) axisX->setRange(-30, 0);
+
+            if (key > axisX->max()) {
+                axisX->setRange(key - 30, key);
             }
+
+            double margin = (maxY - minY) * 0.1;
+            if (margin == 0) margin = std::abs(minY) * 0.1 + 0.1;
+            axisY->setRange(minY - margin, maxY + margin);
         }
     };
 
-    // Cập nhật tất cả biểu đồ
-    if (_series1->chart()) updateChartAxis(_series1->chart());
-    if (_series2->chart()) updateChartAxis(_series2->chart());
-    if (_series3->chart()) updateChartAxis(_series3->chart());
+    if (_series1->chart()) updateChartAxis(_series1->chart(), _tempMin, _tempMax, stopFlag);
+    if (_series2->chart()) updateChartAxis(_series2->chart(), _voltMin, _voltMax, stopFlag);
+    if (_series3->chart()) updateChartAxis(_series3->chart(), _currentMin, _currentMax, stopFlag);
+}
+
+void MainWindow::updatePlot(double throttle, double pwm)
+{
+    double key = _startTime.msecsTo(QTime::currentTime()) / 1000.0;
+
+    _throttleSeries->append(key, throttle);
+
+    if (_throttleSeries->count() > 1000) {
+        _throttleSeries->remove(0);
+    }
+
+    // qDebug() << "Start Time: " << _startTime;
+    // qDebug() << "Key: " << key;
+
+    _throttleLabel->setText(QString("Throttle1:%1").arg(throttle, 0, 'f', 1));
+    _pwmLabel->setText(QString("PWM: %1").arg(pwm, 0, 'f', 1));
+
+    _dataBuffer.append(DataPoint{key, throttle, pwm});
+
+    _throttleMin = std::min(_throttleMin, throttle);
+    _throttleMax = std::max(_throttleMax, throttle);
+
+    auto axes = _chart->axes();
+    if (axes.size() >= 2) {
+        auto *axisX = static_cast<QValueAxis*>(axes[0]);
+        auto *axisY = static_cast<QValueAxis*>(axes[1]);
+
+        if (stopFlag) {
+            axisX->setRange(-30, 0);
+            stopFlag = 0;
+        }
+
+        if (key > axisX->max()) {
+            axisX->setRange(key - 30, key);
+        }
+
+        double margin = (_throttleMax - _throttleMin) * 0.1;
+        if (margin == 0) margin = std::abs(_throttleMin) * 0.1 + 0.1;
+        axisY->setRange(_throttleMin - margin, _throttleMax + margin);
+    }
 }
 
 void MainWindow::readData()
@@ -390,49 +424,41 @@ void MainWindow::readData()
     if (!_serialPort)
         return;
 
-    const QByteArray payload = _serialPort->readAll();
-    QString data = QString::fromUtf8(payload).trimmed();
+    if (_serialPort->canReadLine())
+    {
+        const QByteArray payload = _serialPort->readLine();
+        QString data = QString::fromUtf8(payload).trimmed();
 
-    QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
-    _logTextEdit->append(QString("[%1] RECV: %2").arg(timestamp, data));
+        QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
+        _logTextEdit->append(QString("[%1] RECV: %2").arg(timestamp, data));
 
-    qDebug() << "UART data:" << data;
+        qDebug() << "UART data:" << data;
 
-    // Phân tích dữ liệu UART
-    bool throttleOk = false, pwmOk = false;
-    double throttleValue = 0.0, pwmValue = 0.0;
+        // Phân tích dữ liệu UART
+        bool throttleOk = false;
+        double throttleValue = 0.0, pwmValue = 0.0;
 
-    if (data.contains("THROTTLE") && data.contains("PWM")) {
-        QStringList parts = data.split(',');
-        // SỬA: Dùng iterator
-        for (auto it = parts.begin(); it != parts.end(); ++it) {
-            const QString &part = *it;
-            if (part.contains("THROTTLE:")) {
-                QString valueStr = part.split(':')[1];
-                throttleValue = valueStr.toDouble(&throttleOk);
-            } else if (part.contains("PWM:")) {
-                QString valueStr = part.split(':')[1];
-                pwmValue = valueStr.toDouble(&pwmOk);
+        if (data.contains("Throttle")) {
+            QStringList parts = data.split(',');
+            for (auto it = parts.begin(); it != parts.end(); ++it) {
+                const QString &part = *it;
+                if (part.contains("Throttle")) {
+                    QString valueStr = part.split(':')[1];
+                    throttleValue = valueStr.toDouble(&throttleOk);
+                }
             }
+        } else {
+            throttleValue = data.toDouble(&throttleOk);
+            pwmValue = throttleValue;
         }
-    } else {
-        throttleValue = data.toDouble(&throttleOk);
-        pwmValue = throttleValue;
-        pwmOk = throttleOk;
-    }
 
-    if (throttleOk && pwmOk) {
-        qDebug() << "Parsed - Throttle:" << throttleValue << "PWM:" << pwmValue;
+        if (throttleOk) {
+            if (_plotting) {
+                double key = _startTime.msecsTo(QTime::currentTime()) / 1000.0;
 
-        // Cập nhật biểu đồ nếu đang plot
-        if (_plotting) {
-            double key = _startTime.msecsTo(QTime::currentTime()) / 1000.0;
-
-            // Cập nhật main chart
-            updatePlot(throttleValue, pwmValue);
-
-            // Cập nhật analyze charts
-            updateAnalyzeCharts(key, throttleValue);
+                updateAnalyzeCharts(key, throttleValue);
+                updatePlot(throttleValue, pwmValue);
+            }
         }
     }
 }
@@ -458,17 +484,16 @@ QChartView* MainWindow::createAnalyzeChart(const QString &title, const QString &
     chart->setTitleBrush(QBrush(QColor(226, 232, 240)));
     chart->legend()->setVisible(false);
     chart->setBackgroundBrush(QBrush(QColor(27, 36, 50)));
-    chart->setTheme(QChart::ChartThemeDark);
+    chart->setTheme(QChart::ChartThemeBlueCerulean);
 
     // Tạo axes
     auto *axisX = new QValueAxis();
     auto *axisY = new QValueAxis();
 
-    axisX->setTitleText("Time (s)");
+    axisX->setTitleText("Time(s)");
     axisY->setTitleText(yTitle);
-    axisX->setRange(0, 60);
+    axisX->setRange(-30, 0);
 
-    // Set range khác nhau cho từng biểu đồ
     if (title.contains("Temperature")) {
         axisY->setRange(0, 100);
     } else if (title.contains("Voltage")) {
@@ -503,7 +528,6 @@ QChartView* MainWindow::setupMainChart()
     _chart = new QChart();
     _throttleSeries = new QLineSeries();
 
-    // Thiết lập màu sắc cho series throttle với dark theme
     _throttleSeries->setName("Throttle");
     QPen pen(QColor(65, 90, 119), 3);
     pen.setCapStyle(Qt::RoundCap);
@@ -511,20 +535,19 @@ QChartView* MainWindow::setupMainChart()
     _throttleSeries->setPen(pen);
 
     _chart->addSeries(_throttleSeries);
-    _chart->setTitle("Throttle Real-time Monitor");
+    _chart->setTitle("Throttle Monitor");
     _chart->setTitleBrush(QBrush(QColor(226, 232, 240))); // Light text
-    _chart->legend()->setVisible(true);
-    _chart->legend()->setAlignment(Qt::AlignBottom);
+    _chart->legend()->setVisible(false);
     _chart->setBackgroundBrush(QBrush(QColor(27, 36, 50))); // Graphite blue
-    _chart->setTheme(QChart::ChartThemeDark);
+    _chart->setTheme(QChart::ChartThemeBlueCerulean);
 
     // Tạo axes
     auto *axisX = new QValueAxis();
     auto *axisY = new QValueAxis();
 
-    axisX->setTitleText("Time (s)");
-    axisY->setTitleText("Throttle Value");
-    axisX->setRange(0, 60);
+    axisX->setTitleText("Time(s)");
+    axisY->setTitleText("Throttle(%)");
+    axisX->setRange(-30, 0);
     axisY->setRange(0, 100);
 
     // Thiết lập màu cho axes
@@ -613,9 +636,8 @@ void MainWindow::setupHomeTab()
     miniDashboard->setPointerColor(QColor(255, 107, 107));
     miniDashboard->setValueColor(QColor(226, 232, 240));
     miniDashboard->setTitleColor(QColor(166, 177, 225));
-    miniDashboard->setBackgroundColor(QColor(13, 17, 23, 100));
+    // miniDashboard->setBackgroundColor(QColor(13, 17, 23, 100));
 
-    // Tạo biểu đồ chính cho throttle
     auto *mainChartView = setupMainChart();
 
     // Tạo các control widgets
@@ -702,62 +724,59 @@ void MainWindow::setupHomeTab()
     auto *portComboBox = new QComboBox(_homeTab);
     auto *connectButton = new QPushButton(tr("Connect"), _homeTab);
 
-    qDebug() << "=== SCANNING SERIAL PORTS ===";
+    // qDebug() << "=== SCANNING SERIAL PORTS ===";
 
     // Physical ports
-    qDebug() << "Physical ports from QSerialPortInfo:";
+    // qDebug() << "Physical ports from QSerialPortInfo:";
     foreach (auto &port, QSerialPortInfo::availablePorts()) {
         portComboBox->addItem(port.portName());
-        qDebug() << "  - " << port.portName();
+        // qDebug() << "  - " << port.portName();
     }
 
 // Virtual ports - SỬA FILTER
 #ifdef Q_OS_LINUX
-    qDebug() << "Scanning /dev for virtual ports...";
+    // qDebug() << "Scanning /dev for virtual ports...";
 
     QDir dir("/dev");
 
-    // SỬA: Dùng đúng filter pattern
     QStringList nameFilters;
-    nameFilters << "pts/*" << "pts[0-9]*" << "pts*"; // Thử nhiều pattern
+    nameFilters << "pts/*" << "pts[0-9]*" << "pts*";
 
     QStringList ptsPorts = dir.entryList(nameFilters, QDir::System);
-    qDebug() << "Found pts ports with filter:" << ptsPorts;
+    // qDebug() << "Found pts ports with filter:" << ptsPorts;
 
-    // THỬ CÁCH KHÁC: QDirIterator
-    qDebug() << "Trying QDirIterator...";
+    // qDebug() << "Trying QDirIterator...";
     QDirIterator it("/dev", QStringList() << "pts*", QDir::System | QDir::Files);
-    int iteratorCount = 0;
-    while (it.hasNext()) {
-        QString port = it.next();
-        qDebug() << "QDirIterator found:" << port;
-        if (portComboBox->findText(port) == -1) {
-            portComboBox->addItem(port);
-        }
-        iteratorCount++;
-    }
-    qDebug() << "QDirIterator found" << iteratorCount << "ports";
+    // int iteratorCount = 0;
+    // while (it.hasNext()) {
+    //     QString port = it.next();
+    //     // qDebug() << "QDirIterator found:" << port;
+    //     if (portComboBox->findText(port) == -1) {
+    //         portComboBox->addItem(port);
+    //     }
+    //     iteratorCount++;
+    // }
+    // qDebug() << "QDirIterator found" << iteratorCount << "ports";
 
-    // THỬ CÁCH KHÁC: System command
-    qDebug() << "Trying system command...";
+    // qDebug() << "Trying system command...";
     QProcess process;
     process.start("find", QStringList() << "/dev" << "-name" << "pts*");
     process.waitForFinished();
     QString output = process.readAllStandardOutput();
-    qDebug() << "find command output:" << output;
+    // qDebug() << "find command output:" << output;
 
     QStringList lines = output.split('\n', Qt::SkipEmptyParts);
     foreach (QString line, lines) {
         if (line.startsWith("/dev/pts")) {
             if (portComboBox->findText(line) == -1) {
                 portComboBox->addItem(line);
-                qDebug() << "Added from find:" << line;
+                // qDebug() << "Added from find:" << line;
             }
         }
     }
 #endif
 
-    qDebug() << "Final port count:" << portComboBox->count();
+    // qDebug() << "Final port count:" << portComboBox->count();
 
     portComboBox->setStyleSheet(R"(
         QComboBox {
@@ -841,14 +860,12 @@ void MainWindow::setupHomeTab()
     dashboardLayout->addWidget(miniDashboard);
     dashboardLayout->setAlignment(miniDashboard, Qt::AlignCenter);
 
-    // Thêm các thành phần vào panel trái
     leftLayout->addWidget(dashboardGroup);
     leftLayout->addWidget(connectionGroup);
     leftLayout->addWidget(commandGroup);
     leftLayout->addWidget(modeGroup);
     leftLayout->addStretch();
 
-    // Sắp xếp layout trên cùng - THÊM STRETCH FACTORS
     topContentLayout->addWidget(leftPanel, 1);
     topContentLayout->addLayout(displayLayout, 3);
 
@@ -857,8 +874,8 @@ void MainWindow::setupHomeTab()
     auto *logLayout = new QVBoxLayout(logGroup);
     logLayout->addWidget(logTextEdit);
 
-    homeLayout->addLayout(topContentLayout, 1); // Top content chiếm hầu hết không gian
-    homeLayout->addWidget(logGroup);            // Log chiếm phần còn lại
+    homeLayout->addLayout(topContentLayout, 1);
+    homeLayout->addWidget(logGroup);
 
     // Kết nối signals/slots
     connect(valueSlider, &QSlider::valueChanged, _homeTab, [miniDashboard, valueSpinBox](int value) {
@@ -878,10 +895,10 @@ void MainWindow::setupHomeTab()
                 valueSlider->blockSignals(false);
             });
 
-    // Kết nối valueSlider để tự động gửi UART khi giá trị thay đổi
+    // valueSlider UART
     connect(valueSlider, &QSlider::valueChanged, _homeTab, [this](int value) {
         if (_serialPort && _serialPort->isOpen()) {
-            QString command = QString("s:%1\n").arg(value);
+            QString command = QString("Power:%1\n").arg(value);
             _serialPort->write(command.toUtf8());
 
             QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
@@ -889,11 +906,11 @@ void MainWindow::setupHomeTab()
         }
     });
 
-    // Kết nối valueSpinBox
+    // valueSpinBox UART
     connect(valueSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
             _homeTab, [this](double value) {
                 if (_serialPort && _serialPort->isOpen()) {
-                    QString command = QString("s:%1\n").arg(value, 0, 'f', 2);
+                    QString command = QString("Power:%1\n").arg(value, 0, 'f', 2);
                     _serialPort->write(command.toUtf8());
 
                     QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
@@ -976,14 +993,18 @@ void MainWindow::setupHomeTab()
     });
 
     // Kết nối control biểu đồ
-    connect(startPlotButton, &QPushButton::clicked, _homeTab, [this]() {
+    connect(startPlotButton, &QPushButton::clicked, _homeTab, [this, pwmValueLabel, throttleValueLabel]() {
         _plotting = true;
+        _throttleSeries->clear();
         _startTime = QTime::currentTime();
+        pwmValueLabel->setText("PWM: 0");
+        throttleValueLabel->setText("Throttle: 0");
         qDebug() << "Plotting started";
     });
 
     connect(stopPlotButton, &QPushButton::clicked, _homeTab, [this]() {
         _plotting = false;
+        stopFlag = 1;
         qDebug() << "Plotting stopped";
     });
 
@@ -998,7 +1019,6 @@ void MainWindow::setupHomeTab()
     // Kết nối save data
     connect(saveDataButton, &QPushButton::clicked, this, &MainWindow::saveDataToCSV);
 
-    // Lưu con trỏ đến các label để cập nhật giá trị
     _pwmLabel = pwmValueLabel;
     _throttleLabel = throttleValueLabel;
     _logTextEdit = logTextEdit;

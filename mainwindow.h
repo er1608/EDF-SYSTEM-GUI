@@ -36,6 +36,16 @@ private slots:
     void saveDataToCSV();
 
 private:
+    double _tempMin = std::numeric_limits<double>::max();
+    double _tempMax = std::numeric_limits<double>::lowest();
+    double _voltMin = std::numeric_limits<double>::max();
+    double _voltMax = std::numeric_limits<double>::lowest();
+    double _currentMin = std::numeric_limits<double>::max();
+    double _currentMax = std::numeric_limits<double>::lowest();
+    double _throttleMin = std::numeric_limits<double>::max();
+    double _throttleMax = std::numeric_limits<double>::lowest();
+    int stopFlag = 0;
+
     QSerialPort *_serialPort;
     bool _plotting;
     QChart *_chart;
