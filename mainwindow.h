@@ -44,7 +44,11 @@ private:
     double _currentMax = std::numeric_limits<double>::lowest();
     double _throttleMin = std::numeric_limits<double>::max();
     double _throttleMax = std::numeric_limits<double>::lowest();
+    double _RPMMin = std::numeric_limits<double>::max();
+    double _RPMMax = std::numeric_limits<double>::lowest();
     int stopFlag = 0;
+    double throttleValue = 0.0, pwmValue = 0.0;
+    double currentValue = 0.0, voltageValue = 0.0, temperatureValue = 0.0, RPMValue = 0.0;
 
     QSerialPort *_serialPort;
     bool _plotting;
@@ -58,7 +62,7 @@ private:
 
     QChartView* setupMainChart();
     void updatePlot(double throttle, double pwm);
-    void updateAnalyzeCharts(double key, double throttle);
+    void updateAnalyzeCharts(double temp, double current, double voltage, double RPM);
 
     QTabWidget *_tabWidget;
     QWidget *_homeTab;
@@ -67,7 +71,7 @@ private:
     bool _sidebarCollapsed;
 
     QChart *_analyzeChart1, *_analyzeChart2, *_analyzeChart3;
-    QLineSeries *_series1, *_series2, *_series3;
+    QLineSeries *_series1, *_series2, *_series3, *_series4;
 
     void setupHomeTab();
     void setupAnalyzeTab();

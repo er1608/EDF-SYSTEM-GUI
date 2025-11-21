@@ -13,7 +13,6 @@ public:
 
     DashBoardWidget *q_ptr;
 
-    // 可配置属性
     double maxValue = 100.0;
     double minValue = 0.0;
     double startAngle = -50.0;
@@ -24,7 +23,6 @@ public:
     QString unit = "unit";
     QString title = "test";
 
-    // 颜色配置
     QColor arcColor = QColor(56, 61, 74);
     QColor scaleColor = QColor(4, 168, 173);
     QColor pointerColor = QColor(4, 181, 200);
@@ -33,14 +31,11 @@ public:
     QColor valueColor = QColor(144, 133, 116);
     QColor titleColor = QColor(144, 133, 116);
 
-    // 动画配置
     int animationDuration = 500;
 
-    // 动画
     QPropertyAnimation *animation = nullptr;
     double targetValue = 0.0;
 
-    // 常量定义
     static constexpr double ARC_WIDTH_RATIO = 1.0 / 15.0;
     static constexpr double POINTER_WIDTH_RATIO = 1.0 / 60.0;
     static constexpr double POINTER_LENGTH_RATIO = 1.0 / 3.0;
@@ -74,7 +69,6 @@ auto DashBoardWidget::minimumSizeHint() const -> QSize
     return {100, 100};
 }
 
-// Value
 auto DashBoardWidget::value() const -> double
 {
     return d_ptr->value;
@@ -114,7 +108,6 @@ void DashBoardWidget::setValueAnimated(double value)
     startAnimation(value);
 }
 
-// Min value
 void DashBoardWidget::setMinValue(double min)
 {
     if (qFuzzyCompare(d_ptr->minValue, min))
@@ -132,7 +125,6 @@ auto DashBoardWidget::minValue() const -> double
     return d_ptr->minValue;
 }
 
-// Max value
 void DashBoardWidget::setMaxValue(double max)
 {
     if (qFuzzyCompare(d_ptr->maxValue, max))
@@ -150,7 +142,6 @@ auto DashBoardWidget::maxValue() const -> double
     return d_ptr->maxValue;
 }
 
-// Start angle
 void DashBoardWidget::setStartAngle(double startAngle)
 {
     if (qFuzzyCompare(d_ptr->startAngle, startAngle))
@@ -165,7 +156,6 @@ auto DashBoardWidget::startAngle() const -> double
     return d_ptr->startAngle;
 }
 
-// End angle
 void DashBoardWidget::setEndAngle(double endAngle)
 {
     if (qFuzzyCompare(d_ptr->endAngle, endAngle))
@@ -180,7 +170,6 @@ auto DashBoardWidget::endAngle() const -> double
     return d_ptr->endAngle;
 }
 
-// Scale major
 void DashBoardWidget::setScaleMajor(int scale)
 {
     if (scale <= 0 || d_ptr->scaleMajor == scale)
@@ -195,7 +184,6 @@ auto DashBoardWidget::scaleMajor() const -> int
     return d_ptr->scaleMajor;
 }
 
-// Scale minor
 void DashBoardWidget::setScaleMinor(int scale)
 {
     if (scale <= 0 || d_ptr->scaleMinor == scale)
@@ -210,7 +198,6 @@ auto DashBoardWidget::scaleMinor() const -> int
     return d_ptr->scaleMinor;
 }
 
-// Unit
 void DashBoardWidget::setUnit(const QString &unit)
 {
     if (d_ptr->unit == unit)
@@ -225,7 +212,6 @@ auto DashBoardWidget::unit() const -> QString
     return d_ptr->unit;
 }
 
-// Title
 void DashBoardWidget::setTitle(const QString &title)
 {
     if (d_ptr->title == title)
@@ -240,7 +226,6 @@ auto DashBoardWidget::title() const -> QString
     return d_ptr->title;
 }
 
-// Arc color
 void DashBoardWidget::setArcColor(const QColor &color)
 {
     if (d_ptr->arcColor == color)
@@ -255,7 +240,6 @@ auto DashBoardWidget::arcColor() const -> QColor
     return d_ptr->arcColor;
 }
 
-// Scale color
 void DashBoardWidget::setScaleColor(const QColor &color)
 {
     if (d_ptr->scaleColor == color)
@@ -270,7 +254,6 @@ auto DashBoardWidget::scaleColor() const -> QColor
     return d_ptr->scaleColor;
 }
 
-// Pointer color
 void DashBoardWidget::setPointerColor(const QColor &color)
 {
     if (d_ptr->pointerColor == color)
@@ -285,7 +268,6 @@ auto DashBoardWidget::pointerColor() const -> QColor
     return d_ptr->pointerColor;
 }
 
-// Text color
 void DashBoardWidget::setTextColor(const QColor &color)
 {
     if (d_ptr->textColor == color)
@@ -300,7 +282,6 @@ auto DashBoardWidget::textColor() const -> QColor
     return d_ptr->textColor;
 }
 
-// Background color
 void DashBoardWidget::setBackgroundColor(const QColor &color)
 {
     if (d_ptr->backgroundColor == color)
@@ -315,7 +296,6 @@ auto DashBoardWidget::backgroundColor() const -> QColor
     return d_ptr->backgroundColor;
 }
 
-// Value color
 void DashBoardWidget::setValueColor(const QColor &color)
 {
     if (d_ptr->valueColor == color)
@@ -330,7 +310,6 @@ auto DashBoardWidget::valueColor() const -> QColor
     return d_ptr->valueColor;
 }
 
-// Title color
 void DashBoardWidget::setTitleColor(const QColor &color)
 {
     if (d_ptr->titleColor == color)
@@ -345,7 +324,6 @@ auto DashBoardWidget::titleColor() const -> QColor
     return d_ptr->titleColor;
 }
 
-// Animation duration
 void DashBoardWidget::setAnimationDuration(int duration)
 {
     if (duration < 0 || d_ptr->animationDuration == duration)
@@ -360,13 +338,11 @@ auto DashBoardWidget::animationDuration() const -> int
     return d_ptr->animationDuration;
 }
 
-// Animation state
 bool DashBoardWidget::isAnimating() const
 {
     return d_ptr->animation && d_ptr->animation->state() == QPropertyAnimation::Running;
 }
 
-// Public slots implementation
 void DashBoardWidget::increaseValue(double increment)
 {
     if (increment <= 0.0)
@@ -425,7 +401,6 @@ void DashBoardWidget::paintEvent(QPaintEvent *event)
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
 
-    // VẼ VIỀN - THÊM ĐOẠN NÀY
     if (m_borderWidth > 0) {
         QPen borderPen(m_borderColor, m_borderWidth);
         painter.setPen(borderPen);

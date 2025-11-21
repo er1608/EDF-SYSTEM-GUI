@@ -273,7 +273,7 @@ MainWindow::MainWindow(QWidget *parent)
     _analyzeTab = new QWidget();
 
     QLabel *homeLabel = new QLabel("🏠");
-    QPixmap homePixmap("/home/letandat/Dev/EDF_UI/DashBoard/images/CTUAV.png");
+    QPixmap homePixmap(":/images/CTUAV.png");
     homeLabel->setFixedSize(50, 35);
     homeLabel->setPixmap(homePixmap.scaled(homeLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
     homeLabel->setAlignment(Qt::AlignCenter);
@@ -330,29 +330,34 @@ void MainWindow::saveDataToCSV()
     }
 }
 
-void MainWindow::updateAnalyzeCharts(double key, double throttle)
+void MainWindow::updateAnalyzeCharts(double temp, double current, double voltage, double RPM)
 {
-    // Tạo dữ liệu giả cho demo
-    double tempValue = throttle * 0.8 + 20 + (rand() % 10 - 5) * 0.1;
-    double voltValue = throttle * 0.24 + 12 + (rand() % 10 - 5) * 0.05;
-    double currentValue = throttle * 0.1 + 2 + (rand() % 10 - 5) * 0.02;
+    // double tempValue = throttle * 0.8 + 20 + (rand() % 10 - 5) * 0.1;
+    // double voltValue = throttle * 0.24 + 12 + (rand() % 10 - 5) * 0.05;
+    // double currentValue = throttle * 0.1 + 2 + (rand() % 10 - 5) * 0.02;
 
-    _tempMin = std::min(_tempMin, tempValue);
-    _tempMax = std::max(_tempMax, tempValue);
-    _voltMin = std::min(_voltMin, voltValue);
-    _voltMax = std::max(_voltMax, voltValue);
-    _currentMin = std::min(_currentMin, currentValue);
-    _currentMax = std::max(_currentMax, currentValue);
+    double key = _startTime.msecsTo(QTime::currentTime()) / 1000.0;
 
-    _series1->append(key, tempValue);
-    _series2->append(key, voltValue);
-    _series3->append(key, currentValue);
+    _tempMin = std::min(_tempMin, temp);
+    _tempMax = std::max(_tempMax, temp);
+    _voltMin = std::min(_voltMin, voltage);
+    _voltMax = std::max(_voltMax, voltage);
+    _currentMin = std::min(_currentMin, current);
+    _currentMax = std::max(_currentMax, current);
+    _RPMMin = std::min(_RPMMin, RPM);
+    _RPMMax = std::max(_RPMMax, RPM);
 
-    const int MAX_POINTS = 500;
+    _series1->append(key, temp);
+    _series2->append(key, voltage);
+    _series3->append(key, current);
+    _series4->append(key, RPM);
+
+    const int MAX_POINTS = 1000;
     if (_series1->count() > MAX_POINTS) {
         _series1->remove(0);
         _series2->remove(0);
         _series3->remove(0);
+        _series4->remove(0);
     }
 
     auto updateChartAxis = [key](QChart* chart, double minY, double maxY, int stopFlag) {
@@ -376,6 +381,7 @@ void MainWindow::updateAnalyzeCharts(double key, double throttle)
     if (_series1->chart()) updateChartAxis(_series1->chart(), _tempMin, _tempMax, stopFlag);
     if (_series2->chart()) updateChartAxis(_series2->chart(), _voltMin, _voltMax, stopFlag);
     if (_series3->chart()) updateChartAxis(_series3->chart(), _currentMin, _currentMax, stopFlag);
+    if (_series4->chart()) updateChartAxis(_series4->chart(), _RPMMin, _RPMMax, stopFlag);
 }
 
 void MainWindow::updatePlot(double throttle, double pwm)
@@ -384,14 +390,14 @@ void MainWindow::updatePlot(double throttle, double pwm)
 
     _throttleSeries->append(key, throttle);
 
-    if (_throttleSeries->count() > 1000) {
+    if (_throttleSeries->count() > 1200) {
         _throttleSeries->remove(0);
     }
 
     // qDebug() << "Start Time: " << _startTime;
     // qDebug() << "Key: " << key;
 
-    _throttleLabel->setText(QString("Throttle1:%1").arg(throttle, 0, 'f', 1));
+    _throttleLabel->setText(QString("Throttle: %1").arg(throttle, 0, 'f', 1));
     _pwmLabel->setText(QString("PWM: %1").arg(pwm, 0, 'f', 1));
 
     _dataBuffer.append(DataPoint{key, throttle, pwm});
@@ -405,12 +411,12 @@ void MainWindow::updatePlot(double throttle, double pwm)
         auto *axisY = static_cast<QValueAxis*>(axes[1]);
 
         if (stopFlag) {
-            axisX->setRange(-30, 0);
+            axisX->setRange(-10, 0);
             stopFlag = 0;
         }
 
         if (key > axisX->max()) {
-            axisX->setRange(key - 30, key);
+            axisX->setRange(key - 10, key);
         }
 
         double margin = (_throttleMax - _throttleMin) * 0.1;
@@ -432,33 +438,45 @@ void MainWindow::readData()
         QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
         _logTextEdit->append(QString("[%1] RECV: %2").arg(timestamp, data));
 
-        qDebug() << "UART data:" << data;
+        // qDebug() << "UART data:" << data;
 
-        // Phân tích dữ liệu UART
-        bool throttleOk = false;
-        double throttleValue = 0.0, pwmValue = 0.0;
+        bool throttleOk = false, pwmOk = false, currentOk = false, voltageOk = false, temperatureOk = false, RPMOk = false;
 
-        if (data.contains("Throttle")) {
-            QStringList parts = data.split(',');
-            for (auto it = parts.begin(); it != parts.end(); ++it) {
-                const QString &part = *it;
-                if (part.contains("Throttle")) {
-                    QString valueStr = part.split(':')[1];
-                    throttleValue = valueStr.toDouble(&throttleOk);
-                }
+        QStringList parts = data.split(',');
+
+        for (const QString &part : std::as_const(parts)) {
+            QString trimmedPart = part.trimmed();
+
+            if (trimmedPart.startsWith("Temp:")) {
+                QString valueStr = trimmedPart.split(':')[1].trimmed();
+                temperatureValue = valueStr.toDouble(&temperatureOk);
             }
-        } else {
-            throttleValue = data.toDouble(&throttleOk);
-            pwmValue = throttleValue;
+            else if (trimmedPart.startsWith("Voltage:")) {
+                QString valueStr = trimmedPart.split(':')[1].trimmed();
+                voltageValue = valueStr.toDouble(&voltageOk);
+            }
+            else if (trimmedPart.startsWith("Current:")) {
+                QString valueStr = trimmedPart.split(':')[1].trimmed();
+                currentValue = valueStr.toDouble(&currentOk);
+            }
+            else if (trimmedPart.startsWith("RPM:")) {
+                QString valueStr = trimmedPart.split(':')[1].trimmed();
+                RPMValue = valueStr.toDouble(&RPMOk);
+            }
+            else if (trimmedPart.startsWith("Throttle:")) {
+                QString valueStr = trimmedPart.split(':')[1].trimmed();
+                throttleValue = valueStr.toDouble(&throttleOk);
+            }
+            else if (trimmedPart.startsWith("PWM:")) {
+                QString valueStr = trimmedPart.split(':')[1].trimmed();
+                pwmValue = valueStr.toDouble(&pwmOk);
+            }
         }
 
-        if (throttleOk) {
-            if (_plotting) {
-                double key = _startTime.msecsTo(QTime::currentTime()) / 1000.0;
+        if (_plotting && (temperatureOk || voltageOk || currentOk || RPMOk || throttleOk || pwmOk)) {
+            updateAnalyzeCharts(temperatureValue, currentValue, voltageValue, RPMValue);
+            updatePlot(throttleValue, pwmValue);
 
-                updateAnalyzeCharts(key, throttleValue);
-                updatePlot(throttleValue, pwmValue);
-            }
         }
     }
 }
@@ -469,12 +487,15 @@ QChartView* MainWindow::createAnalyzeChart(const QString &title, const QString &
 
     QPen pen;
     if (title.contains("Temperature")) {
-        pen = QPen(QColor(255, 107, 107), 2); // Red for temperature
+        pen = QPen(QColor(255, 107, 107), 2);
     } else if (title.contains("Voltage")) {
-        pen = QPen(QColor(102, 204, 255), 2); // Blue for voltage
+        pen = QPen(QColor(102, 204, 255), 2);
+    } else if (title.contains("Current")){
+        pen = QPen(QColor(102, 255, 102), 2);
     } else {
-        pen = QPen(QColor(102, 255, 102), 2); // Green for current
+        pen = QPen(QColor(102, 255, 102), 2);
     }
+
     pen.setCapStyle(Qt::RoundCap);
     pen.setJoinStyle(Qt::RoundJoin);
     series->setPen(pen);
@@ -581,17 +602,20 @@ void MainWindow::setupAnalyzeTab()
     _series1 = new QLineSeries();
     _series2 = new QLineSeries();
     _series3 = new QLineSeries();
+    _series4 = new QLineSeries();
 
     // Tạo các biểu đồ
     auto *tempChart = createAnalyzeChart("Temperature", "°C", _series1);
     auto *voltChart = createAnalyzeChart("Voltage", "V", _series2);
     auto *currentChart = createAnalyzeChart("Current", "A", _series3);
+    auto *RPMChart = createAnalyzeChart("RPM", "R/M", _series4);
 
     // Tạo layout lưới cho 3 biểu đồ
     auto *chartsLayout = new QGridLayout();
     chartsLayout->addWidget(tempChart, 0, 0);
     chartsLayout->addWidget(voltChart, 0, 1);
-    chartsLayout->addWidget(currentChart, 1, 0, 1, 2);
+    chartsLayout->addWidget(currentChart, 1, 0);
+    chartsLayout->addWidget(RPMChart, 1, 1);
 
     // Control panel cho analyze tab
     auto *controlGroup = new QGroupBox("Analyze Controls", _analyzeTab);
@@ -612,6 +636,7 @@ void MainWindow::setupAnalyzeTab()
         _series1->clear();
         _series2->clear();
         _series3->clear();
+        _series4->clear();
         _logTextEdit->append("[ANALYZE] Charts cleared");
     });
 
@@ -719,7 +744,7 @@ void MainWindow::setupHomeTab()
     displayLayout->addLayout(bottomControlsLayout);
 
     // UART Connection
-    auto *connectionGroup = new QGroupBox(tr("UART Connection"), _homeTab);
+    auto *connectionGroup = new QGroupBox(tr("Connection"), _homeTab);
     auto *connectionLayout = new QGridLayout(connectionGroup);
     auto *portComboBox = new QComboBox(_homeTab);
     auto *connectButton = new QPushButton(tr("Connect"), _homeTab);
@@ -733,7 +758,6 @@ void MainWindow::setupHomeTab()
         // qDebug() << "  - " << port.portName();
     }
 
-// Virtual ports - SỬA FILTER
 #ifdef Q_OS_LINUX
     // qDebug() << "Scanning /dev for virtual ports...";
 
@@ -811,7 +835,7 @@ void MainWindow::setupHomeTab()
     connectionLayout->addWidget(connectButton, 0, 2);
 
     // UART Command Sending
-    auto *commandGroup = new QGroupBox(tr("UART Command"), _homeTab);
+    auto *commandGroup = new QGroupBox(tr("Command"), _homeTab);
     auto *commandLayout = new QGridLayout(commandGroup);
     auto *commandEdit = new QLineEdit(_homeTab);
     auto *sendButton = new QPushButton(tr("Send Command"), _homeTab);
@@ -877,7 +901,28 @@ void MainWindow::setupHomeTab()
     homeLayout->addLayout(topContentLayout, 1);
     homeLayout->addWidget(logGroup);
 
-    // Kết nối signals/slots
+    qApp->setStyleSheet(
+        "QToolTip {"
+        "   background-color: #1a202c;"
+        "   color: #e2e8f0;"
+        "   border: 1px solid #4a5568;"
+        "   border-radius: 6px;"
+        "   padding: 12px;"
+        "   font-family: 'Segoe UI', system-ui;"
+        "   font-size: 13px;"
+        "   opacity: 230;"
+        "}"
+    );
+
+    sendButton->setToolTip(
+        "Send Commnad to device\n"
+        "Available commands:\n"
+        "   # s or start - Start Motor\n"
+        "   # t or stop - Stop Motor\n"
+        "   # u or up - Increase Motor Power\n"
+        "   # d or down - Decrease Motor Power"
+    );
+
     connect(valueSlider, &QSlider::valueChanged, _homeTab, [miniDashboard, valueSpinBox](int value) {
         valueSpinBox->blockSignals(true);
         miniDashboard->setValue(value);
@@ -946,7 +991,6 @@ void MainWindow::setupHomeTab()
         }
     });
 
-    // Kết nối gửi command UART
     connect(sendButton, &QPushButton::clicked, _homeTab, [this, commandEdit, logTextEdit]() {
         if (_serialPort && _serialPort->isOpen()) {
             QString command = commandEdit->text() + "\n";

@@ -13,3 +13,8 @@ SOURCES += \
 HEADERS += \
     mainwindow.h \
     dashboardwidget.h
+
+RESOURCE += resources.qrc
+
+RESOURCES += \
+    resources.qrc
