@@ -27,9 +27,13 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+signals:
+    void resized();
+
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void resizeEvent(QResizeEvent* event) override;
 
 private slots:
     void readData();
@@ -59,6 +63,7 @@ private:
     QLabel *_throttleLabel;
     QTextEdit *_logTextEdit;
     QVector<DataPoint> _dataBuffer;
+    bool _isDarkMode;
 
     QChartView* setupMainChart();
     void updatePlot(double throttle, double pwm);
@@ -76,6 +81,11 @@ private:
     void setupHomeTab();
     void setupAnalyzeTab();
     QChartView* createAnalyzeChart(const QString &title, const QString &yTitle, QLineSeries *series);
+
+    void addThemeToggleButton();
+    void toggleTheme();
+    void applyDarkTheme();
+    void applyLightTheme();
 };
 
 #endif // MAINWANT

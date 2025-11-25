@@ -20,8 +20,8 @@ public:
     double value = minValue;
     int scaleMajor = 10;
     int scaleMinor = 5;
-    QString unit = "unit";
-    QString title = "test";
+    QString unit = "%";
+    QString title = "Power";
 
     QColor arcColor = QColor(56, 61, 74);
     QColor scaleColor = QColor(4, 168, 173);
