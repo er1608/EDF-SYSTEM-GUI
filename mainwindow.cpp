@@ -619,17 +619,17 @@ void MainWindow::applyLightTheme()
         QChartView {
             background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ffffff, stop:1 #f0f4ff);
             border: 1px solid #d1d9ff;
-            border-radius: 12px;
-            padding: 8px;
+            border-radius: 10px;
+            padding: 6px;
         }
 
         QGroupBox {
             background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ffffff, stop:1 #f8f9ff);
             color: #2d3748;
             border: 1px solid #e2e8ff;
-            border-radius: 12px;
+            border-radius: 10px;
             margin-top: 1.4ex;
-            padding-top: 16px;
+            padding-top: 14px;
             font-size: 12px;
             font-weight: 500;
         }
@@ -637,14 +637,14 @@ void MainWindow::applyLightTheme()
         QGroupBox::title {
             subcontrol-origin: margin;
             subcontrol-position: top center;
-            padding: 8px 20px;
+            padding: 6px 18px;
             background: qlineargradient(
                 x1:0, y1:0, x2:1, y2:0,
                 stop:0 #65BADB,
                 stop:1 #057A9E
             );
             color: #ffffff;
-            border-radius: 8px;
+            border-radius: 6px;
             font-weight: 600;
             border: 1px solid #c7d2fe;
             font-size: 11px;
@@ -658,8 +658,8 @@ void MainWindow::applyLightTheme()
             );
             color: #ffffff;
             border: 1px solid #65BADB;
-            padding: 10px 18px;
-            border-radius: 8px;
+            padding: 8px 16px;
+            border-radius: 6px;
             font-weight: 600;
             font-size: 11px;
         }
@@ -687,8 +687,8 @@ void MainWindow::applyLightTheme()
             background: #ffffff;
             color: #374151;
             border: 1px solid #d1d5ff;
-            border-radius: 6px;
-            padding: 8px 12px;
+            border-radius: 5px;
+            padding: 6px 8px;
             font-size: 11px;
             selection-background-color: #c7d2fe;
         }
@@ -697,8 +697,8 @@ void MainWindow::applyLightTheme()
             background: #ffffff;
             color: #374151;
             border: 1px solid #d1d5ff;
-            border-radius: 6px;
-            padding: 8px 12px;
+            border-radius: 5px;
+            padding: 6px 8px;
             font-size: 11px;
             selection-background-color: #c7d2fe;
         }
@@ -758,7 +758,7 @@ void MainWindow::applyLightTheme()
         QSlider::handle:horizontal {
             background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #65BADB, stop:1 #6366f1);
             border: 1px solid #057A9E;
-            width: 18px;
+            width: 16px;
             margin: -3px 0;
             border-radius: 9px;
         }
@@ -773,7 +773,7 @@ void MainWindow::applyLightTheme()
             background: #ffffff;
             color: #374151;
             border: 1px solid #d1d5ff;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 11px;
             font-family: "Consolas", "Roboto Mono", monospace;
             padding: 8px;
@@ -782,7 +782,7 @@ void MainWindow::applyLightTheme()
         QTabWidget::pane {
             border-radius: 8px;
             background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #f8f9ff, stop:1 #e8ebff);
-            padding: 6px;
+            padding: 4px;
         }
 
         QTabWidget::tab-bar {
@@ -797,7 +797,7 @@ void MainWindow::applyLightTheme()
             background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #f1f5ff, stop:1 #e8ebff);
             color: #6b7280;
             padding: 2px 14px;
-            margin: 4px 2px;
+            margin: 4px 1px;
 
             border-radius: 6px;
             font-weight: 600;
@@ -821,8 +821,8 @@ void MainWindow::applyLightTheme()
             background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #65BADB, stop:1 #8b5cf6);
             color: #ffffff;
             border: 1px solid #8b5cf6;
-            padding: 10px;
-            border-radius: 6px;
+            padding: 8px;
+            border-radius: 4px;
             font-weight: bold;
         }
 
@@ -923,7 +923,7 @@ void MainWindow::saveDataToCSV()
         QTextStream stream(&file);
 
         // Write header
-        stream << "Timestamp,Throttle,PWM\n";
+        stream << "Timestamp,Thrust,PWM\n";
 
         // Write data
         for (auto it = _dataBuffer.begin(); it != _dataBuffer.end(); ++it) {
@@ -936,10 +936,28 @@ void MainWindow::saveDataToCSV()
         // Thêm vào log
         QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
         _logTextEdit->append(QString("[%1] DATA SAVED: %2 (%3 records)").arg(timestamp, fileName, QString::number(_dataBuffer.size())));
+        saveLogToCSV(QString("[%1] DATA SAVED: %2 (%3 records)").arg(timestamp, fileName, QString::number(_dataBuffer.size())));
 
         QMessageBox::information(this, "Success", QString("Data saved to %1\n%2 records written").arg(fileName, QString::number(_dataBuffer.size())));
     } else {
         QMessageBox::critical(this, "Error", "Could not save data to file");
+    }
+}
+
+void MainWindow::saveLogToCSV(const QString& message)
+{
+    QString fileName = QDateTime::currentDateTime().toString("'command_log_'yyyy-MM-dd'.csv'");
+    QFile   file(fileName);
+
+    if (file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
+        QTextStream stream(&file);
+        QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
+
+        if (file.pos() == 0) stream << "Timestamp,Message\n";
+
+        stream << timestamp << "," << "\"" << message << "\"" << "\n";
+
+        file.close();
     }
 }
 
@@ -1010,7 +1028,7 @@ void MainWindow::updatePlot(double throttle, double pwm)
     // qDebug() << "Start Time: " << _startTime;
     // qDebug() << "Key: " << key;
 
-    _throttleLabel->setText(QString("Throttle: %1").arg(throttle, 0, 'f', 1));
+    _throttleLabel->setText(QString("Thrust: %1").arg(throttle, 0, 'f', 1));
     _pwmLabel->setText(QString("PWM: %1").arg(pwm, 0, 'f', 1));
 
     _dataBuffer.append(DataPoint{key, throttle, pwm});
@@ -1049,7 +1067,7 @@ void MainWindow::readData()
         QString data = QString::fromUtf8(payload).trimmed();
 
         QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
-        _logTextEdit->append(QString("[%1] RECV: %2").arg(timestamp, data));
+        // _logTextEdit->append(QString("[%1] RECV: %2").arg(timestamp, data));
 
         // qDebug() << "UART data:" << data;
 
@@ -1078,13 +1096,15 @@ void MainWindow::readData()
             }
             else if (trimmedPart.startsWith("Throttle:")) {
                 QString valueStr = trimmedPart.split(':')[1].trimmed();
-                throttleValue = valueStr.toDouble(&throttleOk);
+                throttleValue = (valueStr.toDouble(&throttleOk)) * 5 / 100;
             }
             else if (trimmedPart.startsWith("PWM:")) {
                 QString valueStr = trimmedPart.split(':')[1].trimmed();
                 pwmValue = valueStr.toDouble(&pwmOk);
             }
         }
+
+        // qDebug() << "UART data:" << throttleValue;
 
         if (_plotting && (temperatureOk || voltageOk || currentOk || RPMOk || throttleOk || pwmOk)) {
             updateAnalyzeCharts(temperatureValue, currentValue, voltageValue, RPMValue);
@@ -1162,14 +1182,14 @@ QChartView* MainWindow::setupMainChart()
     _chart = new QChart();
     _throttleSeries = new QLineSeries();
 
-    _throttleSeries->setName("Throttle");
+    _throttleSeries->setName("Thrust");
     QPen pen(QColor(65, 90, 119), 3);
     pen.setCapStyle(Qt::RoundCap);
     pen.setJoinStyle(Qt::RoundJoin);
     _throttleSeries->setPen(pen);
 
     _chart->addSeries(_throttleSeries);
-    _chart->setTitle("Throttle");
+    _chart->setTitle("Thrust");
     _chart->setTitleBrush(QBrush(QColor(226, 232, 240))); // Light text
     _chart->legend()->setVisible(false);
     _chart->setBackgroundBrush(QBrush(QColor(27, 36, 50))); // Graphite blue
@@ -1180,7 +1200,7 @@ QChartView* MainWindow::setupMainChart()
     auto *axisY = new QValueAxis();
 
     axisX->setTitleText("Time(s)");
-    axisY->setTitleText("%");
+    axisY->setTitleText("Newton");
     axisX->setRange(-30, 0);
     axisY->setRange(0, 100);
 
@@ -1251,6 +1271,7 @@ void MainWindow::setupAnalyzeTab()
         _series3->clear();
         _series4->clear();
         _logTextEdit->append("[ANALYZE] Charts cleared");
+        saveLogToCSV("[ANALYZE] Charts cleared");
     });
 
     connect(exportDataBtn, &QPushButton::clicked, this, &MainWindow::saveDataToCSV);
@@ -1306,7 +1327,7 @@ void MainWindow::setupHomeTab()
     auto *saveDataButton = new QPushButton(tr("Save Data to CSV"), _homeTab);
 
     auto *pwmValueLabel = new QLabel(tr("PWM: 0"), _homeTab);
-    auto *throttleValueLabel = new QLabel(tr("Throttle: 0"), _homeTab);
+    auto *throttleValueLabel = new QLabel(tr("Thrust: 0"), _homeTab);
     pwmValueLabel->setStyleSheet("font-weight: bold; color: #5E9C43; font-size: 13px; padding: 6px; border-radius: 4px;");
     throttleValueLabel->setStyleSheet("font-weight: bold; color: #ff6666; font-size: 13px; padding: 6px; border-radius: 4px;");
 
@@ -1417,7 +1438,7 @@ void MainWindow::setupHomeTab()
 
     portComboBox->setStyleSheet(R"(
         QComboBox {
-            background: ##0C2A97 !important;
+            background: #0C2A97 !important;
             color: #ffffff !important;
             border: 1px solid #2d3250 !important;
             padding: 5px;
@@ -1437,7 +1458,7 @@ void MainWindow::setupHomeTab()
         }
         QComboBox QAbstractItemView {
             background: #121722;
-            color: #ffffff;
+            color: #000000;
             border: 1px solid #2d3250;
             selection-background-color: #2d3250;
         }
@@ -1453,10 +1474,19 @@ void MainWindow::setupHomeTab()
     auto *commandEdit = new QLineEdit(_homeTab);
     auto *sendButton = new QPushButton(tr("Send Command"), _homeTab);
 
+    auto *startButton = new QPushButton(tr("Start"), _homeTab);
+    auto *stopButton = new QPushButton(tr("Stop"), _homeTab);
+    startButton->setObjectName("startButton");
+    stopButton->setObjectName("stopButton");
+    startButton->setStyleSheet("#startButton { color: green; font-weight: bold; }");
+    stopButton->setStyleSheet("#stopButton { color: red; font-weight: bold; }");
+
     commandEdit->setPlaceholderText("Enter command to send via UART...");
     commandLayout->addWidget(new QLabel(tr("Command:")), 0, 0);
     commandLayout->addWidget(commandEdit, 0, 1);
     commandLayout->addWidget(sendButton, 0, 2);
+    commandLayout->addWidget(startButton, 1, 1);
+    commandLayout->addWidget(stopButton, 1, 2);
 
     auto *modeGroup = new QGroupBox(tr("Signal Generator Mode"), _homeTab);
     auto *modeLayout = new QGridLayout(modeGroup);
@@ -1524,7 +1554,7 @@ void MainWindow::setupHomeTab()
         "   font-size: 13px;"
         "   opacity: 230;"
         "}"
-    );
+        );
 
     sendButton->setToolTip(
         "Send Commnad to device\n"
@@ -1533,7 +1563,7 @@ void MainWindow::setupHomeTab()
         "   # t or stop - Stop Motor\n"
         "   # u or up - Increase Motor Power\n"
         "   # d or down - Decrease Motor Power"
-    );
+        );
 
     connect(valueSlider, &QSlider::valueChanged, _homeTab, [miniDashboard, valueSpinBox](int value) {
         valueSpinBox->blockSignals(true);
@@ -1553,27 +1583,56 @@ void MainWindow::setupHomeTab()
             });
 
     // valueSlider UART
-    connect(valueSlider, &QSlider::valueChanged, _homeTab, [this](int value) {
+    connect(valueSlider, &QSlider::valueChanged, _homeTab, [this, minValueSpinBox, maxValueSpinBox](int value) {
         if (_serialPort && _serialPort->isOpen()) {
+            if (value > maxValueSpinBox->value()) value = maxValueSpinBox->value();
+            else if (value < minValueSpinBox->value()) value = minValueSpinBox->value();
             QString command = QString("Power:%1\n").arg(value);
             _serialPort->write(command.toUtf8());
 
             QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
             _logTextEdit->append(QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
+            saveLogToCSV(QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
         }
     });
 
-    // valueSpinBox UART
-    connect(valueSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-            _homeTab, [this](double value) {
+    connect(valueSpinBox, &QDoubleSpinBox::editingFinished,
+            this, [this, valueSpinBox, minValueSpinBox, maxValueSpinBox]() {
                 if (_serialPort && _serialPort->isOpen()) {
-                    QString command = QString("Power:%1\n").arg(value, 0, 'f', 2);
+                    double value = valueSpinBox->value();
+                    if (value > maxValueSpinBox->value()) value = maxValueSpinBox->value();
+                    else if (value < minValueSpinBox->value()) value = minValueSpinBox->value();
+                    QString command = QString("Power:%1\n").arg(value, 0, 'f', 1);
                     _serialPort->write(command.toUtf8());
 
                     QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
-                    _logTextEdit->append(QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
+                    _logTextEdit->append(QString("[%1] AUTO SEND: %2")
+                                             .arg(timestamp, command.trimmed()));
+                    saveLogToCSV(QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
                 }
             });
+
+    connect(startButton, &QPushButton::clicked, _homeTab, [this]() {
+        if (_serialPort && _serialPort->isOpen()) {
+            QString command = QString("start\n");
+            _serialPort->write(command.toUtf8());
+
+            QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
+            _logTextEdit->append(QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
+            saveLogToCSV(QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
+        }
+    });
+
+    connect(stopButton, &QPushButton::clicked, _homeTab, [this]() {
+        if (_serialPort && _serialPort->isOpen()) {
+            QString command = QString("stop\n");
+            _serialPort->write(command.toUtf8());
+
+            QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
+            _logTextEdit->append(QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
+            saveLogToCSV(QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
+        }
+    });
 
     // Kết nối các control với mini dashboard
     connect(minValueSpinBox,
@@ -1627,6 +1686,7 @@ void MainWindow::setupHomeTab()
 
             QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
             _logTextEdit->append(QString("[%1] MODE SET: %2").arg(timestamp, command.trimmed()));
+            saveLogToCSV(QString("[%1] MODE SET: %2").arg(timestamp, command.trimmed()));
         }
     });
 
@@ -1640,21 +1700,20 @@ void MainWindow::setupHomeTab()
 
             QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
             _logTextEdit->append(QString("[%1] MODE SET: %2").arg(timestamp, command.trimmed()));
+            saveLogToCSV(QString("[%1] MODE SET: %2").arg(timestamp, command.trimmed()));
         }
     });
 
-    // Kết nối Enter key để gửi command
     connect(commandEdit, &QLineEdit::returnPressed, _homeTab, [sendButton]() {
         sendButton->click();
     });
 
-    // Kết nối control biểu đồ
     connect(startPlotButton, &QPushButton::clicked, _homeTab, [this, pwmValueLabel, throttleValueLabel]() {
         _plotting = true;
         _throttleSeries->clear();
         _startTime = QTime::currentTime();
         pwmValueLabel->setText("PWM: 0");
-        throttleValueLabel->setText("Throttle: 0");
+        throttleValueLabel->setText("Thrust: 0");
         qDebug() << "Plotting started";
     });
 
@@ -1668,7 +1727,7 @@ void MainWindow::setupHomeTab()
         _throttleSeries->clear();
         _startTime = QTime::currentTime();
         pwmValueLabel->setText("PWM: 0");
-        throttleValueLabel->setText("Throttle: 0");
+        throttleValueLabel->setText("Thrust: 0");
         qDebug() << "Plot cleared";
     });
 

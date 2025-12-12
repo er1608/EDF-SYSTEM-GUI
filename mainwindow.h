@@ -82,6 +82,7 @@ private:
     void setupAnalyzeTab();
     QChartView* createAnalyzeChart(const QString &title, const QString &yTitle, QLineSeries *series);
 
+    void saveLogToCSV(const QString& message);
     void addThemeToggleButton();
     void toggleTheme();
     void applyDarkTheme();
