@@ -53,6 +53,7 @@ private:
     int stopFlag = 0;
     double throttleValue = 0.0, pwmValue = 0.0;
     double currentValue = 0.0, voltageValue = 0.0, temperatureValue = 0.0, RPMValue = 0.0;
+    bool swcurrent = false;
 
     QSerialPort *_serialPort;
     bool _plotting;
@@ -85,6 +86,7 @@ private:
     void saveLogToCSV(const QString& message);
     void addThemeToggleButton();
     void toggleTheme();
+    void addToggleSwitch();
     void applyDarkTheme();
     void applyLightTheme();
 };

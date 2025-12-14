@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 18.0.0, 2025-12-09T18:21:39. -->
+<!-- Written by QtCreator 18.0.0, 2025-12-12T10:20:20. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -177,8 +177,8 @@
     <value type="int" key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration">2</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.1">
-    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/letandat/Dev/Qt_build</value>
-    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory.shadowDir">/home/letandat/Dev/Qt_build</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/letandat/Dev/EDF_UI/EDF-SYSTEM-GUI/build</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory.shadowDir">/home/letandat/Dev/EDF_UI/EDF-SYSTEM-GUI/build</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
