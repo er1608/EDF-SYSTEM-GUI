@@ -2,5 +2,6 @@
 <RCC>
 <qresource prefix="/">
     <file>images/CTUAV.png</file>
+    <file>images/Anal.png</file>
 </qresource>
 </RCC>

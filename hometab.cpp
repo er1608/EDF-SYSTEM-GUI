@@ -16,14 +16,14 @@ void MainWindow::setupHomeTab()
     homeLayout->setSpacing(10);
 
     auto *miniDashboard = new DashBoardWidget(_homeTab);
-    miniDashboard->setFixedSize(260, 260);
-    miniDashboard->setBorderColor(QColor(45, 50, 80));
-    miniDashboard->setBorderWidth(2);
+    miniDashboard->setMinimumSize(230, 230);
+    miniDashboard->setBorderColor(QColor(27, 36, 50));
+    miniDashboard->setBorderWidth(0);
     miniDashboard->setBorderRadius(10);
-    miniDashboard->setArcColor(QColor(65, 90, 119, 180));
-    miniDashboard->setScaleColor(QColor(255, 107, 107));
-    miniDashboard->setPointerColor(QColor(255, 107, 107));
-    miniDashboard->setValueColor(QColor(226, 232, 240));
+    // miniDashboard->setArcColor(QColor(65, 90, 119, 180));
+    // miniDashboard->setScaleColor(QColor(255, 107, 107));
+    // miniDashboard->setPointerColor(QColor(255, 107, 107));
+    miniDashboard->setValueColor(QColor(255, 107, 107));
     miniDashboard->setTitleColor(QColor(255, 107, 107));
 
     auto *mainChartView = setupMainChart();
@@ -201,7 +201,7 @@ void MainWindow::setupHomeTab()
     auto *dashboardGroup = new QGroupBox(tr("Motor Power"), _homeTab);
     auto *dashboardLayout = new QVBoxLayout(dashboardGroup);
     dashboardLayout->addWidget(miniDashboard);
-    dashboardLayout->setAlignment(miniDashboard, Qt::AlignCenter);
+    dashboardLayout->setAlignment(miniDashboard, Qt::AlignTop);
 
     leftLayout->addWidget(dashboardGroup);
     leftLayout->addWidget(connectionGroup);

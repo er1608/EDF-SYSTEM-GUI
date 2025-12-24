@@ -32,29 +32,23 @@ MainWindow::MainWindow(QWidget *parent)
         }
 
         QGroupBox {
-            background: #1b2432;
+            background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #1b2432, stop:1 #1b2432);
             color: #e2e8f0;
             border: 1px solid #2d3250;
             border-radius: 10px;
             margin-top: 1.4ex;
-            padding-top: 14px;
-            background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #1b2432, stop:1 #1b2432);
+            padding-top: 5px;
             font-size: 12px;
             font-weight: 500;
         }
 
         QGroupBox::title {
             subcontrol-origin: margin;
-            subcontrol-position: top center;
-            padding: 6px 18px;
-            background: qlineargradient(
-                x1:0, y1:0, x2:1, y2:0,
-                stop:0 #2d3250,
-                stop:1 #3a3f66
-            );
+            subcontrol-position: top left;
+            left: 15px;
+            top: -2px;
+            padding: 0 5px;
             color: #a6b1e1;
-            border-radius: 6px;
-            font-weight: 600;
         }
 
         QPushButton {
@@ -288,9 +282,10 @@ MainWindow::MainWindow(QWidget *parent)
     homeLabel->setAlignment(Qt::AlignTop);
 
     QLabel *analyzeLabel = new QLabel("📊");
-    analyzeLabel->setAlignment(Qt::AlignCenter);
-    analyzeLabel->setFixedSize(50, 35);
-    analyzeLabel->setStyleSheet("font-size: 25px;");
+    QPixmap analPixmap(":/images/Anal.png");
+    analyzeLabel->setFixedSize(40, 35);
+    analyzeLabel->setPixmap(analPixmap.scaled(analyzeLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    analyzeLabel->setAlignment(Qt::AlignTop);
 
     _tabWidget->addTab(_homeTab, "");
     _tabWidget->addTab(_analyzeTab, "");
