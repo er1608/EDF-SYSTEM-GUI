@@ -115,7 +115,7 @@ void MainWindow::setupHomeTab()
     portComboBox->setStyleSheet(R"(
         QComboBox {
             background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                      stop:0 #2d3250, stop:1 #CFAB3E);
+                                            stop:0 #5f758a, stop:1 #455a64);
             color: #e2e8f0;
             border: 1px solid #2d3250 !important;
             padding: 5px;
@@ -316,8 +316,14 @@ void MainWindow::setupHomeTab()
         }
     });
 
-    connect(stopButton, &QPushButton::clicked, _homeTab, [this]() {
+    connect(stopButton, &QPushButton::clicked, _homeTab, [this, valueSlider, valueSpinBox, miniDashboard]() {
         if (_serialPort && _serialPort->isOpen()) {
+            valueSlider->blockSignals(true);
+            miniDashboard->setValue(0);
+            valueSlider->setValue(static_cast<int>(0));
+            valueSpinBox->setValue(static_cast<int>(0));
+            valueSlider->blockSignals(false);
+
             QString command = QString("stop\n");
             _serialPort->write(command.toUtf8());
 
