@@ -44,6 +44,9 @@ void MainWindow::readData()
             else if (trimmedPart.startsWith("Throttle:")) {
                 QString valueStr = trimmedPart.split(':')[1].trimmed();
                 throttleValue = (valueStr.toDouble(&throttleOk)) * 5 / 100;
+
+                if (throttleValue > 300.0) throttleValue = 300.0;
+                if (throttleValue > 0.0) throttleValue = 0.0;
             }
             else if (trimmedPart.startsWith("PWM:")) {
                 QString valueStr = trimmedPart.split(':')[1].trimmed();
