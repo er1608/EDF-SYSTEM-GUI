@@ -415,18 +415,65 @@ void MainWindow::setupHomeTab()
         qDebug() << "Plotting started";
     });
 
-    connect(stopPlotButton, &QPushButton::clicked, _homeTab, [this]() {
-        _plotting = false;
-        stopFlag = 1;
-        qDebug() << "Plotting stopped";
+    connect(stopPlotButton, &QPushButton::clicked, _homeTab, [this, saveDataButton]() {
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Warning");
+        msgBox.setText("Would you like to save your Data before Stopping the plot?");
+        msgBox.setIcon(QMessageBox::Question);
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+
+        QFont font;
+        font.setPointSize(12);
+        msgBox.setFont(font);
+
+        msgBox.button(QMessageBox::Yes)->setFont(font);
+        msgBox.button(QMessageBox::No)->setFont(font);
+
+        if (msgBox.exec() == QMessageBox::Yes) {
+            Q_EMIT saveDataButton->clicked();
+
+            _plotting = false;
+            stopFlag = 1;
+            qDebug() << "Plotting stopped";
+        }
+        else {
+            _plotting = false;
+            stopFlag = 1;
+            qDebug() << "Plotting stopped";
+        }
+
     });
 
-    connect(clearPlotButton, &QPushButton::clicked, _homeTab, [this, pwmValueLabel, throttleValueLabel]() {
-        _throttleSeries->clear();
-        _startTime = QTime::currentTime();
-        pwmValueLabel->setText("PWM: 0");
-        throttleValueLabel->setText("Thrust: 0");
-        qDebug() << "Plot cleared";
+    connect(clearPlotButton, &QPushButton::clicked, _homeTab, [this, pwmValueLabel, throttleValueLabel, saveDataButton]() {
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Warning");
+        msgBox.setText("Would you like to save your Data before Clearing the plot?");
+        msgBox.setIcon(QMessageBox::Question);
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+
+        QFont font;
+        font.setPointSize(12);
+        msgBox.setFont(font);
+
+        msgBox.button(QMessageBox::Yes)->setFont(font);
+        msgBox.button(QMessageBox::No)->setFont(font);
+
+        if (msgBox.exec() == QMessageBox::Yes) {
+            Q_EMIT saveDataButton->clicked();
+
+            _throttleSeries->clear();
+            _startTime = QTime::currentTime();
+            pwmValueLabel->setText("PWM: 0");
+            throttleValueLabel->setText("Thrust: 0");
+            qDebug() << "Plot cleared";
+        }
+        else {
+            _throttleSeries->clear();
+            _startTime = QTime::currentTime();
+            pwmValueLabel->setText("PWM: 0");
+            throttleValueLabel->setText("Thrust: 0");
+            qDebug() << "Plot cleared";
+        }
     });
 
     connect(saveDataButton, &QPushButton::clicked, this, &MainWindow::saveDataToCSV);
