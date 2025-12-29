@@ -98,14 +98,10 @@ MainWindow::MainWindow(QWidget *parent)
 
         QSpinBox::up-button, QDoubleSpinBox::up-button {
             background: #0e202d;
-            border: 1px solid #456882;
-            border-top-right-radius: 4px;
         }
 
         QSpinBox::down-button, QDoubleSpinBox::down-button {
             background: #0e202d;
-            border: 1px solid #456882;
-            border-bottom-right-radius: 4px;
         }
 
         QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover {
@@ -117,21 +113,15 @@ MainWindow::MainWindow(QWidget *parent)
         }
 
         QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
-            width: 0px;
-            height: 0px;
-            image: none;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-bottom: 5px solid #d2c1b6;
+            image: url(:/images/up.png);
+            width: 12px;
+            height: 12px;
         }
 
         QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
-            width: 0px;
-            height: 0px;
-            image: none;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-top: 5px solid #d2c1b6;
+            image: url(:/images/down.png);
+            width: 12px;
+            height: 12px;
         }
 
         QLineEdit:focus,
@@ -139,7 +129,6 @@ MainWindow::MainWindow(QWidget *parent)
         QSpinBox:focus,
         QDoubleSpinBox:focus {
             border: 1px solid #d2c1b6;
-            /* Focus sáng hơn một chút */
             background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #234c6a, stop:1 #234c6a);
         }
 
