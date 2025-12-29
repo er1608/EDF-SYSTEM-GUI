@@ -154,14 +154,10 @@ void MainWindow::applyDarkTheme()
 
         QSpinBox::up-button, QDoubleSpinBox::up-button {
             background: #0e202d;
-            border: 1px solid #456882;
-            border-top-right-radius: 4px;
         }
 
         QSpinBox::down-button, QDoubleSpinBox::down-button {
             background: #0e202d;
-            border: 1px solid #456882;
-            border-bottom-right-radius: 4px;
         }
 
         QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover {
@@ -173,21 +169,15 @@ void MainWindow::applyDarkTheme()
         }
 
         QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
-            width: 0px;
-            height: 0px;
-            image: none;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-bottom: 5px solid #d2c1b6;
+            image: url(:/images/up.png);
+            width: 12px;
+            height: 12px;
         }
 
         QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
-            width: 0px;
-            height: 0px;
-            image: none;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-top: 5px solid #d2c1b6;
+            image: url(:/images/down.png);
+            width: 12px;
+            height: 12px;
         }
 
         QLineEdit:focus,
@@ -396,14 +386,10 @@ void MainWindow::applyLightTheme()
 
         QSpinBox::up-button, QDoubleSpinBox::up-button {
             background: transparent;
-            border: 1px solid transparent;
-            border-top-right-radius: 4px;
         }
 
         QSpinBox::down-button, QDoubleSpinBox::down-button {
             background: transparent;
-            border: 1px solid transparent;
-            border-bottom-right-radius: 4px;
         }
 
         QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover {
@@ -415,21 +401,15 @@ void MainWindow::applyLightTheme()
         }
 
         QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
-            width: 0px;
-            height: 0px;
-            image: none;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-bottom: 5px solid #80a1ba;
+            image: url(:/images/up.png);
+            width: 12px;
+            height: 12px;
         }
 
         QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
-            width: 0px;
-            height: 0px;
-            image: none;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-top: 5px solid #80a1ba;
+            image: url(:/images/down.png);
+            width: 12px;
+            height: 12px;
         }
 
         QLineEdit:focus,
