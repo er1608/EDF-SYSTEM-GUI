@@ -58,6 +58,11 @@ void MainWindow::updateAnalyzeCharts(double temp, double current, double voltage
 
 void MainWindow::updatePlot(double throttle, double pwm)
 {
+    if (_timeReset) {
+        _startTime = QTime::currentTime();
+        _timeReset = false;
+    }
+
     double key = _startTime.msecsTo(QTime::currentTime()) / 1000.0;
 
     _throttleSeries->append(key, throttle);

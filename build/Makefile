@@ -1256,7 +1256,10 @@ compiler_rcc_clean:
 	-$(DEL_FILE) qrc_resources.cpp
 qrc_resources.cpp: ../resources.qrc \
 		../../../../Qt/6.9.3/gcc_64/libexec/rcc \
-		../images/CTUAV.png
+		../images/CTUAV.png \
+		../images/down.png \
+		../images/up.png \
+		../images/Anal.png
 	/home/letandat/Qt/6.9.3/gcc_64/libexec/rcc -name resources ../resources.qrc -o qrc_resources.cpp
 
 compiler_moc_predefs_make_all: moc_predefs.h
@@ -4063,7 +4066,102 @@ toggleswitch.o: ../toggleswitch.cpp ../toggleswitch.h \
 		../../../../Qt/6.9.3/gcc_64/include/QtCore/qvarlengtharray.h \
 		../../../../Qt/6.9.3/gcc_64/include/QtCore/q23utility.h \
 		../../../../Qt/6.9.3/gcc_64/include/QtCore/q20utility.h \
-		../../../../Qt/6.9.3/gcc_64/include/QtWidgets
+		../../../../Qt/6.9.3/gcc_64/include/QtWidgets \
+		../mainwindow.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtWidgets/QMainWindow \
+		../../../../Qt/6.9.3/gcc_64/include/QtWidgets/qmainwindow.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtWidgets/qtwidgetsglobal.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qtguiglobal.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qtgui-config.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qtguiexports.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtWidgets/qtwidgets-config.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtWidgets/qtwidgetsexports.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtWidgets/qwidget.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qwindowdefs.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qmargins.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qaction.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qkeysequence.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qicon.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qsize.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qpixmap.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qpaintdevice.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qrect.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qpoint.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qcolor.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qrgb.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qrgba64.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qimage.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qpixelformat.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qtransform.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qpolygon.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qregion.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qline.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qpalette.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qbrush.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qfont.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qendian.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qfontmetrics.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qfontinfo.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qfontvariableaxis.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtWidgets/qsizepolicy.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qcursor.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qbitmap.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qevent.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qurl.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qeventpoint.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qvector2d.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qvectornd.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qpointingdevice.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qinputdevice.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qscreen.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/QList \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/QObject \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/QRect \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/QSize \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/QSizeF \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/QTransform \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qnativeinterface.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qscreen_platform.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qguiapplication.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qcoreapplication.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qcoreapplication_platform.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qfuture.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qfutureinterface.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qmutex.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qtsan_impl.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qresultstore.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qfuture_impl.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qthreadpool.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qthread.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qrunnable.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qexception.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qpromise.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qinputmethod.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qguiapplication_platform.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtWidgets/qtabwidget.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtSerialPort/QSerialPort \
+		../../../../Qt/6.9.3/gcc_64/include/QtSerialPort/qserialport.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qproperty.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qpropertyprivate.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtSerialPort/qserialportglobal.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtSerialPort/qtserialportexports.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtSerialPort/QSerialPortInfo \
+		../../../../Qt/6.9.3/gcc_64/include/QtSerialPort/qserialportinfo.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/QTime \
+		../../../../Qt/6.9.3/gcc_64/include/QtWidgets/QLabel \
+		../../../../Qt/6.9.3/gcc_64/include/QtWidgets/qlabel.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtWidgets/qframe.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qpicture.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qtextdocument.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtWidgets/QTextEdit \
+		../../../../Qt/6.9.3/gcc_64/include/QtWidgets/qtextedit.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qtextoption.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qtextcursor.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qtextformat.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtGui/qpen.h \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/QVector \
+		../../../../Qt/6.9.3/gcc_64/include/QtCore/qvector.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o toggleswitch.o ../toggleswitch.cpp
 
 qrc_resources.o: qrc_resources.cpp 

@@ -16,14 +16,14 @@ void MainWindow::setupHomeTab()
     homeLayout->setSpacing(10);
 
     auto *miniDashboard = new DashBoardWidget(_homeTab);
-    miniDashboard->setFixedSize(260, 260);
-    miniDashboard->setBorderColor(QColor(45, 50, 80));
-    miniDashboard->setBorderWidth(2);
+    miniDashboard->setMinimumSize(230, 230);
+    miniDashboard->setBorderColor(QColor(27, 36, 50));
+    miniDashboard->setBorderWidth(0);
     miniDashboard->setBorderRadius(10);
-    miniDashboard->setArcColor(QColor(65, 90, 119, 180));
-    miniDashboard->setScaleColor(QColor(255, 107, 107));
-    miniDashboard->setPointerColor(QColor(255, 107, 107));
-    miniDashboard->setValueColor(QColor(226, 232, 240));
+    // miniDashboard->setArcColor(QColor(65, 90, 119, 180));
+    // miniDashboard->setScaleColor(QColor(255, 107, 107));
+    // miniDashboard->setPointerColor(QColor(255, 107, 107));
+    miniDashboard->setValueColor(QColor(255, 107, 107));
     miniDashboard->setTitleColor(QColor(255, 107, 107));
 
     auto *mainChartView = setupMainChart();
@@ -115,7 +115,7 @@ void MainWindow::setupHomeTab()
     portComboBox->setStyleSheet(R"(
         QComboBox {
             background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                      stop:0 #2d3250, stop:1 #CFAB3E);
+                                            stop:0 #5f758a, stop:1 #455a64);
             color: #e2e8f0;
             border: 1px solid #2d3250 !important;
             padding: 5px;
@@ -201,7 +201,7 @@ void MainWindow::setupHomeTab()
     auto *dashboardGroup = new QGroupBox(tr("Motor Power"), _homeTab);
     auto *dashboardLayout = new QVBoxLayout(dashboardGroup);
     dashboardLayout->addWidget(miniDashboard);
-    dashboardLayout->setAlignment(miniDashboard, Qt::AlignCenter);
+    dashboardLayout->setAlignment(miniDashboard, Qt::AlignTop);
 
     leftLayout->addWidget(dashboardGroup);
     leftLayout->addWidget(connectionGroup);
@@ -316,8 +316,14 @@ void MainWindow::setupHomeTab()
         }
     });
 
-    connect(stopButton, &QPushButton::clicked, _homeTab, [this]() {
+    connect(stopButton, &QPushButton::clicked, _homeTab, [this, valueSlider, valueSpinBox, miniDashboard]() {
         if (_serialPort && _serialPort->isOpen()) {
+            valueSlider->blockSignals(true);
+            miniDashboard->setValue(0);
+            valueSlider->setValue(static_cast<int>(0));
+            valueSpinBox->setValue(static_cast<int>(0));
+            valueSlider->blockSignals(false);
+
             QString command = QString("stop\n");
             _serialPort->write(command.toUtf8());
 
@@ -409,18 +415,44 @@ void MainWindow::setupHomeTab()
         qDebug() << "Plotting started";
     });
 
-    connect(stopPlotButton, &QPushButton::clicked, _homeTab, [this]() {
+    connect(stopPlotButton, &QPushButton::clicked, _homeTab, [this, saveDataButton]() {
         _plotting = false;
         stopFlag = 1;
         qDebug() << "Plotting stopped";
     });
 
-    connect(clearPlotButton, &QPushButton::clicked, _homeTab, [this, pwmValueLabel, throttleValueLabel]() {
-        _throttleSeries->clear();
-        _startTime = QTime::currentTime();
-        pwmValueLabel->setText("PWM: 0");
-        throttleValueLabel->setText("Thrust: 0");
-        qDebug() << "Plot cleared";
+    connect(clearPlotButton, &QPushButton::clicked, _homeTab, [this, pwmValueLabel, throttleValueLabel, saveDataButton]() {
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Warning");
+        msgBox.setText("Would you like to save your Data before Clearing the plot?");
+        msgBox.setIcon(QMessageBox::Question);
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+
+        QFont font;
+        font.setPointSize(12);
+        msgBox.setFont(font);
+
+        msgBox.button(QMessageBox::Yes)->setFont(font);
+        msgBox.button(QMessageBox::No)->setFont(font);
+
+        if (msgBox.exec() == QMessageBox::Yes) {
+            Q_EMIT saveDataButton->clicked();
+
+            _throttleSeries->clear();
+            _startTime = QTime::currentTime();
+            pwmValueLabel->setText("PWM: 0");
+            throttleValueLabel->setText("Thrust: 0");
+            qDebug() << "Plot cleared";
+        }
+        else {
+            _throttleSeries->clear();
+            _startTime = QTime::currentTime();
+            pwmValueLabel->setText("PWM: 0");
+            throttleValueLabel->setText("Thrust: 0");
+            qDebug() << "Plot cleared";
+        }
+
+        _timeReset = true;
     });
 
     connect(saveDataButton, &QPushButton::clicked, this, &MainWindow::saveDataToCSV);

@@ -57,6 +57,7 @@ private:
 
     QSerialPort *_serialPort;
     bool _plotting;
+    bool _timeReset = false;
     QChart *_chart;
     QLineSeries *_throttleSeries;
     QTime _startTime;
