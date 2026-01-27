@@ -9,8 +9,6 @@
 
 void MainWindow::setupHomeTab()
 {
-    // _homeTab->setStyleSheet("background: #1b2432;");
-
     auto *homeLayout = new QVBoxLayout(_homeTab);
     homeLayout->setContentsMargins(10, 10, 10, 10);
     homeLayout->setSpacing(10);
@@ -20,13 +18,8 @@ void MainWindow::setupHomeTab()
     miniDashboard->setBorderColor(QColor(27, 36, 50));
     miniDashboard->setBorderWidth(0);
     miniDashboard->setBorderRadius(10);
-    // miniDashboard->setArcColor(QColor(65, 90, 119, 180));
-    // miniDashboard->setScaleColor(QColor(255, 107, 107));
-    // miniDashboard->setPointerColor(QColor(255, 107, 107));
     miniDashboard->setValueColor(QColor(255, 107, 107));
     miniDashboard->setTitleColor(QColor(255, 107, 107));
-
-    auto *mainChartView = setupMainChart();
 
     auto *valueSlider = new QSlider(Qt::Horizontal, _homeTab);
     valueSlider->setRange(0, 100);
@@ -52,12 +45,7 @@ void MainWindow::setupHomeTab()
     auto *clearPlotButton = new QPushButton(tr("Clear Plot"), _homeTab);
     auto *startPlotButton = new QPushButton(tr("Start Plot"), _homeTab);
     auto *stopPlotButton = new QPushButton(tr("Stop Plot"), _homeTab);
-    auto *saveDataButton = new QPushButton(tr("Save Data to CSV"), _homeTab);
-
-    auto *pwmValueLabel = new QLabel(tr("PWM: 0"), _homeTab);
-    auto *throttleValueLabel = new QLabel(tr("Thrust: 0"), _homeTab);
-    pwmValueLabel->setStyleSheet("font-weight: bold; color: #5E9C43; font-size: 13px; padding: 6px; border-radius: 4px;");
-    throttleValueLabel->setStyleSheet("font-weight: bold; color: #ff6666; font-size: 13px; padding: 6px; border-radius: 4px;");
+    auto *saveDataButton = new QPushButton(tr("Save Data"), _homeTab);
 
     auto *logTextEdit = new QTextEdit(_homeTab);
     logTextEdit->setMaximumHeight(100);
@@ -70,37 +58,42 @@ void MainWindow::setupHomeTab()
     leftLayout->setAlignment(Qt::AlignTop);
     leftLayout->setSpacing(10);
 
-    auto *displayLayout = new QVBoxLayout();
+    // Chart Display
+    auto *scrollContentWidget = new QWidget();
+
+    scrollContentWidget->setObjectName("ChartContainerWidget");
+
+    auto *displayLayout = new QVBoxLayout(scrollContentWidget);
     displayLayout->setSpacing(10);
+    displayLayout->setContentsMargins(10, 10, 10, 10);
 
-    displayLayout->addWidget(mainChartView, 1);
+    _series1 = new QLineSeries();
+    _series2 = new QLineSeries();
+    _series3 = new QLineSeries();
+    _series4 = new QLineSeries();
 
-    auto *bottomControlsLayout = new QHBoxLayout();
-    bottomControlsLayout->setSpacing(10);
+    auto *mainChartView = createAnalyzeChart("Thrust", "Thrust (N)", _series1);
+    auto *torqueChart = createAnalyzeChart("Torque", "Torque (Nm)", _series2);
+    auto *voltChart = createAnalyzeChart("Voltage", "Voltage (V)", _series3);
+    auto *currentChart = createAnalyzeChart("Current", "Current (A)", _series4);
 
-    auto *valueGroup = new QGroupBox(tr("Value Settings"), _homeTab);
-    auto *valueControlLayout = new QGridLayout(valueGroup);
-    valueControlLayout->addWidget(new QLabel(tr("Current Value:")), 0, 0);
-    valueControlLayout->addWidget(valueSlider, 0, 1);
-    valueControlLayout->addWidget(valueSpinBox, 0, 2);
-    valueControlLayout->addWidget(minValueLabel, 1, 0);
-    valueControlLayout->addWidget(minValueSpinBox, 1, 1, 1, 2);
-    valueControlLayout->addWidget(maxValueLabel, 2, 0);
-    valueControlLayout->addWidget(maxValueSpinBox, 2, 1, 1, 2);
+    mainChartView->setMinimumHeight(250);
+    voltChart->setMinimumHeight(250);
+    currentChart->setMinimumHeight(250);
+    torqueChart->setMinimumHeight(250);
 
-    auto *plotControlGroup = new QGroupBox(tr("Plot Control"), _homeTab);
-    auto *plotControlLayout = new QGridLayout(plotControlGroup);
-    plotControlLayout->addWidget(startPlotButton, 0, 0);
-    plotControlLayout->addWidget(stopPlotButton, 0, 1);
-    plotControlLayout->addWidget(clearPlotButton, 1, 0);
-    plotControlLayout->addWidget(saveDataButton, 1, 1);
-    plotControlLayout->addWidget(throttleValueLabel, 2, 0, 1, 2);
-    plotControlLayout->addWidget(pwmValueLabel, 3, 0, 1, 2);
+    displayLayout->addWidget(mainChartView);
+    displayLayout->addWidget(torqueChart);
+    displayLayout->addWidget(voltChart);
+    displayLayout->addWidget(currentChart);
 
-    bottomControlsLayout->addWidget(valueGroup, 2);
-    bottomControlsLayout->addWidget(plotControlGroup, 1);
+    displayLayout->addStretch();
 
-    displayLayout->addLayout(bottomControlsLayout);
+    auto *scrollArea = new QScrollArea();
+    scrollArea->setWidget(scrollContentWidget);
+
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setFrameShape(QFrame::NoFrame);
 
     // UART Connection
     auto *connectionGroup = new QGroupBox(tr("Connection"), _homeTab);
@@ -160,65 +153,77 @@ void MainWindow::setupHomeTab()
 
     commandEdit->setPlaceholderText("Enter command to send via UART...");
     commandLayout->addWidget(new QLabel(tr("Command:")), 0, 0);
-    commandLayout->addWidget(commandEdit, 0, 1);
-    commandLayout->addWidget(startButton, 0, 2);
-    commandLayout->addWidget(sendButton, 1, 1);
-    commandLayout->addWidget(stopButton, 1, 2);
+    commandLayout->addWidget(commandEdit, 0, 1, 1, 2);
+    commandLayout->addWidget(startButton, 1, 0);
+    commandLayout->addWidget(stopButton, 1, 1);
+    commandLayout->addWidget(sendButton, 1, 2);
 
-    auto *modeGroup = new QGroupBox(tr("Signal Generator Mode"), _homeTab);
-    auto *modeLayout = new QGridLayout(modeGroup);
+    auto *dataGroup = new QGroupBox(tr("Data Signal"), _homeTab);
+    auto *dataLayout = new QGridLayout(dataGroup);
 
-    auto *rampModeButton = new QPushButton(tr("Ramp Mode"), _homeTab);
-    auto *sineWaveButton = new QPushButton(tr("Sine Wave Mode"), _homeTab);
+    auto *thrustValueLabel = new QLabel(tr("Thrust: 0 N"), _homeTab);
+    auto *pwmValueLabel = new QLabel(tr("PWM: 0"), _homeTab);
+    auto *torqueValueLabel = new QLabel(tr("Torque: 0 Nm"), _homeTab);
+    auto *voltageValueLabel = new QLabel(tr("Voltage: 0 V"), _homeTab);
+    auto *currentValueLabel = new QLabel(tr("Current: 0 A"), _homeTab);
+    auto *temperatureValueLabel = new QLabel(tr("Temperature: 0 °C"), _homeTab);
+    auto *RPMValueLabel = new QLabel(tr("RPM: 0"), _homeTab);
 
-    auto *amplitudeLabel = new QLabel(tr("Amplitude:"), _homeTab);
-    auto *amplitudeSpinBox = new QDoubleSpinBox(_homeTab);
-    amplitudeSpinBox->setRange(0, 100);
-    amplitudeSpinBox->setValue(50);
-    amplitudeSpinBox->setDecimals(1);
+    thrustValueLabel->setStyleSheet("font-weight: bold; font-size: 13px; padding: 6px; border-radius: 3px;");
+    pwmValueLabel->setStyleSheet("font-weight: bold; font-size: 13px; padding: 6px; border-radius: 3px;");
+    torqueValueLabel->setStyleSheet("font-weight: bold; font-size: 13px; padding: 6px; border-radius: 3px;");
+    voltageValueLabel->setStyleSheet("font-weight: bold; font-size: 13px; padding: 6px; border-radius: 3px;");
+    currentValueLabel->setStyleSheet("font-weight: bold; font-size: 13px; padding: 6px; border-radius: 3px;");
+    temperatureValueLabel->setStyleSheet("font-weight: bold; font-size: 13px; padding: 6px; border-radius: 3px;");
+    RPMValueLabel->setStyleSheet("font-weight: bold; font-size: 13px; padding: 6px; border-radius: 3px;");
 
-    auto *frequencyLabel = new QLabel(tr("Frequency (Hz):"), _homeTab);
-    auto *frequencySpinBox = new QDoubleSpinBox(_homeTab);
-    frequencySpinBox->setRange(0.1, 10.0);
-    frequencySpinBox->setValue(1.0);
-    frequencySpinBox->setDecimals(2);
-
-    auto *durationLabel = new QLabel(tr("Duration (s):"), _homeTab);
-    auto *durationSpinBox = new QDoubleSpinBox(_homeTab);
-    durationSpinBox->setRange(1, 60);
-    durationSpinBox->setValue(10);
-    durationSpinBox->setDecimals(1);
-
-    modeLayout->addWidget(rampModeButton, 0, 0);
-    modeLayout->addWidget(sineWaveButton, 0, 1);
-    modeLayout->addWidget(amplitudeLabel, 1, 0);
-    modeLayout->addWidget(amplitudeSpinBox, 1, 1);
-    modeLayout->addWidget(frequencyLabel, 2, 0);
-    modeLayout->addWidget(frequencySpinBox, 2, 1);
-    modeLayout->addWidget(durationLabel, 3, 0);
-    modeLayout->addWidget(durationSpinBox, 3, 1);
+    dataLayout->addWidget(thrustValueLabel, 0, 0);
+    dataLayout->addWidget(currentValueLabel, 0, 1);
+    dataLayout->addWidget(torqueValueLabel, 0, 2);
+    dataLayout->addWidget(voltageValueLabel, 1, 0);
+    dataLayout->addWidget(pwmValueLabel, 1, 1);
+    dataLayout->addWidget(RPMValueLabel, 1, 2);
+    dataLayout->addWidget(temperatureValueLabel, 2, 0);
 
     auto *dashboardGroup = new QGroupBox(tr("Motor Power"), _homeTab);
     auto *dashboardLayout = new QVBoxLayout(dashboardGroup);
     dashboardLayout->addWidget(miniDashboard);
     dashboardLayout->setAlignment(miniDashboard, Qt::AlignTop);
 
-    leftLayout->addWidget(dashboardGroup);
-    leftLayout->addWidget(connectionGroup);
-    leftLayout->addWidget(commandGroup);
-    leftLayout->addWidget(modeGroup);
-    leftLayout->addStretch();
+    auto *valueGroup = new QGroupBox(tr("Control"), _homeTab);
+    auto *valueControlLayout = new QGridLayout(valueGroup);
+    valueControlLayout->addWidget(new QLabel(tr("Throttle:")), 0, 0);
+    valueControlLayout->addWidget(valueSlider, 0, 1, 1, 2);
+    valueControlLayout->addWidget(valueSpinBox, 0, 3);
+    valueControlLayout->addWidget(minValueLabel, 1, 0);
+    valueControlLayout->addWidget(minValueSpinBox, 1, 1, 1, 3);
+    valueControlLayout->addWidget(maxValueLabel, 2, 0);
+    valueControlLayout->addWidget(maxValueSpinBox, 2, 1, 1, 3);
+    valueControlLayout->addWidget(startPlotButton, 3, 0);
+    valueControlLayout->addWidget(stopPlotButton, 3, 1);
+    valueControlLayout->addWidget(clearPlotButton, 3, 2);
+    valueControlLayout->addWidget(saveDataButton, 3, 3);
 
-    topContentLayout->addWidget(leftPanel, 1);
-    topContentLayout->addLayout(displayLayout, 3);
+    valueControlLayout->setColumnStretch(1, 1);
+    valueControlLayout->setColumnStretch(2, 1);
 
     // UART Log Display
     auto *logGroup = new QGroupBox(tr("Command Log"), _homeTab);
     auto *logLayout = new QVBoxLayout(logGroup);
     logLayout->addWidget(logTextEdit);
 
+    leftLayout->addWidget(dashboardGroup);
+    leftLayout->addWidget(valueGroup);
+    leftLayout->addWidget(connectionGroup);
+    leftLayout->addWidget(commandGroup);
+    leftLayout->addWidget(dataGroup);
+    leftLayout->addWidget(logGroup);
+    leftLayout->addStretch();
+
+    topContentLayout->addWidget(leftPanel, 1);
+    topContentLayout->addWidget(scrollArea, 3);
+
     homeLayout->addLayout(topContentLayout, 1);
-    homeLayout->addWidget(logGroup);
 
     qApp->setStyleSheet(
         "QToolTip {"
@@ -375,53 +380,32 @@ void MainWindow::setupHomeTab()
         }
     });
 
-    connect(rampModeButton, &QPushButton::clicked, _homeTab, [this, amplitudeSpinBox, durationSpinBox]() {
-        if (_serialPort && _serialPort->isOpen()) {
-            QString command = QString("ramp:%1:%2\n")
-            .arg(amplitudeSpinBox->value(), 0, 'f', 1)
-                .arg(durationSpinBox->value(), 0, 'f', 1);
-            _serialPort->write(command.toUtf8());
-
-            QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
-            _logTextEdit->append(QString("[%1] MODE SET: %2").arg(timestamp, command.trimmed()));
-            saveLogToCSV(QString("[%1] MODE SET: %2").arg(timestamp, command.trimmed()));
-        }
-    });
-
-    connect(sineWaveButton, &QPushButton::clicked, _homeTab, [this, amplitudeSpinBox, frequencySpinBox, durationSpinBox]() {
-        if (_serialPort && _serialPort->isOpen()) {
-            QString command = QString("sine:%1:%2:%3\n")
-            .arg(amplitudeSpinBox->value(), 0, 'f', 1)
-                .arg(frequencySpinBox->value(), 0, 'f', 2)
-                .arg(durationSpinBox->value(), 0, 'f', 1);
-            _serialPort->write(command.toUtf8());
-
-            QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
-            _logTextEdit->append(QString("[%1] MODE SET: %2").arg(timestamp, command.trimmed()));
-            saveLogToCSV(QString("[%1] MODE SET: %2").arg(timestamp, command.trimmed()));
-        }
-    });
-
     connect(commandEdit, &QLineEdit::returnPressed, _homeTab, [sendButton]() {
         sendButton->click();
     });
 
-    connect(startPlotButton, &QPushButton::clicked, _homeTab, [this, pwmValueLabel, throttleValueLabel]() {
+    connect(startPlotButton, &QPushButton::clicked, _homeTab, [this]() {
         _plotting = true;
-        _throttleSeries->clear();
+
+        _series1->clear();
+        _series2->clear();
+        _series3->clear();
+        _series4->clear();
+
         _startTime = QTime::currentTime();
-        pwmValueLabel->setText("PWM: 0");
-        throttleValueLabel->setText("Thrust: 0");
+
+        reset();
+
         qDebug() << "Plotting started";
     });
 
-    connect(stopPlotButton, &QPushButton::clicked, _homeTab, [this, saveDataButton]() {
+    connect(stopPlotButton, &QPushButton::clicked, _homeTab, [this]() {
         _plotting = false;
         stopFlag = 1;
         qDebug() << "Plotting stopped";
     });
 
-    connect(clearPlotButton, &QPushButton::clicked, _homeTab, [this, pwmValueLabel, throttleValueLabel, saveDataButton]() {
+    connect(clearPlotButton, &QPushButton::clicked, _homeTab, [this, saveDataButton]() {
         QMessageBox msgBox;
         msgBox.setWindowTitle("Warning");
         msgBox.setText("Would you like to save your Data before Clearing the plot?");
@@ -438,17 +422,27 @@ void MainWindow::setupHomeTab()
         if (msgBox.exec() == QMessageBox::Yes) {
             Q_EMIT saveDataButton->clicked();
 
-            _throttleSeries->clear();
+            _series1->clear();
+            _series2->clear();
+            _series3->clear();
+            _series4->clear();
+
             _startTime = QTime::currentTime();
-            pwmValueLabel->setText("PWM: 0");
-            throttleValueLabel->setText("Thrust: 0");
+
+            reset();
+
             qDebug() << "Plot cleared";
         }
         else {
-            _throttleSeries->clear();
+            _series1->clear();
+            _series2->clear();
+            _series3->clear();
+            _series4->clear();
+
             _startTime = QTime::currentTime();
-            pwmValueLabel->setText("PWM: 0");
-            throttleValueLabel->setText("Thrust: 0");
+
+            reset();
+
             qDebug() << "Plot cleared";
         }
 
@@ -457,8 +451,14 @@ void MainWindow::setupHomeTab()
 
     connect(saveDataButton, &QPushButton::clicked, this, &MainWindow::saveDataToCSV);
 
+    _thrustLabel = thrustValueLabel;
     _pwmLabel = pwmValueLabel;
-    _throttleLabel = throttleValueLabel;
+    _torqueLabel = torqueValueLabel;
+    _voltageLabel = voltageValueLabel;
+    _currentLabel = currentValueLabel;
+    _temperatureLabel = temperatureValueLabel;
+    _RPMLabel = RPMValueLabel;
+
     _logTextEdit = logTextEdit;
 
     miniDashboard->setValue(0);

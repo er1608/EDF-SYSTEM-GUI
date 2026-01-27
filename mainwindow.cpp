@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "toggleswitch.h"
 #include <QtCharts>
 #include <QFile>
 #include <QTextStream>
@@ -12,7 +11,6 @@ MainWindow::MainWindow(QWidget *parent)
     , _serialPort(nullptr)
     , _plotting(false)
     , _chart(nullptr)
-    , _throttleSeries(nullptr)
     , _startTime(QTime::currentTime())
     , _isDarkMode(true)
 {
@@ -23,12 +21,47 @@ MainWindow::MainWindow(QWidget *parent)
             font-family: "Segoe UI", "Roboto", sans-serif;
         }
 
-        QChartView {
-            background: #0e202d;
+        QScrollArea {
             border: none;
-            border-radius: 10px;
-            padding: 6px;
-            background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #1b3c53, stop:1 #0e202d);
+            background: #0e202d;
+        }
+
+        QWidget#ChartContainerWidget {
+            background: #0e202d;
+        }
+
+        QScrollBar:vertical {
+            border: none;
+            background: #0e202d;
+            width: 10px;
+            margin: 0px;
+        }
+
+        QScrollBar::handle:vertical {
+            background: #1b3c53;
+            min-height: 20px;
+            border-radius: 5px;
+        }
+
+        QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+            height: 0px;
+        }
+
+        QScrollBar:horizontal {
+            border: none;
+            background: #0e202d;
+            height: 10px;
+            margin: 0px;
+        }
+
+        QScrollBar::handle:horizontal {
+            background: #1b3c53;
+            min-width: 20px;
+            border-radius: 5px;
+        }
+
+        QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+            width: 0px;
         }
 
         QGroupBox {
@@ -67,7 +100,7 @@ MainWindow::MainWindow(QWidget *parent)
 
         QPushButton:hover {
             background: #234c6a;
-            color: #ffffff;
+            color: #f5f5f5;
         }
 
         QPushButton:pressed {
@@ -168,19 +201,16 @@ MainWindow::MainWindow(QWidget *parent)
             border: 1px solid #456882;
             border-radius: 10px;
             padding: 6px;
-            background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #0e202d, stop:1 #0e202d);
         }
 
         QTabWidget::pane {
             border: 1px solid #0e202d;
-            border-radius: 8px;
             background: #0e202d;
             padding: 4px;
         }
 
         QTabWidget::tab-bar {
             alignment: left;
-            width: 69px;
         }
 
         QTabBar {
@@ -218,7 +248,7 @@ MainWindow::MainWindow(QWidget *parent)
 
         QTabBar::tab:hover:!selected {
             background: #1b3c53;
-            color: #ffffff;
+            color: #f5f5f5;
         }
 
         QPushButton#toggleTabsBtn {
@@ -232,7 +262,7 @@ MainWindow::MainWindow(QWidget *parent)
 
         QPushButton#toggleTabsBtn:hover {
             background: #456882;
-            color: #ffffff;
+            color: #f5f5f5;
         }
 
         QWidget#contentArea {
@@ -254,7 +284,7 @@ MainWindow::MainWindow(QWidget *parent)
     leftPanel->setMinimumWidth(100);
     leftPanel->setMaximumWidth(200);
     leftPanel->setObjectName("leftPanel");
-    leftPanel->setStyleSheet("QWidget#leftPanel { background: #ffffff}");
+    leftPanel->setStyleSheet("QWidget#leftPanel { background: #f5f5f5}");
 
     auto *leftPanelLayout = new QVBoxLayout(leftPanel);
     leftPanelLayout->setContentsMargins(0,0,0,0);
@@ -265,24 +295,37 @@ MainWindow::MainWindow(QWidget *parent)
 
     _homeTab = new QWidget();
     _analyzeTab = new QWidget();
+    _settingTab = new QWidget();
 
-    QLabel *homeLabel = new QLabel("🏠");
+    QLabel *homeLabel = new QLabel();
     QPixmap homePixmap(":/images/CTUAV.png");
     homeLabel->setFixedSize(40, 35);
     homeLabel->setPixmap(homePixmap.scaled(homeLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
     homeLabel->setAlignment(Qt::AlignTop);
 
-    QLabel *analyzeLabel = new QLabel("📊");
+    QLabel *analyzeLabel = new QLabel();
     QPixmap analPixmap(":/images/Anal.png");
-    analyzeLabel->setFixedSize(40, 35);
-    analyzeLabel->setPixmap(analPixmap.scaled(analyzeLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    QPixmap smallPixmap = analPixmap.scaled(35, 35, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QIcon analIcon(smallPixmap);
+    analyzeLabel->setPixmap(analIcon.pixmap(40, 40));
+    analyzeLabel->setFixedSize(40, 40);
     analyzeLabel->setAlignment(Qt::AlignTop);
+
+    QLabel *settingLabel = new QLabel();
+    QPixmap settingPixmap(":/images/setting.png");
+    QPixmap smallsettingPixmap = settingPixmap.scaled(35, 35, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QIcon settingIcon(smallsettingPixmap);
+    settingLabel->setPixmap(settingIcon.pixmap(40, 40));
+    settingLabel->setFixedSize(40, 45);
+    settingLabel->setAlignment(Qt::AlignTop);
 
     _tabWidget->addTab(_homeTab, "");
     _tabWidget->addTab(_analyzeTab, "");
+    _tabWidget->addTab(_settingTab, "");
 
     _tabWidget->tabBar()->setTabButton(0, QTabBar::LeftSide, homeLabel);
     _tabWidget->tabBar()->setTabButton(1, QTabBar::LeftSide, analyzeLabel);
+    _tabWidget->tabBar()->setTabButton(2, QTabBar::LeftSide, settingLabel);
 
     mainLayout->addWidget(_tabWidget, 1);
 
@@ -293,11 +336,21 @@ MainWindow::MainWindow(QWidget *parent)
     _sidebarCollapsed = false;
 
     addThemeToggleButton();
-
     addToggleSwitch();
 
     setupHomeTab();
     setupAnalyzeTab();
+}
+
+void MainWindow::reset()
+{
+    _thrustLabel->setText(QString("Thrust: %1 N").arg(throttleValue, 0, 'f', 1));
+    _pwmLabel->setText(QString("PWM: %1").arg(pwmValue, 0, 'f', 1));
+    _torqueLabel->setText(QString("Torque: %1 Nm").arg(torqueValue, 0, 'f', 1));
+    _voltageLabel->setText(QString("Voltage: %1 V").arg(voltageValue, 0, 'f', 1));
+    _currentLabel->setText(QString("Current: %1 A").arg(currentValue, 0, 'f', 1));
+    _temperatureLabel->setText(QString("Temperature: %1 °C").arg(temperatureValue, 0, 'f', 1));
+    _RPMLabel->setText(QString("RPM: %1").arg(RPMValue, 0, 'f', 1));
 }
 
 MainWindow::~MainWindow()

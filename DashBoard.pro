@@ -14,6 +14,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     dashboardwidget.cpp \
+    settingtab.cpp \
     theme.cpp \
     toggleswitch.cpp
 

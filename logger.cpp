@@ -14,11 +14,11 @@ void MainWindow::saveDataToCSV()
     if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QTextStream stream(&file);
 
-        stream << "Timestamp,Thrust,PWM\n";
+        stream << "Timestamp,Thrust,Torque,Voltage,Current,PWM\n";
 
         for (auto it = _dataBuffer.begin(); it != _dataBuffer.end(); ++it) {
             const auto &data = *it;
-            stream << data.timestamp << "," << data.throttle << "," << data.pwm << "\n";
+            stream << data.timestamp << "," << data.thrust << "," << data.torque << "," << data.current << "," << data.voltage << "," << data.pwm << "\n";
         }
 
         file.close();

@@ -3,6 +3,7 @@
 <qresource prefix="/">
     <file>images/CTUAV.png</file>
     <file>images/Anal.png</file>
+    <file>images/setting.png</file>
     <file>images/up.png</file>
     <file>images/down.png</file>
 </qresource>

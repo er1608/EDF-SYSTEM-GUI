@@ -15,7 +15,10 @@ QT_USE_NAMESPACE
 
 struct DataPoint {
     double timestamp;
-    double throttle;
+    double thrust;
+    double torque;
+    double voltage;
+    double current;
     double pwm;
 };
 
@@ -40,40 +43,44 @@ private slots:
     void saveDataToCSV();
 
 private:
-    double _tempMin = std::numeric_limits<double>::max();
-    double _tempMax = std::numeric_limits<double>::lowest();
-    double _voltMin = std::numeric_limits<double>::max();
-    double _voltMax = std::numeric_limits<double>::lowest();
-    double _currentMin = std::numeric_limits<double>::max();
-    double _currentMax = std::numeric_limits<double>::lowest();
-    double _throttleMin = std::numeric_limits<double>::max();
-    double _throttleMax = std::numeric_limits<double>::lowest();
-    double _RPMMin = std::numeric_limits<double>::max();
-    double _RPMMax = std::numeric_limits<double>::lowest();
+    double _thrustMin = 0;
+    double _thrustMax = 100;
+    double _voltMin = 0;
+    double _voltMax = 100;
+    double _currentMin = 0;
+    double _currentMax = 100;
+    double _torqueMin = 0;
+    double _torqueMax = 100;
+
     int stopFlag = 0;
-    double throttleValue = 0.0, pwmValue = 0.0;
+    double throttleValue = 0.0, pwmValue = 0.0, torqueValue = 0.0;
     double currentValue = 0.0, voltageValue = 0.0, temperatureValue = 0.0, RPMValue = 0.0;
     bool swcurrent = false;
+
+    QLabel *_thrustLabel;
+    QLabel *_pwmLabel;
+    QLabel *_torqueLabel;
+    QLabel *_voltageLabel;
+    QLabel *_currentLabel;
+    QLabel *_temperatureLabel;
+    QLabel *_RPMLabel;
 
     QSerialPort *_serialPort;
     bool _plotting;
     bool _timeReset = false;
     QChart *_chart;
-    QLineSeries *_throttleSeries;
     QTime _startTime;
-    QLabel *_pwmLabel;
-    QLabel *_throttleLabel;
+
     QTextEdit *_logTextEdit;
     QVector<DataPoint> _dataBuffer;
     bool _isDarkMode;
 
-    QChartView* setupMainChart();
-    void updatePlot(double throttle, double pwm);
-    void updateAnalyzeCharts(double temp, double current, double voltage, double RPM);
+    void updateAnalyzeCharts(double thrust, double torque, double voltage,double current, double pwm);
 
     QTabWidget *_tabWidget;
     QWidget *_homeTab;
     QWidget *_analyzeTab;
+    QWidget *_settingTab;
 
     bool _sidebarCollapsed;
 
@@ -82,6 +89,7 @@ private:
 
     void setupHomeTab();
     void setupAnalyzeTab();
+    void setupSettingTab();
     QChartView* createAnalyzeChart(const QString &title, const QString &yTitle, QLineSeries *series);
 
     void saveLogToCSV(const QString& message);
@@ -90,6 +98,15 @@ private:
     void addToggleSwitch();
     void applyDarkTheme();
     void applyLightTheme();
+    void reset();
+
+    QStringList _csvHeaders;
+    QLineSeries *_csvSeries;
+    QTableWidget *_csvTableWidget;
+    QVector<QStringList> _csvData;
+
+    void setupPlotTab(QWidget *tab);
+    void setupTableTab(QWidget *tab);
 };
 
 #endif // MAINWANT

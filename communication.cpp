@@ -54,10 +54,12 @@ void MainWindow::readData()
             }
         }
 
-        if (_plotting && (temperatureOk || voltageOk || currentOk || RPMOk || throttleOk || pwmOk)) {
-            updateAnalyzeCharts(temperatureValue, currentValue, voltageValue, RPMValue);
-            updatePlot(throttleValue, pwmValue);
+        torqueValue = throttleValue;
 
-        }
+        _thrustLabel->setText(QString("Thrust: %1").arg(throttleValue, 0, 'f', 1));
+        _pwmLabel->setText(QString("PWM: %1").arg(pwmValue, 0, 'f', 1));
+
+        if (_plotting && ( voltageOk || currentOk || throttleOk ))
+            updateAnalyzeCharts(throttleValue, torqueValue, voltageValue, currentValue, pwmValue);
     }
 }

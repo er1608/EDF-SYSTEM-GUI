@@ -63,7 +63,6 @@ void MainWindow::toggleTheme()
         applyLightTheme();
     }
 
-    // Update button text
     QPushButton *themeBtn = findChild<QPushButton*>("themeToggleBtn");
     if (themeBtn) {
         themeBtn->setText(_isDarkMode ? "🌙" : "☀️");
@@ -79,12 +78,47 @@ void MainWindow::applyDarkTheme()
             font-family: "Segoe UI", "Roboto", sans-serif;
         }
 
-        QChartView {
-            background: #0e202d;
+        QScrollArea {
             border: none;
-            border-radius: 10px;
-            padding: 6px;
-            background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #1b3c53, stop:1 #0e202d);
+            background: #0e202d;
+        }
+
+        QWidget#ChartContainerWidget {
+            background: #0e202d;
+        }
+
+        QScrollBar:vertical {
+            border: none;
+            background: #0e202d;
+            width: 10px;
+            margin: 0px;
+        }
+
+        QScrollBar::handle:vertical {
+            background: #1b3c53;
+            min-height: 20px;
+            border-radius: 5px;
+        }
+
+        QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+            height: 0px;
+        }
+
+        QScrollBar:horizontal {
+            border: none;
+            background: #0e202d;
+            height: 10px;
+            margin: 0px;
+        }
+
+        QScrollBar::handle:horizontal {
+            background: #1b3c53;
+            min-width: 20px;
+            border-radius: 5px;
+        }
+
+        QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+            width: 0px;
         }
 
         QGroupBox {
@@ -123,7 +157,7 @@ void MainWindow::applyDarkTheme()
 
         QPushButton:hover {
             background: #234c6a;
-            color: #ffffff;
+            color: #f5f5f5;
         }
 
         QPushButton:pressed {
@@ -224,19 +258,16 @@ void MainWindow::applyDarkTheme()
             border: 1px solid #456882;
             border-radius: 10px;
             padding: 6px;
-            background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #0e202d, stop:1 #0e202d);
         }
 
         QTabWidget::pane {
             border: 1px solid #0e202d;
-            border-radius: 8px;
             background: #0e202d;
             padding: 4px;
         }
 
         QTabWidget::tab-bar {
             alignment: left;
-            width: 69px;
         }
 
         QTabBar {
@@ -274,7 +305,7 @@ void MainWindow::applyDarkTheme()
 
         QTabBar::tab:hover:!selected {
             background: #1b3c53;
-            color: #ffffff;
+            color: #f5f5f5;
         }
 
         QPushButton#toggleTabsBtn {
@@ -288,7 +319,7 @@ void MainWindow::applyDarkTheme()
 
         QPushButton#toggleTabsBtn:hover {
             background: #456882;
-            color: #ffffff;
+            color: #f5f5f5;
         }
 
         QWidget#contentArea {
@@ -309,6 +340,49 @@ void MainWindow::applyLightTheme()
             background: #f5f5f5;
             color: #4a5b6c;
             font-family: "Segoe UI", "Roboto", sans-serif;
+        }
+
+        QScrollArea {
+            border: none;
+            background: #f5f5f5;
+        }
+
+        QWidget#ChartContainerWidget {
+            background: #f5f5f5;
+        }
+
+        QScrollBar:vertical {
+            border: none;
+            background: #f5f5f5;
+            width: 10px;
+            margin: 0px;
+        }
+
+        QScrollBar::handle:vertical {
+            background: #6c8a9e;
+            min-height: 20px;
+            border-radius: 5px;
+        }
+
+        QScrollBar:horizontal {
+            border: none;
+            background: #f5f5f5;
+            height: 10px;
+            margin: 0px;
+        }
+
+        QScrollBar::handle:horizontal {
+            background: #6c8a9e;
+            min-width: 20px;
+            border-radius: 5px;
+        }
+
+        QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+            width: 0px;
+        }
+
+        QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+            height: 0px;
         }
 
         QChartView {
@@ -453,14 +527,12 @@ void MainWindow::applyLightTheme()
 
         QTabWidget::pane {
             border: 1px solid #f5f5f5;
-            border-radius: 8px;
             background: #f5f5f5;
             padding: 4px;
         }
 
         QTabWidget::tab-bar {
             alignment: left;
-            width: 69px;
         }
 
         QTabBar {
@@ -512,7 +584,7 @@ void MainWindow::applyLightTheme()
 
         QPushButton#toggleTabsBtn:hover {
             background: #80a1ba;
-            color: #ffffff;
+            color: #f5f5f5;
         }
 
         QWidget#contentArea {
