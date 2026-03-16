@@ -10,6 +10,7 @@
 #include <QLabel>
 #include <QTextEdit>
 #include <QVector>
+#include <QTimer>
 
 QT_USE_NAMESPACE
 
@@ -21,6 +22,19 @@ struct DataPoint {
     double current;
     double pwm;
 };
+
+struct LCConfig {
+    int id;
+    int quantity;
+    int val_per_unit;
+    int gain;
+    int sign;
+    char channel;
+    int sampleAverage;
+    int tarePrecision;
+};
+
+extern QVector<LCConfig> _lcConfigs;
 
 namespace Ui {
 class MainWindow;
@@ -52,10 +66,14 @@ private:
     double _torqueMin = 0;
     double _torqueMax = 100;
 
+    double _lastKey = -1;
+    double _lastThrust = 0;
+
     int stopFlag = 0;
     double throttleValue = 0.0, pwmValue = 0.0, torqueValue = 0.0;
     double currentValue = 0.0, voltageValue = 0.0, temperatureValue = 0.0, RPMValue = 0.0;
     bool swcurrent = false;
+    int _currentLC = 0;
 
     QLabel *_thrustLabel;
     QLabel *_pwmLabel;
@@ -65,6 +83,11 @@ private:
     QLabel *_temperatureLabel;
     QLabel *_RPMLabel;
 
+    QChartView *_thrustChart;
+    QChartView *_torqueChart;
+    QChartView *_voltChart;
+    QChartView *_currentChart;
+
     QSerialPort *_serialPort;
     bool _plotting;
     bool _timeReset = false;
@@ -73,14 +96,22 @@ private:
 
     QTextEdit *_logTextEdit;
     QVector<DataPoint> _dataBuffer;
+    QVector<DataPoint> _dataPDFBuffer;
+    QVector<DataPoint> bufferCopy;
     bool _isDarkMode;
 
     void updateAnalyzeCharts(double thrust, double torque, double voltage,double current, double pwm);
+    void appendInterpolated(QLineSeries* series, double key, double value);
 
     QTabWidget *_tabWidget;
     QWidget *_homeTab;
     QWidget *_analyzeTab;
     QWidget *_settingTab;
+
+    QTimer *_autoTimer = nullptr;
+    int autoValue = 0;
+    bool pdf = false;
+    QByteArray _rxBuffer;
 
     bool _sidebarCollapsed;
 
@@ -90,15 +121,23 @@ private:
     void setupHomeTab();
     void setupAnalyzeTab();
     void setupSettingTab();
+    void updateAxis(QChart* chart, double key, double minY, double maxY);
     QChartView* createAnalyzeChart(const QString &title, const QString &yTitle, QLineSeries *series);
 
     void saveLogToCSV(const QString& message);
+    void saveDataToPDF();
     void addThemeToggleButton();
     void toggleTheme();
     void addToggleSwitch();
     void applyDarkTheme();
     void applyLightTheme();
     void reset();
+
+    void setupSignalGeneratorTab(QWidget *tab);
+    void setupPWMTab(QWidget *tab);
+    void setupLCTab(QWidget *tab);
+    void setupMavlinkTab(QWidget *tab);
+    void setupFFTTab(QWidget *tab);
 
     QStringList _csvHeaders;
     QLineSeries *_csvSeries;

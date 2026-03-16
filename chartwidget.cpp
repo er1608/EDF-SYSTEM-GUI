@@ -5,6 +5,32 @@
 #include <QDateTime>
 #include <QtWidgets>
 
+// void MainWindow::appendInterpolated(QLineSeries* series, double key, double value)
+// {
+//     const int INTERP_POINTS = 4;   // số điểm nội suy
+
+//     if (_lastKey < 0) {
+//         series->append(key, value);
+//         _lastKey = key;
+//         _lastThrust = value;
+//         return;
+//     }
+
+//     double dt = (key - _lastKey) / (INTERP_POINTS + 1);
+//     double dv = (value - _lastThrust) / (INTERP_POINTS + 1);
+
+//     for (int i = 1; i <= INTERP_POINTS; i++) {
+//         double t = _lastKey + dt * i;
+//         double v = _lastThrust + dv * i;
+//         series->append(t, v);
+//     }
+
+//     series->append(key, value);
+
+//     _lastKey = key;
+//     _lastThrust = value;
+// }
+
 void MainWindow::updateAnalyzeCharts(double thrust, double torque, double voltage, double current, double pwm)
 {
     if (_timeReset) {
@@ -24,18 +50,19 @@ void MainWindow::updateAnalyzeCharts(double thrust, double torque, double voltag
     _torqueMax = std::max(_torqueMax, torque);
 
     _series1->append(key, thrust);
-    _series2->append(key, voltage);
-    _series3->append(key, current);
-    _series4->append(key, torque);
+    // _series2->append(key, voltage);
+    // _series3->append(key, current);
+    // _series4->append(key, torque);
 
-    if (_series1->count() > 1200) {
+    if (_series1->count() > 4700) {
         _series1->remove(0);
-        _series2->remove(0);
-        _series3->remove(0);
-        _series4->remove(0);
+        // _series2->remove(0);
+        // _series3->remove(0);
+        // _series4->remove(0);
     }
 
     _dataBuffer.append(DataPoint{key, thrust, torque, voltage, current, pwm});
+    if(pdf) _dataPDFBuffer.append(DataPoint{key, thrust, torque, voltage, current, pwm});
 
     auto updateChartAxis = [key](QChart* chart, double minY, double maxY, int stopFlag) {
         auto axes = chart->axes();
@@ -59,10 +86,47 @@ void MainWindow::updateAnalyzeCharts(double thrust, double torque, double voltag
     };
 
     if (_series1->chart()) updateChartAxis(_series1->chart(), _thrustMin, _thrustMax, stopFlag);
-    if (_series2->chart()) updateChartAxis(_series2->chart(), _voltMin, _voltMax, stopFlag);
-    if (_series3->chart()) updateChartAxis(_series3->chart(), _currentMin, _currentMax, stopFlag);
-    if (_series4->chart()) updateChartAxis(_series4->chart(), _torqueMin, _torqueMax, stopFlag);
+    // if (_series2->chart()) updateChartAxis(_series2->chart(), _voltMin, _voltMax, stopFlag);
+    // if (_series3->chart()) updateChartAxis(_series3->chart(), _currentMin, _currentMax, stopFlag);
+    // if (_series4->chart()) updateChartAxis(_series4->chart(), _torqueMin, _torqueMax, stopFlag);
 }
+
+// void MainWindow::updateAnalyzeCharts(double thrust, double torque, double voltage, double current, double pwm)
+// {
+//     static int frame = 0;
+
+//     if (_timeReset) {
+//         _startTime = QTime::currentTime();
+//         _timeReset = false;
+//     }
+
+//     double key = _startTime.msecsTo(QTime::currentTime()) / 1000.0;
+
+//     _series1->append(key, thrust);
+//     _series2->append(key, voltage);
+//     _series3->append(key, current);
+//     _series4->append(key, torque);
+
+//     if (_series1->count() > 1200) {
+//         _series1->removePoints(0, 1);
+//         _series2->removePoints(0, 1);
+//         _series3->removePoints(0, 1);
+//         _series4->removePoints(0, 1);
+//     }
+
+//     frame++;
+
+//     // chỉ update axis mỗi 5 lần
+//     if (frame % 5 == 0) {
+
+//         auto axisX = static_cast<QValueAxis*>(_series1->chart()->axisX());
+//         if (key > axisX->max())
+//             axisX->setRange(key - 10, key);
+
+//         auto axisY = static_cast<QValueAxis*>(_series1->chart()->axisY());
+//         axisY->setRange(_thrustMin, _thrustMax);
+//     }
+// }
 
 QChartView* MainWindow::createAnalyzeChart(const QString &title, const QString &yTitle, QLineSeries *series)
 {

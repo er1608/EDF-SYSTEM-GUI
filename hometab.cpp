@@ -22,25 +22,25 @@ void MainWindow::setupHomeTab()
     miniDashboard->setTitleColor(QColor(255, 107, 107));
 
     auto *valueSlider = new QSlider(Qt::Horizontal, _homeTab);
-    valueSlider->setRange(0, 100);
+    valueSlider->setRange(0, 1000);
     valueSlider->setValue(0);
 
     auto *valueSpinBox = new QDoubleSpinBox(_homeTab);
-    valueSpinBox->setRange(0, 100);
+    valueSpinBox->setRange(0, 1000);
     valueSpinBox->setValue(0);
-    valueSpinBox->setDecimals(2);
+    valueSpinBox->setDecimals(0);
 
     auto *minValueLabel = new QLabel(tr("Min Value:"), _homeTab);
     auto *minValueSpinBox = new QDoubleSpinBox(_homeTab);
-    minValueSpinBox->setRange(0, 100);
+    minValueSpinBox->setRange(0, 1000);
     minValueSpinBox->setValue(0);
-    minValueSpinBox->setDecimals(2);
+    minValueSpinBox->setDecimals(0);
 
     auto *maxValueLabel = new QLabel(tr("Max Value:"), _homeTab);
     auto *maxValueSpinBox = new QDoubleSpinBox(_homeTab);
-    maxValueSpinBox->setRange(0, 100);
-    maxValueSpinBox->setValue(100);
-    maxValueSpinBox->setDecimals(2);
+    maxValueSpinBox->setRange(0, 1000);
+    maxValueSpinBox->setValue(1000);
+    maxValueSpinBox->setDecimals(0);
 
     auto *clearPlotButton = new QPushButton(tr("Clear Plot"), _homeTab);
     auto *startPlotButton = new QPushButton(tr("Start Plot"), _homeTab);
@@ -65,29 +65,82 @@ void MainWindow::setupHomeTab()
 
     auto *displayLayout = new QVBoxLayout(scrollContentWidget);
     displayLayout->setSpacing(10);
-    displayLayout->setContentsMargins(10, 10, 10, 10);
+    displayLayout->setContentsMargins(10,10,10,10);
 
     _series1 = new QLineSeries();
     _series2 = new QLineSeries();
     _series3 = new QLineSeries();
     _series4 = new QLineSeries();
 
-    auto *mainChartView = createAnalyzeChart("Thrust", "Thrust (N)", _series1);
-    auto *torqueChart = createAnalyzeChart("Torque", "Torque (Nm)", _series2);
-    auto *voltChart = createAnalyzeChart("Voltage", "Voltage (V)", _series3);
-    auto *currentChart = createAnalyzeChart("Current", "Current (A)", _series4);
+    _thrustChart  = createAnalyzeChart("Thrust",  "Thrust (N)",  _series1);
+    _torqueChart  = createAnalyzeChart("Torque",  "Torque (Nm)", _series2);
+    _voltChart    = createAnalyzeChart("Voltage", "Voltage (V)", _series3);
+    _currentChart = createAnalyzeChart("Current", "Current (A)", _series4);
 
-    mainChartView->setMinimumHeight(250);
-    voltChart->setMinimumHeight(250);
-    currentChart->setMinimumHeight(250);
-    torqueChart->setMinimumHeight(250);
+    _thrustChart->setMinimumHeight(250);
+    _torqueChart->setMinimumHeight(250);
+    _voltChart->setMinimumHeight(250);
+    _currentChart->setMinimumHeight(250);
 
-    displayLayout->addWidget(mainChartView);
-    displayLayout->addWidget(torqueChart);
-    displayLayout->addWidget(voltChart);
-    displayLayout->addWidget(currentChart);
+    displayLayout->addWidget(_thrustChart);
+    displayLayout->addWidget(_torqueChart);
+    displayLayout->addWidget(_voltChart);
+    displayLayout->addWidget(_currentChart);
 
-    displayLayout->addStretch();
+    _thrustChart->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    _torqueChart->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    _voltChart->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    _currentChart->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    displayLayout->addWidget(_thrustChart, 1);
+    displayLayout->addWidget(_torqueChart, 1);
+    displayLayout->addWidget(_voltChart, 1);
+    displayLayout->addWidget(_currentChart, 1);
+
+    QToolButton *chartSelector = new QToolButton();
+    chartSelector->setText("Charts");
+    chartSelector->setPopupMode(QToolButton::InstantPopup);
+
+    QMenu *menu = new QMenu(chartSelector);
+
+    QAction *thrustAct  = menu->addAction("Thrust");
+    QAction *torqueAct  = menu->addAction("Torque");
+    QAction *voltAct    = menu->addAction("Voltage");
+    QAction *currentAct = menu->addAction("Current");
+
+    thrustAct->setCheckable(true);
+    torqueAct->setCheckable(true);
+    voltAct->setCheckable(true);
+    currentAct->setCheckable(true);
+
+    thrustAct->setChecked(true);
+    torqueAct->setChecked(true);
+    voltAct->setChecked(true);
+    currentAct->setChecked(true);
+
+    chartSelector->setMenu(menu);
+
+    connect(thrustAct, &QAction::toggled, this, [=](bool checked){
+        _thrustChart->setVisible(checked);
+    });
+
+    connect(torqueAct, &QAction::toggled, this, [=](bool checked){
+        _torqueChart->setVisible(checked);
+    });
+
+    connect(voltAct, &QAction::toggled, this, [=](bool checked){
+        _voltChart->setVisible(checked);
+    });
+
+    connect(currentAct, &QAction::toggled, this, [=](bool checked){
+        _currentChart->setVisible(checked);
+    });
+
+    auto *topLayout = new QHBoxLayout();
+    topLayout->addStretch();
+    topLayout->addWidget(chartSelector);
+
+    displayLayout->insertLayout(0, topLayout);
 
     auto *scrollArea = new QScrollArea();
     scrollArea->setWidget(scrollContentWidget);
@@ -142,21 +195,27 @@ void MainWindow::setupHomeTab()
     auto *commandGroup = new QGroupBox(tr("Command"), _homeTab);
     auto *commandLayout = new QGridLayout(commandGroup);
     auto *commandEdit = new QLineEdit(_homeTab);
-    auto *sendButton = new QPushButton(tr("Send Command"), _homeTab);
+    auto *sendButton = new QPushButton(tr("Send"), _homeTab);
 
     auto *startButton = new QPushButton(tr("Start"), _homeTab);
     auto *stopButton = new QPushButton(tr("Stop"), _homeTab);
+    auto *rampModeButton = new QPushButton(tr("Ramp Mode"), _homeTab);
+    auto *sineModeButton = new QPushButton(tr("Sine Mode"), _homeTab);
     startButton->setObjectName("startButton");
     stopButton->setObjectName("stopButton");
+    rampModeButton->setObjectName("rampModeButton");
+    sineModeButton->setObjectName("sineModeButton");
     startButton->setStyleSheet("#startButton { color: green; font-weight: bold; }");
     stopButton->setStyleSheet("#stopButton { color: red; font-weight: bold; }");
 
-    commandEdit->setPlaceholderText("Enter command to send via UART...");
+    commandEdit->setPlaceholderText("Enter command to send");
     commandLayout->addWidget(new QLabel(tr("Command:")), 0, 0);
     commandLayout->addWidget(commandEdit, 0, 1, 1, 2);
-    commandLayout->addWidget(startButton, 1, 0);
-    commandLayout->addWidget(stopButton, 1, 1);
-    commandLayout->addWidget(sendButton, 1, 2);
+    commandLayout->addWidget(sendButton, 0, 3);
+    commandLayout->addWidget(rampModeButton, 1, 0);
+    commandLayout->addWidget(sineModeButton, 1, 1);
+    commandLayout->addWidget(startButton, 1, 2);
+    commandLayout->addWidget(stopButton, 1, 3);
 
     auto *dataGroup = new QGroupBox(tr("Data Signal"), _homeTab);
     auto *dataLayout = new QGridLayout(dataGroup);
@@ -257,10 +316,10 @@ void MainWindow::setupHomeTab()
     connect(valueSpinBox,
             QOverload<double>::of(&QDoubleSpinBox::valueChanged),
             _homeTab,
-            [miniDashboard, valueSlider](double value) {
+            [miniDashboard, valueSlider](int value) {
                 valueSlider->blockSignals(true);
                 miniDashboard->setValue(value);
-                valueSlider->setValue(static_cast<int>(value));
+                valueSlider->setValue(value);
                 valueSlider->blockSignals(false);
             });
 
@@ -274,7 +333,8 @@ void MainWindow::setupHomeTab()
             }
             else
             {
-                if (value > 50) value = 50;
+                // if (value > 50) value = 50;
+                if (value > 29) value = 29;
                 else if (value < 0) value = 0;
             }
             QString command = QString("Power:%1\n").arg(value);
@@ -288,27 +348,27 @@ void MainWindow::setupHomeTab()
 
     connect(valueSpinBox, &QDoubleSpinBox::editingFinished,
             this, [this, valueSpinBox, minValueSpinBox, maxValueSpinBox]() {
-                if (_serialPort && _serialPort->isOpen()) {
-                    double value = valueSpinBox->value();
-                    if (swcurrent)
-                    {
-                        if (value > maxValueSpinBox->value()) value = maxValueSpinBox->value();
-                        else if (value < minValueSpinBox->value()) value = minValueSpinBox->value();
-                    }
-                    else
-                    {
-                        if (value > 50) value = 50;
-                        else if (value < 0) value = 0;
-                    }
-                    QString command = QString("Power:%1\n").arg(value, 0, 'f', 1);
-                    _serialPort->write(command.toUtf8());
+        if (_serialPort && _serialPort->isOpen()) {
+            double value = valueSpinBox->value();
+            if (swcurrent)
+            {
+                if (value > maxValueSpinBox->value()) value = maxValueSpinBox->value();
+                else if (value < minValueSpinBox->value()) value = minValueSpinBox->value();
+            }
+            else
+            {
+                if (value > 50) value = 50;
+                else if (value < 0) value = 0;
+            }
+            QString command = QString("Power:%1\n").arg(value, 0, 'f', 1);
+            _serialPort->write(command.toUtf8());
 
-                    QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
-                    _logTextEdit->append(QString("[%1] AUTO SEND: %2")
-                                             .arg(timestamp, command.trimmed()));
-                    saveLogToCSV(QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
-                }
-            });
+            QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
+            _logTextEdit->append(QString("[%1] AUTO SEND: %2")
+                                     .arg(timestamp, command.trimmed()));
+            saveLogToCSV(QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
+        }
+    });
 
     connect(startButton, &QPushButton::clicked, _homeTab, [this]() {
         if (_serialPort && _serialPort->isOpen()) {
@@ -323,6 +383,7 @@ void MainWindow::setupHomeTab()
 
     connect(stopButton, &QPushButton::clicked, _homeTab, [this, valueSlider, valueSpinBox, miniDashboard]() {
         if (_serialPort && _serialPort->isOpen()) {
+            _autoTimer->stop();
             valueSlider->blockSignals(true);
             miniDashboard->setValue(0);
             valueSlider->setValue(static_cast<int>(0));
@@ -337,6 +398,36 @@ void MainWindow::setupHomeTab()
             saveLogToCSV(QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
         }
     });
+
+    // connect(autoButton, &QPushButton::clicked, this,[this, valueSlider]() {
+    //     if (!_serialPort || !_serialPort->isOpen())
+    //         return;
+
+    //     if (!_autoTimer) {
+    //         _autoTimer = new QTimer(this);
+
+    //         connect(_autoTimer, &QTimer::timeout, this,[this, valueSlider]() {
+    //             if (autoValue >= 23) {
+    //                 _autoTimer->stop();
+    //                 autoValue = 0;
+    //                 pdf = false;
+    //                 bufferCopy = _dataPDFBuffer;
+    //                 saveDataToPDF();
+    //                 _dataPDFBuffer.clear();
+    //                 return;
+    //             }
+
+    //             autoValue++;
+    //             valueSlider->setValue(autoValue);
+    //         });
+    //     }
+
+    //     autoValue = 0;
+    //     valueSlider->setValue(0);
+    //     pdf = true;
+
+    //     _autoTimer->start(1000);
+    // });
 
     connect(minValueSpinBox,
             QOverload<double>::of(&QDoubleSpinBox::valueChanged),
@@ -383,6 +474,7 @@ void MainWindow::setupHomeTab()
     connect(commandEdit, &QLineEdit::returnPressed, _homeTab, [sendButton]() {
         sendButton->click();
     });
+
 
     connect(startPlotButton, &QPushButton::clicked, _homeTab, [this]() {
         _plotting = true;

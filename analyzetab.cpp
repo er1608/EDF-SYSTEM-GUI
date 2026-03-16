@@ -17,6 +17,13 @@ void MainWindow::setupAnalyzeTab()
     analyzeTabs->setTabPosition(QTabWidget::South);
     analyzeTabs->setFont(QFont("Arial", 9, QFont::Bold));
 
+    analyzeTabs->setStyleSheet(R"(
+        QTabBar::tab {
+        min-width: 79px;
+        height: 18px;
+        }
+    )");
+
     auto *csvPlotTab = new QWidget();
     setupPlotTab(csvPlotTab);
     analyzeTabs->addTab(csvPlotTab, "Chart");
@@ -337,21 +344,19 @@ void MainWindow::setupTableTab(QWidget *tab)
 
     _csvTableWidget = new QTableWidget();
     _csvTableWidget->setFont(QFont("Arial", 9));
-    _csvTableWidget->setAlternatingRowColors(true);
+
     _csvTableWidget->setStyleSheet(
         "QTableWidget {"
-        "  gridline-color: #ddd;"
+        "  gridline-color: #f5f5f5;"
+        "  background-image: url(:/images/CTUAV.png);"
+        "  background-repeat: no-repeat;"
+        "  background-position: center;"
         "}"
-        "QHeaderView::section {"
-        "  background-color: #f0f0f0;"
-        "  padding: 5px;"
-        "  border: 1px solid #ddd;"
-        "  font-weight: bold;"
-        "}"
+
         "QTableWidget::item {"
-        "  padding: 3px;"
+        "  background: rgba(255,255,255,0.85);"
         "}"
-        );
+    );
 
     _csvTableWidget->setSortingEnabled(true);
 

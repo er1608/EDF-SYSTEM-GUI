@@ -146,13 +146,13 @@ MainWindow::MainWindow(QWidget *parent)
         }
 
         QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
-            image: url(:/images/up.png);
+            image: url(:/images/up_white.png);
             width: 12px;
             height: 12px;
         }
 
         QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
-            image: url(:/images/down.png);
+            image: url(:/images/down_white.png);
             width: 12px;
             height: 12px;
         }
@@ -340,6 +340,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     setupHomeTab();
     setupAnalyzeTab();
+    setupSettingTab();
 }
 
 void MainWindow::reset()

@@ -13,7 +13,7 @@ public:
 
     DashBoardWidget *q_ptr;
 
-    double maxValue = 100.0;
+    double maxValue = 1000.0;
     double minValue = 0.0;
     double startAngle = -50.0;
     double endAngle = 230.0;
