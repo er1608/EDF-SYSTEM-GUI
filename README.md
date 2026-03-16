@@ -1,7 +1,7 @@
 
-# Motor Testbench
+# Thrust Stand System
 
-The Motor Testbench source are specialized testing platforms designed to measure and analyze the performance of electric propulsion systems used in UAVs.
+Thrust Stand System source are specialized testing platforms designed to measure and analyze the performance of electric propulsion systems used in UAVs.
 
 
 
