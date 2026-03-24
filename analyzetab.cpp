@@ -84,15 +84,35 @@ void MainWindow::setupPlotTab(QWidget *tab)
     axisY->setTitleFont(QFont("Arial", 9));
     axisY->setLabelFormat("%.1f");
 
+    QColor textColor("#6B7280");
+
+    csvChart->setTitleBrush(QBrush(textColor));
+
+    axisX->setLabelsColor(textColor);
+    axisY->setLabelsColor(textColor);
+
+    QPen pen(textColor);
+    axisX->setLinePen(pen);
+    axisY->setLinePen(pen);
+
+    QColor gridColor = textColor;
+    gridColor.setAlpha(80);
+
+    axisX->setGridLinePen(QPen(gridColor));
+    axisY->setGridLinePen(QPen(gridColor));
+
     csvChart->addAxis(axisX, Qt::AlignBottom);
     csvChart->addAxis(axisY, Qt::AlignLeft);
+
+    axisX->setTitleBrush(QBrush(textColor));
+    axisY->setTitleBrush(QBrush(textColor));
 
     _csvSeries->attachAxis(axisX);
     _csvSeries->attachAxis(axisY);
 
     csvChart->legend()->setVisible(false);
     csvChart->setBackgroundBrush(QBrush(QColor(27, 36, 50)));
-    csvChart->setTheme(QChart::ChartThemeBlueCerulean);
+    csvChart->setBackgroundBrush(QBrush(QColor(0, 0, 0, 0)));
 
     csvChart->layout()->setContentsMargins(0, 0, 0, 0);
     csvChart->setBackgroundRoundness(0);

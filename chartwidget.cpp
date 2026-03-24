@@ -132,21 +132,38 @@ QChartView* MainWindow::createAnalyzeChart(const QString &title, const QString &
 {
     auto *chart = new QChart();
 
-    QPen pen(QColor(65, 90, 119), 3);
-    pen.setCapStyle(Qt::RoundCap);
-    pen.setJoinStyle(Qt::RoundJoin);
-    series->setPen(pen);
-
     chart->addSeries(series);
     chart->legend()->setVisible(false);
-    chart->setBackgroundBrush(QBrush(QColor(27, 36, 50)));
-    chart->setTheme(QChart::ChartThemeBlueCerulean);
+    chart->setBackgroundBrush(QBrush(QColor(0, 0, 0, 0)));
 
     auto *axisX = new QValueAxis();
     auto *axisY = new QValueAxis();
 
     axisY->setTitleText(yTitle);
     axisX->setRange(-10, 0);
+
+    QColor textColor("#6B7280");
+
+    chart->setTitleBrush(QBrush(textColor));
+
+    axisX->setLabelsColor(textColor);
+    axisY->setLabelsColor(textColor);
+
+    QPen pen(textColor);
+    axisX->setLinePen(pen);
+    axisY->setLinePen(pen);
+
+    QColor gridColor = textColor;
+    gridColor.setAlpha(80);
+
+    axisX->setGridLinePen(QPen(gridColor));
+    axisY->setGridLinePen(QPen(gridColor));
+
+    chart->addAxis(axisX, Qt::AlignBottom);
+    chart->addAxis(axisY, Qt::AlignLeft);
+
+    axisX->setTitleBrush(QBrush(textColor));
+    axisY->setTitleBrush(QBrush(textColor));
 
     if (title.contains("Thrust")) {
         axisY->setRange(0, 100);
@@ -158,16 +175,6 @@ QChartView* MainWindow::createAnalyzeChart(const QString &title, const QString &
         axisX->setTitleText("Time(s)");
         axisY->setRange(0, 100);
     }
-
-    axisX->setLabelsColor(QColor(166, 177, 225));
-    axisY->setLabelsColor(QColor(166, 177, 225));
-    axisX->setTitleBrush(QBrush(QColor(226, 232, 240)));
-    axisY->setTitleBrush(QBrush(QColor(226, 232, 240)));
-    axisX->setGridLineColor(QColor(45, 50, 80, 100));
-    axisY->setGridLineColor(QColor(45, 50, 80, 100));
-
-    chart->addAxis(axisX, Qt::AlignBottom);
-    chart->addAxis(axisY, Qt::AlignLeft);
 
     series->attachAxis(axisX);
     series->attachAxis(axisY);

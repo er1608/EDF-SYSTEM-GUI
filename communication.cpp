@@ -67,6 +67,24 @@
 //     }
 // }
 
+void MainWindow::refreshSerialPorts()
+{
+    QStringList currentPorts;
+
+    for (const auto &port : QSerialPortInfo::availablePorts()) {
+        currentPorts << port.portName();
+    }
+
+    if (currentPorts != lastPortList) {
+        portComboBox->clear();
+        portComboBox->addItems(currentPorts);
+
+        qDebug() << "Ports updated:" << currentPorts;
+
+        lastPortList = currentPorts;
+    }
+}
+
 void MainWindow::readData()
 {
     if (!_serialPort)
@@ -112,7 +130,7 @@ void MainWindow::readData()
             {
                 RPMValue = trimmedPart.section(':',1).toDouble(&RPMOk);
             }
-            else if (trimmedPart.startsWith("Thrust:"))
+            else if (trimmedPart.startsWith("Throttle:"))
             {
                 throttleValue = trimmedPart.section(':',1).toDouble(&throttleOk) * 5 / 100;
 
@@ -122,10 +140,6 @@ void MainWindow::readData()
             else if (trimmedPart.startsWith("PWM:"))
             {
                 pwmValue = trimmedPart.section(':',1).toDouble(&pwmOk);
-            }
-            else
-            {
-                _logTextEdit->append(part);
             }
         }
 

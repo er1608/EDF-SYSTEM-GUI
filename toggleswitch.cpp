@@ -244,9 +244,9 @@ SwitchButton::SwitchBackground::SwitchBackground(QWidget* parent, QColor color, 
     setFixedHeight(20);
 
     _lg = QLinearGradient(0, 0, 0, height());
-    _lg.setColorAt(0, QColor(0x2d, 0x32, 0x50));
-    _lg.setColorAt(0.2, QColor(0x5d, 0x65, 0x8a));
-    _lg.setColorAt(1, QColor(0xCF, 0xAB, 0x3E));
+    _lg.setColorAt(0, QColor(0x8B, 0x2C, 0x2C));
+    _lg.setColorAt(0.2, QColor(0xA5, 0x3D, 0x3D));
+    _lg.setColorAt(1, QColor(0xCD, 0x5C, 0x5C));
 
     _lg_disabled = QLinearGradient(0, 25, 70, 0);
     _lg_disabled.setColorAt(0, QColor(190, 190, 190));
@@ -326,9 +326,11 @@ SwitchButton::SwitchCircle::SwitchCircle(QWidget* parent, QColor color, bool rec
 
     _enabled = true;
 }
+
 SwitchButton::SwitchCircle::~SwitchCircle()
 {
 }
+
 void SwitchButton::SwitchCircle::paintEvent(QPaintEvent*)
 {
     QPainter* painter = new QPainter;

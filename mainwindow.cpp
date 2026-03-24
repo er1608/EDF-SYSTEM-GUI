@@ -273,6 +273,77 @@ MainWindow::MainWindow(QWidget *parent)
             background: #1b3c53;
             border-right: 1px solid #1b3c53;
         }
+
+        QComboBox {
+            background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                        stop:0 #456882, stop:1 #1b3c53);
+            color: #d2c1b6;
+            border: 1px solid #0e202d !important;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        QComboBox::drop-down {
+            border: none;
+            width: 20px;
+        }
+
+        QComboBox::down-arrow {
+            width: 12px;
+            height: 12px;
+            image: none;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid #d2c1b6;
+        }
+
+        QComboBox QAbstractItemView {
+            background: #0e202d;
+            color: #d2c1b6;
+            border: 1px solid #1b3c53;
+            selection-background-color: #1b3c53;
+            selection-color: #d2c1b6;
+        }
+
+        QToolTip {
+            background-color: #0e202d;
+            color: #d2c1b6;
+            border: 1px solid #456882;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: 'Segoe UI', system-ui;
+            font-size: 13px;
+            opacity: 230;
+        }
+
+        QMenu {
+            background-color: #0e202d;
+            border: 1px solid #1b3c53;
+            border-radius: 5px;
+            padding: 5px 0px;
+        }
+
+        QMenu::item {
+            padding: 8px 30px 8px 20px;
+            color: #d2c1b6;
+            background-color: transparent;
+        }
+
+        QMenu::item:selected {
+            background-color: #1b3c53;
+            color: #d2c1b6;
+        }
+
+        QMenu::item:checked {
+            background-color: #456882;
+            color: #d2c1b6;
+        }
+
+        QMenu::separator {
+            height: 1px;
+            background-color: #456882;
+            margin: 5px 0px;
+        }
     )");
 
     auto *mainWidget = new QWidget(this);
@@ -331,7 +402,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     setCentralWidget(mainWidget);
     resize(1400, 900);
-    setWindowTitle(tr("EDF SYSTEM"));
+    setWindowTitle(tr("KTS SYSTEM"));
 
     _sidebarCollapsed = false;
 

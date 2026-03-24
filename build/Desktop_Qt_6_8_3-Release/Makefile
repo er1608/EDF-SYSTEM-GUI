@@ -1199,7 +1199,9 @@ compiler_rcc_clean:
 	-$(DEL_FILE) qrc_resources.cpp
 qrc_resources.cpp: ../../resources.qrc \
 		/home/khoa/Qt/6.8.3/gcc_64/libexec/rcc \
+		../../images/moon.png \
 		../../images/CTUAV.png \
+		../../images/sun.png \
 		../../images/down.png \
 		../../images/down_white.png \
 		../../images/up_white.png \

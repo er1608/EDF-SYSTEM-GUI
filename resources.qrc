@@ -8,5 +8,7 @@
     <file>images/down.png</file>
     <file>images/up_white.png</file>
     <file>images/down_white.png</file>
+    <file>images/sun.png</file>
+    <file>images/moon.png</file>
 </qresource>
 </RCC>

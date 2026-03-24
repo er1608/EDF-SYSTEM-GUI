@@ -151,41 +151,15 @@ void MainWindow::setupHomeTab()
     // UART Connection
     auto *connectionGroup = new QGroupBox(tr("Connection"), _homeTab);
     auto *connectionLayout = new QGridLayout(connectionGroup);
-    auto *portComboBox = new QComboBox(_homeTab);
     auto *connectButton = new QPushButton(tr("Connect"), _homeTab);
 
-    foreach (auto &port, QSerialPortInfo::availablePorts()) {
-        portComboBox->addItem(port.portName());
-    }
+    portComboBox = new QComboBox(this);
 
-    portComboBox->setStyleSheet(R"(
-        QComboBox {
-            background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                            stop:0 #5f758a, stop:1 #455a64);
-            color: #e2e8f0;
-            border: 1px solid #2d3250 !important;
-            padding: 5px;
-            border-radius: 4px;
-        }
-        QComboBox::drop-down {
-            border: none;
-            width: 20px;
-        }
-        QComboBox::down-arrow {
-            width: 12px;
-            height: 12px;
-            image: none;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-top: 6px solid #00b4d8;
-        }
-        QComboBox QAbstractItemView {
-            background: #121722;
-            color: #121722;
-            border: 1px solid #2d3250;
-            selection-background-color: #2d3250;
-        }
-    )");
+    refreshTimer = new QTimer(this);
+    connect(refreshTimer, &QTimer::timeout, this, &MainWindow::refreshSerialPorts);
+    refreshTimer->start(1000);
+
+    refreshSerialPorts();
 
     connectionLayout->addWidget(new QLabel(tr("Port:")), 0, 0);
     connectionLayout->addWidget(portComboBox, 0, 1);
@@ -283,19 +257,6 @@ void MainWindow::setupHomeTab()
     topContentLayout->addWidget(scrollArea, 3);
 
     homeLayout->addLayout(topContentLayout, 1);
-
-    qApp->setStyleSheet(
-        "QToolTip {"
-        "   background-color: #1a202c;"
-        "   color: #e2e8f0;"
-        "   border: 1px solid #4a5568;"
-        "   border-radius: 6px;"
-        "   padding: 12px;"
-        "   font-family: 'Segoe UI', system-ui;"
-        "   font-size: 13px;"
-        "   opacity: 230;"
-        "}"
-        );
 
     sendButton->setToolTip(
         "Send Commnad to device\n"
@@ -439,9 +400,9 @@ void MainWindow::setupHomeTab()
             &DashBoardWidget::setMaxValue);
 
     // Kết nối UART
-    connect(connectButton, &QPushButton::clicked, _homeTab, [this, portComboBox]() {
+    connect(connectButton, &QPushButton::clicked, _homeTab, [this]() {
         _serialPort = new QSerialPort;
-        _serialPort->setPortName(portComboBox->currentText());
+        _serialPort->setPortName(this->portComboBox->currentText());
         _serialPort->setBaudRate(QSerialPort::Baud115200);
         _serialPort->setDataBits(QSerialPort::Data8);
         _serialPort->setParity(QSerialPort::NoParity);

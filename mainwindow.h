@@ -94,6 +94,10 @@ private:
     QChart *_chart;
     QTime _startTime;
 
+    QComboBox *portComboBox;
+    QTimer *refreshTimer;
+    QStringList lastPortList;
+
     QTextEdit *_logTextEdit;
     QVector<DataPoint> _dataBuffer;
     QVector<DataPoint> _dataPDFBuffer;
@@ -138,6 +142,7 @@ private:
     void setupLCTab(QWidget *tab);
     void setupMavlinkTab(QWidget *tab);
     void setupFFTTab(QWidget *tab);
+    void refreshSerialPorts();
 
     QStringList _csvHeaders;
     QLineSeries *_csvSeries;
