@@ -22,24 +22,24 @@ void MainWindow::setupHomeTab()
     miniDashboard->setTitleColor(QColor(255, 107, 107));
 
     auto *valueSlider = new QSlider(Qt::Horizontal, _homeTab);
-    valueSlider->setRange(0, 1000);
+    valueSlider->setRange(0, 100);
     valueSlider->setValue(0);
 
     auto *valueSpinBox = new QDoubleSpinBox(_homeTab);
-    valueSpinBox->setRange(0, 1000);
+    valueSpinBox->setRange(0, 100);
     valueSpinBox->setValue(0);
     valueSpinBox->setDecimals(0);
 
     auto *minValueLabel = new QLabel(tr("Min Value:"), _homeTab);
     auto *minValueSpinBox = new QDoubleSpinBox(_homeTab);
-    minValueSpinBox->setRange(0, 1000);
+    minValueSpinBox->setRange(0, 100);
     minValueSpinBox->setValue(0);
     minValueSpinBox->setDecimals(0);
 
     auto *maxValueLabel = new QLabel(tr("Max Value:"), _homeTab);
     auto *maxValueSpinBox = new QDoubleSpinBox(_homeTab);
-    maxValueSpinBox->setRange(0, 1000);
-    maxValueSpinBox->setValue(1000);
+    maxValueSpinBox->setRange(0, 100);
+    maxValueSpinBox->setValue(100);
     maxValueSpinBox->setDecimals(0);
 
     auto *clearPlotButton = new QPushButton(tr("Clear Plot"), _homeTab);
@@ -295,7 +295,7 @@ void MainWindow::setupHomeTab()
             else
             {
                 // if (value > 50) value = 50;
-                if (value > 29) value = 29;
+                if (value > 50) value = 50;
                 else if (value < 0) value = 0;
             }
             QString command = QString("Power:%1\n").arg(value);
@@ -360,35 +360,35 @@ void MainWindow::setupHomeTab()
         }
     });
 
-    // connect(autoButton, &QPushButton::clicked, this,[this, valueSlider]() {
-    //     if (!_serialPort || !_serialPort->isOpen())
-    //         return;
+    connect(rampModeButton, &QPushButton::clicked, this,[this, valueSlider]() {
+        if (!_serialPort || !_serialPort->isOpen())
+            return;
 
-    //     if (!_autoTimer) {
-    //         _autoTimer = new QTimer(this);
+        if (!_autoTimer) {
+            _autoTimer = new QTimer(this);
 
-    //         connect(_autoTimer, &QTimer::timeout, this,[this, valueSlider]() {
-    //             if (autoValue >= 23) {
-    //                 _autoTimer->stop();
-    //                 autoValue = 0;
-    //                 pdf = false;
-    //                 bufferCopy = _dataPDFBuffer;
-    //                 saveDataToPDF();
-    //                 _dataPDFBuffer.clear();
-    //                 return;
-    //             }
+            connect(_autoTimer, &QTimer::timeout, this,[this, valueSlider]() {
+                if (autoValue >= 23) {
+                    _autoTimer->stop();
+                    autoValue = 0;
+                    pdf = false;
+                    bufferCopy = _dataPDFBuffer;
+                    saveDataToPDF();
+                    _dataPDFBuffer.clear();
+                    return;
+                }
 
-    //             autoValue++;
-    //             valueSlider->setValue(autoValue);
-    //         });
-    //     }
+                autoValue++;
+                valueSlider->setValue(autoValue);
+            });
+        }
 
-    //     autoValue = 0;
-    //     valueSlider->setValue(0);
-    //     pdf = true;
+        autoValue = 0;
+        valueSlider->setValue(0);
+        pdf = true;
 
-    //     _autoTimer->start(1000);
-    // });
+        _autoTimer->start(1000);
+    });
 
     connect(minValueSpinBox,
             QOverload<double>::of(&QDoubleSpinBox::valueChanged),
