@@ -131,7 +131,6 @@ void MainWindow::applyDarkTheme()
             margin-top: 1.4ex;
             padding-top: 5px;
             font-size: 12px;
-            font-weight: 500;
         }
 
         QGroupBox::title {
@@ -183,17 +182,23 @@ void MainWindow::applyDarkTheme()
             color: #d2c1b6;
             border: 1px solid #456882;
             border-radius: 5px;
-            padding: 6px 8px;
-            font-size: 11px;
+            padding: 5px 7px;
+            font-size: 9px;
             selection-background-color: #456882;
         }
 
         QSpinBox::up-button, QDoubleSpinBox::up-button {
-            background: #0e202d;
+            subcontrol-origin: border;
+            subcontrol-position: top right;
+            border-radius: 5px;
+            background: #1b3c53;
         }
 
         QSpinBox::down-button, QDoubleSpinBox::down-button {
-            background: #0e202d;
+            subcontrol-origin: border;
+            subcontrol-position: bottom right;
+            border-radius: 5px;
+            background: #1b3c53;
         }
 
         QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover {
@@ -473,7 +478,6 @@ void MainWindow::applyLightTheme()
             margin-top: 1.4ex;
             padding-top: 5px;
             font-size: 12px;
-            font-weight: 500;
         }
 
         QGroupBox::title {
@@ -526,9 +530,23 @@ void MainWindow::applyLightTheme()
             color: #4a5568;
             border: 1px solid #e5e5e5;
             border-radius: 5px;
-            padding: 6px 8px;
-            font-size: 11px;
+            padding: 5px 7px;
+            font-size: 9px;
             selection-background-color: #edf2f7;
+        }
+
+        QSpinBox::up-button, QDoubleSpinBox::up-button {
+            subcontrol-origin: border;
+            subcontrol-position: top right;
+            border-radius: 5px;
+            background: #ffffff;
+        }
+
+        QSpinBox::down-button, QDoubleSpinBox::down-button {
+            subcontrol-origin: border;
+            subcontrol-position: bottom right;
+            border-radius: 5px;
+            background: #ffffff;
         }
 
         QSpinBox::up-button, QDoubleSpinBox::up-button {

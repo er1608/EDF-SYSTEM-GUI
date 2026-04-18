@@ -72,7 +72,6 @@ MainWindow::MainWindow(QWidget *parent)
             margin-top: 1.4ex;
             padding-top: 5px;
             font-size: 12px;
-            font-weight: 500;
         }
 
         QGroupBox::title {
@@ -124,17 +123,23 @@ MainWindow::MainWindow(QWidget *parent)
             color: #d2c1b6;
             border: 1px solid #456882;
             border-radius: 5px;
-            padding: 6px 8px;
-            font-size: 11px;
+            padding: 5px 7px;
+            font-size: 9px;
             selection-background-color: #456882;
         }
 
         QSpinBox::up-button, QDoubleSpinBox::up-button {
-            background: #0e202d;
+            subcontrol-origin: border;
+            subcontrol-position: top right;
+            border-radius: 5px;
+            background: #1b3c53;
         }
 
         QSpinBox::down-button, QDoubleSpinBox::down-button {
-            background: #0e202d;
+            subcontrol-origin: border;
+            subcontrol-position: bottom right;
+            border-radius: 5px;
+            background: #1b3c53;
         }
 
         QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover {
@@ -289,8 +294,6 @@ MainWindow::MainWindow(QWidget *parent)
         }
 
         QComboBox::down-arrow {
-            width: 12px;
-            height: 12px;
             image: none;
             border-left: 6px solid transparent;
             border-right: 6px solid transparent;
@@ -402,7 +405,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     setCentralWidget(mainWidget);
     resize(1400, 900);
-    setWindowTitle(tr("KTS SYSTEM"));
+    setWindowTitle(tr("THRUST STAND SYSTEM"));
 
     _sidebarCollapsed = false;
 
