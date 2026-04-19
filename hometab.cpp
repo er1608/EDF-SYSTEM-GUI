@@ -48,7 +48,6 @@ void MainWindow::setupHomeTab()
     auto *saveDataButton = new QPushButton(tr("Save Data"), _homeTab);
 
     auto *logTextEdit = new QTextEdit(_homeTab);
-    logTextEdit->setMaximumHeight(100);
     logTextEdit->setReadOnly(true);
 
     auto *topContentLayout = new QHBoxLayout();
@@ -294,8 +293,7 @@ void MainWindow::setupHomeTab()
             }
             else
             {
-                // if (value > 50) value = 50;
-                if (value > 50) value = 50;
+                if (value > 50) value = maxValueSpinBox->value() < 50 ? maxValueSpinBox->value() : 50;
                 else if (value < 0) value = 0;
             }
             QString command = QString("Power:%1\n").arg(value);
@@ -318,7 +316,7 @@ void MainWindow::setupHomeTab()
             }
             else
             {
-                if (value > 50) value = 50;
+                if (value > 50) value = maxValueSpinBox->value() < 50 ? maxValueSpinBox->value() : 50;
                 else if (value < 0) value = 0;
             }
             QString command = QString("Power:%1\n").arg(value, 0, 'f', 1);
