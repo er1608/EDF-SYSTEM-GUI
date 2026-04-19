@@ -105,11 +105,12 @@ MainWindow::MainWindow(QWidget *parent)
             color: #0e202d;
         }
 
-        QLineEdit, QComboBox {
+        QLineEdit {
             background: #1b3c53;
             color: #d2c1b6;
             border: 1px solid #456882;
             border-radius: 5px;
+            padding: 3px;
             font-size: 11px;
             selection-background-color: #456882;
         }
