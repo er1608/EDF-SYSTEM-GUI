@@ -70,8 +70,6 @@ MainWindow::MainWindow(QWidget *parent)
             border: 1px solid #456882;
             border-radius: 10px;
             margin-top: 1.4ex;
-            padding-top: 5px;
-            font-size: 12px;
         }
 
         QGroupBox::title {
@@ -79,7 +77,6 @@ MainWindow::MainWindow(QWidget *parent)
             subcontrol-position: top left;
             left: 15px;
             top: -2px;
-            padding: 0 5px;
             color: #d2c1b6;
         }
 
@@ -91,7 +88,7 @@ MainWindow::MainWindow(QWidget *parent)
             );
             color: #d2c1b6;
             border: 1px solid #456882;
-            padding: 8px 16px;
+            padding: 4px 8px;
             border-radius: 6px;
             font-weight: 600;
             font-size: 11px;
@@ -113,7 +110,6 @@ MainWindow::MainWindow(QWidget *parent)
             color: #d2c1b6;
             border: 1px solid #456882;
             border-radius: 5px;
-            padding: 6px 8px;
             font-size: 11px;
             selection-background-color: #456882;
         }
@@ -123,7 +119,6 @@ MainWindow::MainWindow(QWidget *parent)
             color: #d2c1b6;
             border: 1px solid #456882;
             border-radius: 5px;
-            padding: 5px 7px;
             font-size: 9px;
             selection-background-color: #456882;
         }
@@ -152,14 +147,14 @@ MainWindow::MainWindow(QWidget *parent)
 
         QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
             image: url(:/images/up_white.png);
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
         }
 
         QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
             image: url(:/images/down_white.png);
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
         }
 
         QLineEdit:focus,
@@ -198,14 +193,12 @@ MainWindow::MainWindow(QWidget *parent)
             border-radius: 6px;
             font-size: 11px;
             font-family: "Consolas", "Roboto Mono", monospace;
-            padding: 6px;
         }
 
         QChartView {
             background: #0e202d;
             border: 1px solid #456882;
             border-radius: 10px;
-            padding: 6px;
         }
 
         QTabWidget::pane {
@@ -284,8 +277,8 @@ MainWindow::MainWindow(QWidget *parent)
                                         stop:0 #456882, stop:1 #1b3c53);
             color: #d2c1b6;
             border: 1px solid #0e202d !important;
-            padding: 5px;
             border-radius: 4px;
+            padding: 3px;
         }
 
         QComboBox::drop-down {
@@ -313,7 +306,6 @@ MainWindow::MainWindow(QWidget *parent)
             color: #d2c1b6;
             border: 1px solid #456882;
             border-radius: 6px;
-            padding: 12px;
             font-family: 'Segoe UI', system-ui;
             font-size: 13px;
             opacity: 230;

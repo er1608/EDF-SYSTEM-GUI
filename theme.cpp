@@ -31,7 +31,7 @@ void MainWindow::addThemeToggleButton()
             border: none;
             border-radius: 25px;
             font-weight: bold;
-            font-size: 20px;
+            font-size: 15px;
             padding: 6px 14px;
         }
 
@@ -129,8 +129,6 @@ void MainWindow::applyDarkTheme()
             border: 1px solid #456882;
             border-radius: 10px;
             margin-top: 1.4ex;
-            padding-top: 5px;
-            font-size: 12px;
         }
 
         QGroupBox::title {
@@ -138,7 +136,6 @@ void MainWindow::applyDarkTheme()
             subcontrol-position: top left;
             left: 15px;
             top: -2px;
-            padding: 0 5px;
             color: #d2c1b6;
         }
 
@@ -150,7 +147,7 @@ void MainWindow::applyDarkTheme()
             );
             color: #d2c1b6;
             border: 1px solid #456882;
-            padding: 8px 16px;
+            padding: 4px 8px;
             border-radius: 6px;
             font-weight: 600;
             font-size: 11px;
@@ -172,7 +169,6 @@ void MainWindow::applyDarkTheme()
             color: #d2c1b6;
             border: 1px solid #456882;
             border-radius: 5px;
-            padding: 6px 8px;
             font-size: 11px;
             selection-background-color: #456882;
         }
@@ -182,7 +178,6 @@ void MainWindow::applyDarkTheme()
             color: #d2c1b6;
             border: 1px solid #456882;
             border-radius: 5px;
-            padding: 5px 7px;
             font-size: 9px;
             selection-background-color: #456882;
         }
@@ -211,14 +206,14 @@ void MainWindow::applyDarkTheme()
 
         QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
             image: url(:/images/up_white.png);
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
         }
 
         QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
             image: url(:/images/down_white.png);
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
         }
 
         QLineEdit:focus,
@@ -257,14 +252,12 @@ void MainWindow::applyDarkTheme()
             border-radius: 6px;
             font-size: 11px;
             font-family: "Consolas", "Roboto Mono", monospace;
-            padding: 6px;
         }
 
         QChartView {
             background: #0e202d;
             border: 1px solid #456882;
             border-radius: 10px;
-            padding: 6px;
         }
 
         QTabWidget::pane {
@@ -343,8 +336,8 @@ void MainWindow::applyDarkTheme()
                                         stop:0 #456882, stop:1 #1b3c53);
             color: #d2c1b6;
             border: 1px solid #0e202d !important;
-            padding: 5px;
             border-radius: 4px;
+            padding: 3px;
         }
 
         QComboBox::drop-down {
@@ -374,7 +367,6 @@ void MainWindow::applyDarkTheme()
             color: #d2c1b6;
             border: 1px solid #456882;
             border-radius: 6px;
-            padding: 12px;
             font-family: 'Segoe UI', system-ui;
             font-size: 13px;
             opacity: 230;
@@ -467,7 +459,6 @@ void MainWindow::applyLightTheme()
             background: #ffffff;
             border: 1px solid #e5e5e5;
             border-radius: 10px;
-            padding: 6px;
         }
 
         QGroupBox {
@@ -476,8 +467,6 @@ void MainWindow::applyLightTheme()
             border: 1px solid #e5e5e5;
             border-radius: 10px;
             margin-top: 1.4ex;
-            padding-top: 5px;
-            font-size: 12px;
         }
 
         QGroupBox::title {
@@ -485,7 +474,6 @@ void MainWindow::applyLightTheme()
             subcontrol-position: top left;
             left: 15px;
             top: -2px;
-            padding: 0 5px;
             color: #718096;
         }
 
@@ -497,7 +485,7 @@ void MainWindow::applyLightTheme()
             );
             color: #ffffff;
             border: 1px solid rgba(4, 139, 143, 0.7);
-            padding: 8px 16px;
+            padding: 4px 8px;
             border-radius: 6px;
             font-weight: 600;
             font-size: 11px;
@@ -519,7 +507,6 @@ void MainWindow::applyLightTheme()
             color: #4a5568;
             border: 1px solid #e5e5e5;
             border-radius: 5px;
-            padding: 6px 8px;
             font-size: 11px;
             selection-background-color: #edf2f7;
             selection-color: #4a5568;
@@ -530,7 +517,6 @@ void MainWindow::applyLightTheme()
             color: #4a5568;
             border: 1px solid #e5e5e5;
             border-radius: 5px;
-            padding: 5px 7px;
             font-size: 9px;
             selection-background-color: #edf2f7;
         }
@@ -567,14 +553,14 @@ void MainWindow::applyLightTheme()
 
         QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
             image: url(:/images/up.png);
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
         }
 
         QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
             image: url(:/images/down.png);
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
         }
 
         QLineEdit:focus,
@@ -613,7 +599,6 @@ void MainWindow::applyLightTheme()
             border-radius: 6px;
             font-size: 11px;
             font-family: "Consolas", "Roboto Mono", monospace;
-            padding: 6px;
         }
 
         QTabWidget::pane {
@@ -693,8 +678,8 @@ void MainWindow::applyLightTheme()
                                             stop:0 rgba(4, 168, 173, 0.15), stop:1 rgba(4, 139, 143, 0.1));
             color: #4a5568;
             border: 1px solid rgba(4, 168, 173, 0.3) !important;
-            padding: 5px;
             border-radius: 4px;
+            padding: 3px;
         }
 
         QComboBox::drop-down {
@@ -724,7 +709,6 @@ void MainWindow::applyLightTheme()
            color: #f5f5f5;
            border: 1px solid rgba(4, 168, 173, 0.5);
            border-radius: 6px;
-           padding: 12px;
            font-family: 'Segoe UI', system-ui;
            font-size: 13px;
            opacity: 230;
