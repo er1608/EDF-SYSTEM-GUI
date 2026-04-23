@@ -31,16 +31,16 @@ Download the UI from [Link](https://drive.google.com/drive/folders/1KWAv9vNzF9oP
 
 ## Desktop App
 
-# Home Tab Light Mode
+Home Tab Light Mode
 ![App Screenshot](hometabl.png)
 
-# Home Tab Dark Mode
+Home Tab Dark Mode
 ![App Screenshot](hometab.png)
 
-# Analyze Tab
+Analyze Tab
 ![App Screenshot](analtab.png)
 
-# Setting Tab
+Setting Tab
 ![App Screenshot](settingtab.png)
 
 ## Contributing
