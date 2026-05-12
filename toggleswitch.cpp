@@ -46,7 +46,7 @@ SwitchButton::SwitchButton(QWidget* parent, Style style)
     setWindowFlags(Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground);
 
-    _labelon->setText("PRO");
+    _labelon->setText("EN");
     _labeloff->move(31, 5);
     _labelon->move(15, 5);
     setFixedSize(QSize(60, 24));

@@ -149,7 +149,7 @@ void MainWindow::setupHomeTab()
     scrollArea->setFrameShape(QFrame::NoFrame);
 
     // UART Connection
-    auto *connectionGroup = new QGroupBox(tr("Connection"), _homeTab);
+    auto *connectionGroup = new QGroupBox(tr("Serial Connection"), _homeTab);
     auto *connectionLayout = new QGridLayout(connectionGroup);
     auto *connectButton = new QPushButton(tr("Connect"), _homeTab);
 
@@ -166,7 +166,7 @@ void MainWindow::setupHomeTab()
     connectionLayout->addWidget(connectButton, 0, 2);
 
     // UART Command Sending
-    auto *commandGroup = new QGroupBox(tr("Command"), _homeTab);
+    auto *commandGroup = new QGroupBox(tr("Test Modes"), _homeTab);
     auto *commandLayout = new QGridLayout(commandGroup);
     auto *commandEdit = new QLineEdit(_homeTab);
     auto *sendButton = new QPushButton(tr("Send"), _homeTab);
@@ -179,19 +179,70 @@ void MainWindow::setupHomeTab()
     stopButton->setObjectName("stopButton");
     rampModeButton->setObjectName("rampModeButton");
     sineModeButton->setObjectName("sineModeButton");
-    startButton->setStyleSheet("#startButton { color: green; font-weight: bold; }");
-    stopButton->setStyleSheet("#stopButton { color: red; font-weight: bold; }");
+
+    startButton->setMinimumHeight(60);
+    stopButton->setMinimumHeight(60);
+
+    startButton->setCursor(Qt::PointingHandCursor);
+    stopButton->setCursor(Qt::PointingHandCursor);
+
+    startButton->setStyleSheet(R"(
+        QPushButton#startButton {
+            background-color: #238a63;
+            color: white;
+            font-size: 26px;
+            font-weight: 600;
+            border-radius: 14px;
+            border: 2px solid #36b37e;
+            padding: 14px 28px;
+        }
+
+        QPushButton#startButton:hover {
+            background-color: #2fa574;
+            border: 2px solid #4cc38f;
+        }
+
+        QPushButton#startButton:pressed {
+            background-color: #1c6e50;
+        }
+    )");
+
+    stopButton->setStyleSheet(R"(
+        QPushButton#stopButton {
+            background-color: #b23a3a;
+            color: white;
+            font-size: 26px;
+            font-weight: 600;
+            border-radius: 14px;
+            border: 2px solid #d65a5a;
+            padding: 14px 28px;
+        }
+
+        QPushButton#stopButton:hover {
+            background-color: #c94b4b;
+            border: 2px solid #e57373;
+        }
+
+        QPushButton#stopButton:pressed {
+            background-color: #8f2f2f;
+        }
+    )");
+
+    startButton->setText("▶ START");
+    stopButton->setText("■ STOP");
 
     commandEdit->setPlaceholderText("Enter command to send");
     commandLayout->addWidget(new QLabel(tr("Command:")), 0, 0);
     commandLayout->addWidget(commandEdit, 0, 1, 1, 2);
     commandLayout->addWidget(sendButton, 0, 3);
-    commandLayout->addWidget(rampModeButton, 1, 0);
-    commandLayout->addWidget(sineModeButton, 1, 1);
-    commandLayout->addWidget(startButton, 1, 2);
-    commandLayout->addWidget(stopButton, 1, 3);
+    commandLayout->addWidget(rampModeButton, 1, 0, 1, 2);
+    commandLayout->addWidget(sineModeButton, 1, 2, 1, 2);
+    commandLayout->setColumnStretch(0, 1);
+    commandLayout->setColumnStretch(1, 1);
+    commandLayout->setColumnStretch(2, 1);
+    commandLayout->setColumnStretch(3, 1);
 
-    auto *dataGroup = new QGroupBox(tr("Data Signal"), _homeTab);
+    auto *dataGroup = new QGroupBox(tr("Live Telemetry"), _homeTab);
     auto *dataLayout = new QGridLayout(dataGroup);
 
     auto *thrustValueLabel = new QLabel(tr("Thrust: 0 N"), _homeTab);
@@ -199,7 +250,6 @@ void MainWindow::setupHomeTab()
     auto *torqueValueLabel = new QLabel(tr("Torque: 0 Nm"), _homeTab);
     auto *voltageValueLabel = new QLabel(tr("Voltage: 0 V"), _homeTab);
     auto *currentValueLabel = new QLabel(tr("Current: 0 A"), _homeTab);
-    auto *temperatureValueLabel = new QLabel(tr("Temperature: 0 °C"), _homeTab);
     auto *RPMValueLabel = new QLabel(tr("RPM: 0"), _homeTab);
 
     thrustValueLabel->setStyleSheet("font-weight: bold; font-size: 13px; padding: 6px; border-radius: 3px;");
@@ -207,7 +257,6 @@ void MainWindow::setupHomeTab()
     torqueValueLabel->setStyleSheet("font-weight: bold; font-size: 13px; padding: 6px; border-radius: 3px;");
     voltageValueLabel->setStyleSheet("font-weight: bold; font-size: 13px; padding: 6px; border-radius: 3px;");
     currentValueLabel->setStyleSheet("font-weight: bold; font-size: 13px; padding: 6px; border-radius: 3px;");
-    temperatureValueLabel->setStyleSheet("font-weight: bold; font-size: 13px; padding: 6px; border-radius: 3px;");
     RPMValueLabel->setStyleSheet("font-weight: bold; font-size: 13px; padding: 6px; border-radius: 3px;");
 
     dataLayout->addWidget(thrustValueLabel, 0, 0);
@@ -216,14 +265,13 @@ void MainWindow::setupHomeTab()
     dataLayout->addWidget(voltageValueLabel, 1, 0);
     dataLayout->addWidget(pwmValueLabel, 1, 1);
     dataLayout->addWidget(RPMValueLabel, 1, 2);
-    dataLayout->addWidget(temperatureValueLabel, 2, 0);
 
-    auto *dashboardGroup = new QGroupBox(tr("Motor Power"), _homeTab);
+    auto *dashboardGroup = new QGroupBox(tr("Motor Output"), _homeTab);
     auto *dashboardLayout = new QVBoxLayout(dashboardGroup);
     dashboardLayout->addWidget(miniDashboard);
     dashboardLayout->setAlignment(miniDashboard, Qt::AlignTop);
 
-    auto *valueGroup = new QGroupBox(tr("Control"), _homeTab);
+    auto *valueGroup = new QGroupBox(tr("Control Panel"), _homeTab);
     auto *valueControlLayout = new QGridLayout(valueGroup);
     valueControlLayout->addWidget(new QLabel(tr("Throttle:")), 0, 0);
     valueControlLayout->addWidget(valueSlider, 0, 1, 1, 2);
@@ -241,9 +289,14 @@ void MainWindow::setupHomeTab()
     valueControlLayout->setColumnStretch(2, 1);
 
     // UART Log Display
-    auto *logGroup = new QGroupBox(tr("Command Log"), _homeTab);
+    auto *logGroup = new QGroupBox(tr("System Log"), _homeTab);
     auto *logLayout = new QVBoxLayout(logGroup);
     logLayout->addWidget(logTextEdit);
+
+    QHBoxLayout *enableLayout = new QHBoxLayout();
+
+    enableLayout->addWidget(startButton);
+    enableLayout->addWidget(stopButton);
 
     leftLayout->addWidget(dashboardGroup);
     leftLayout->addWidget(valueGroup);
@@ -251,6 +304,7 @@ void MainWindow::setupHomeTab()
     leftLayout->addWidget(commandGroup);
     leftLayout->addWidget(dataGroup);
     leftLayout->addWidget(logGroup);
+    leftLayout->addLayout(enableLayout);
     leftLayout->addStretch();
 
     topContentLayout->addWidget(leftPanel, 1);
@@ -447,7 +501,7 @@ void MainWindow::setupHomeTab()
 
         _startTime = QTime::currentTime();
 
-        reset();
+        // reset();
 
         qDebug() << "Plotting started";
     });
@@ -509,7 +563,6 @@ void MainWindow::setupHomeTab()
     _torqueLabel = torqueValueLabel;
     _voltageLabel = voltageValueLabel;
     _currentLabel = currentValueLabel;
-    _temperatureLabel = temperatureValueLabel;
     _RPMLabel = RPMValueLabel;
 
     _logTextEdit = logTextEdit;
