@@ -104,6 +104,8 @@ private:
     QVector<DataPoint> bufferCopy;
     bool _isDarkMode;
 
+    float L = 0.25;
+
     void updateAnalyzeCharts(double thrust, double torque, double voltage,double current, double pwm);
     void appendInterpolated(QLineSeries* series, double key, double value);
 

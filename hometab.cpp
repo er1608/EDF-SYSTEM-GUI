@@ -42,6 +42,36 @@ void MainWindow::setupHomeTab()
     maxValueSpinBox->setValue(100);
     maxValueSpinBox->setDecimals(0);
 
+    auto *propLenLabel = new QLabel(tr("Propeller Length:"), _homeTab);
+
+    auto *propLenSpinBox = new QDoubleSpinBox(_homeTab);
+    propLenSpinBox->setRange(0, 100);
+    propLenSpinBox->setValue(0);
+    propLenSpinBox->setDecimals(0);
+
+    auto *propLenUnitComboBox = new QComboBox(_homeTab);
+    propLenUnitComboBox->addItem("mm");
+    propLenUnitComboBox->addItem("cm");
+    propLenUnitComboBox->addItem("m");
+    propLenUnitComboBox->addItem("inch");
+
+    L = propLenSpinBox->value();
+
+    QString unit = propLenUnitComboBox->currentText();
+
+    if (unit == "mm")
+    {
+        L /= 1000.0f;
+    }
+    else if (unit == "cm")
+    {
+        L /= 100.0f;
+    }
+    else if (unit == "inch")
+    {
+        L *= 0.0254f;
+    }
+
     auto *clearPlotButton = new QPushButton(tr("Clear Plot"), _homeTab);
     auto *startPlotButton = new QPushButton(tr("Start Plot"), _homeTab);
     auto *stopPlotButton = new QPushButton(tr("Stop Plot"), _homeTab);
@@ -115,8 +145,8 @@ void MainWindow::setupHomeTab()
 
     thrustAct->setChecked(true);
     torqueAct->setChecked(true);
-    voltAct->setChecked(true);
-    currentAct->setChecked(true);
+    voltAct->setChecked(false);
+    currentAct->setChecked(false);
 
     chartSelector->setMenu(menu);
 
@@ -135,6 +165,9 @@ void MainWindow::setupHomeTab()
     connect(currentAct, &QAction::toggled, this, [=](bool checked){
         _currentChart->setVisible(checked);
     });
+
+    _voltChart->setVisible(false);
+    _currentChart->setVisible(false);
 
     auto *topLayout = new QHBoxLayout();
     topLayout->addStretch();
@@ -277,9 +310,12 @@ void MainWindow::setupHomeTab()
     valueControlLayout->addWidget(valueSlider, 0, 1, 1, 2);
     valueControlLayout->addWidget(valueSpinBox, 0, 3);
     valueControlLayout->addWidget(minValueLabel, 1, 0);
-    valueControlLayout->addWidget(minValueSpinBox, 1, 1, 1, 3);
-    valueControlLayout->addWidget(maxValueLabel, 2, 0);
-    valueControlLayout->addWidget(maxValueSpinBox, 2, 1, 1, 3);
+    valueControlLayout->addWidget(minValueSpinBox, 1, 1);
+    valueControlLayout->addWidget(maxValueLabel, 1, 2);
+    valueControlLayout->addWidget(maxValueSpinBox, 1, 3);
+    valueControlLayout->addWidget(propLenLabel, 2, 0);
+    valueControlLayout->addWidget(propLenSpinBox, 2, 1, 1, 2);
+    valueControlLayout->addWidget(propLenUnitComboBox, 2, 3);
     valueControlLayout->addWidget(startPlotButton, 3, 0);
     valueControlLayout->addWidget(stopPlotButton, 3, 1);
     valueControlLayout->addWidget(clearPlotButton, 3, 2);
@@ -348,7 +384,6 @@ void MainWindow::setupHomeTab()
             }
             else
             {
-                // if (value > 50) value = 50;
                 if (value > 50) value = 50;
                 else if (value < 0) value = 0;
             }
