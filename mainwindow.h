@@ -71,7 +71,7 @@ private:
 
     int stopFlag = 0;
     double throttleValue = 0.0, pwmValue = 0.0, torqueValue = 0.0;
-    double currentValue = 0.0, voltageValue = 0.0, temperatureValue = 0.0, RPMValue = 0.0;
+    double currentValue = 0.0, voltageValue = 0.0, RPMValue = 0.0;
     bool swcurrent = false;
     int _currentLC = 0;
 
@@ -80,7 +80,6 @@ private:
     QLabel *_torqueLabel;
     QLabel *_voltageLabel;
     QLabel *_currentLabel;
-    QLabel *_temperatureLabel;
     QLabel *_RPMLabel;
 
     QChartView *_thrustChart;

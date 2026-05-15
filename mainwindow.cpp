@@ -402,7 +402,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     setCentralWidget(mainWidget);
     resize(1400, 900);
-    setWindowTitle(tr("KTS SYSTEM"));
+    setWindowTitle(tr("THRUST STAND SYSTEM"));
 
     _sidebarCollapsed = false;
 
@@ -421,7 +421,6 @@ void MainWindow::reset()
     _torqueLabel->setText(QString("Torque: %1 Nm").arg(torqueValue, 0, 'f', 1));
     _voltageLabel->setText(QString("Voltage: %1 V").arg(voltageValue, 0, 'f', 1));
     _currentLabel->setText(QString("Current: %1 A").arg(currentValue, 0, 'f', 1));
-    _temperatureLabel->setText(QString("Temperature: %1 °C").arg(temperatureValue, 0, 'f', 1));
     _RPMLabel->setText(QString("RPM: %1").arg(RPMValue, 0, 'f', 1));
 }
 

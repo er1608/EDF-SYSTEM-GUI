@@ -44,7 +44,6 @@ void MainWindow::readData()
         bool pwmOk = false;
         bool currentOk = false;
         bool voltageOk = false;
-        bool temperatureOk = false;
         bool RPMOk = false;
 
         QStringList parts = data.split(',');
@@ -53,11 +52,7 @@ void MainWindow::readData()
         {
             QString trimmedPart = part.trimmed();
 
-            if (trimmedPart.startsWith("Temp:"))
-            {
-                temperatureValue = trimmedPart.section(':',1).toDouble(&temperatureOk);
-            }
-            else if (trimmedPart.startsWith("Voltage:"))
+            if (trimmedPart.startsWith("Voltage:"))
             {
                 voltageValue = trimmedPart.section(':',1).toDouble(&voltageOk);
             }
