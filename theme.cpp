@@ -168,7 +168,7 @@ void MainWindow::applyDarkTheme()
             color: #0e202d;
         }
 
-        QLineEdit, QComboBox {
+        QLineEdit {
             background: #1b3c53;
             color: #d2c1b6;
             border: 1px solid #456882;
@@ -183,17 +183,22 @@ void MainWindow::applyDarkTheme()
             color: #d2c1b6;
             border: 1px solid #456882;
             border-radius: 5px;
-            padding: 6px 8px;
-            font-size: 11px;
+            font-size: 9px;
             selection-background-color: #456882;
         }
 
         QSpinBox::up-button, QDoubleSpinBox::up-button {
-            background: #0e202d;
+            subcontrol-origin: border;
+            subcontrol-position: top right;
+            border-radius: 5px;
+            background: #1b3c53;
         }
 
         QSpinBox::down-button, QDoubleSpinBox::down-button {
-            background: #0e202d;
+            subcontrol-origin: border;
+            subcontrol-position: bottom right;
+            border-radius: 5px;
+            background: #1b3c53;
         }
 
         QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover {
@@ -206,14 +211,14 @@ void MainWindow::applyDarkTheme()
 
         QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
             image: url(:/images/up_white.png);
-            width: 12px;
-            height: 12px;
+            width: 8px;
+            height: 8px;
         }
 
         QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
             image: url(:/images/down_white.png);
-            width: 12px;
-            height: 12px;
+            width: 8px;
+            height: 8px;
         }
 
         QLineEdit:focus,
@@ -510,7 +515,7 @@ void MainWindow::applyLightTheme()
             color: #ffffff;
         }
 
-        QLineEdit, QComboBox {
+        QLineEdit {
             background: #ffffff;
             color: #4a5568;
             border: 1px solid #e5e5e5;
@@ -526,17 +531,22 @@ void MainWindow::applyLightTheme()
             color: #4a5568;
             border: 1px solid #e5e5e5;
             border-radius: 5px;
-            padding: 6px 8px;
-            font-size: 11px;
+            font-size: 9px;
             selection-background-color: #edf2f7;
         }
 
         QSpinBox::up-button, QDoubleSpinBox::up-button {
-            background: transparent;
+            subcontrol-origin: border;
+            subcontrol-position: top right;
+            border-radius: 5px;
+            background: #ffffff;
         }
 
         QSpinBox::down-button, QDoubleSpinBox::down-button {
-            background: transparent;
+            subcontrol-origin: border;
+            subcontrol-position: top right;
+            border-radius: 5px;
+            background: #ffffff;
         }
 
         QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover {
@@ -549,14 +559,14 @@ void MainWindow::applyLightTheme()
 
         QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
             image: url(:/images/up.png);
-            width: 12px;
-            height: 12px;
+            width: 8px;
+            height: 8px;
         }
 
         QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
             image: url(:/images/down.png);
-            width: 12px;
-            height: 12px;
+            width: 8px;
+            height: 8px;
         }
 
         QLineEdit:focus,

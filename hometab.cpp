@@ -16,6 +16,7 @@ void MainWindow::setupHomeTab()
     auto *miniDashboard = new DashBoardWidget(_homeTab);
     miniDashboard->setMinimumSize(230, 230);
     miniDashboard->setBorderColor(QColor(27, 36, 50));
+    miniDashboard->setArcColor(QColor(215, 170, 60));
     miniDashboard->setBorderWidth(0);
     miniDashboard->setBorderRadius(10);
     miniDashboard->setValueColor(QColor(255, 107, 107));
