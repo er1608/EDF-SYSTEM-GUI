@@ -54,7 +54,7 @@ void MainWindow::readData() {
         currentValue = trimmedPart.section(':', 1).toDouble(&currentOk);
       } else if (trimmedPart.startsWith("RPM:")) {
         RPMValue = trimmedPart.section(':', 1).toDouble(&RPMOk);
-      } else if (trimmedPart.startsWith("Thrust:")) {
+      } else if (trimmedPart.startsWith("Throttle:")) {
         // thrustValue =
         //     trimmedPart.section(':', 1).toDouble(&throttleOk) * 5 / 100;
 
