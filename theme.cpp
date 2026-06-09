@@ -1213,7 +1213,7 @@ void MainWindow::applyLightTheme() {
 
         QSpinBox::down-button, QDoubleSpinBox::down-button {
             subcontrol-origin: border;
-            subcontrol-position: top right;
+            subcontrol-position: bottom right;
             border-radius: 5px;
             background: #ffffff;
         }
