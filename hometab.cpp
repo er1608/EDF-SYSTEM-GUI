@@ -571,6 +571,8 @@ void MainWindow::setupHomeTab() {
                                   QMessageBox::Yes | QMessageBox::No);
         if (reply == QMessageBox::Yes) {
           saveDataToCSV();
+          bufferCopy = _dataBuffer;
+          saveDataToPDF();
         }
       }
     }
