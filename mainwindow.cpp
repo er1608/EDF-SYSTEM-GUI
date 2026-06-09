@@ -700,10 +700,7 @@ MainWindow::MainWindow(QWidget *parent)
 
   QLabel *homeLabel = new QLabel();
   QPixmap homePixmap(":/images/CTUAV.png");
-#if defined(Q_OS_WIN)
-#else
   homeLabel->setFixedSize(40, 35);
-#endif
   homeLabel->setPixmap(homePixmap.scaled(homeLabel->size(), Qt::KeepAspectRatio,
                                          Qt::SmoothTransformation));
   homeLabel->setAlignment(Qt::AlignTop);
