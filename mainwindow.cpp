@@ -114,9 +114,9 @@ MainWindow::MainWindow(QWidget *parent)
         QSpinBox, QDoubleSpinBox {
             background: #1b3c53;
             color: #d2c1b6;
-            border: 1px solid #456882;
+            border: 1px solid #1b3c53;
             border-radius: 5px;
-            font-size: 9px;
+            font-size: 13px;
             selection-background-color: #456882;
         }
 
@@ -338,7 +338,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
     )");
 #else
-    setStyleSheet(R"(
+  setStyleSheet(R"(
         QMainWindow {
             background: #0e202d;
             color: #d2c1b6;
@@ -700,7 +700,10 @@ MainWindow::MainWindow(QWidget *parent)
 
   QLabel *homeLabel = new QLabel();
   QPixmap homePixmap(":/images/CTUAV.png");
+#if defined(Q_OS_WIN)
+#else
   homeLabel->setFixedSize(40, 35);
+#endif
   homeLabel->setPixmap(homePixmap.scaled(homeLabel->size(), Qt::KeepAspectRatio,
                                          Qt::SmoothTransformation));
   homeLabel->setAlignment(Qt::AlignTop);

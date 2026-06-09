@@ -14,16 +14,16 @@ void MainWindow::setupHomeTab() {
 
   auto *miniDashboard = new DashBoardWidget(_homeTab);
 #if defined(Q_OS_WIN)
-  miniDashboard->setMinimumSize(200, 200);
+  miniDashboard->setMinimumSize(180, 180);
 #else
   miniDashboard->setMinimumSize(230, 230);
+#endif
   miniDashboard->setBorderColor(QColor(27, 36, 50));
   miniDashboard->setArcColor(QColor(215, 170, 60));
   miniDashboard->setBorderWidth(0);
   miniDashboard->setBorderRadius(10);
   miniDashboard->setValueColor(QColor(255, 107, 107));
   miniDashboard->setTitleColor(QColor(255, 107, 107));
-#endif
 
   auto *valueSlider = new QSlider(Qt::Horizontal, _homeTab);
   valueSlider->setRange(0, 100);

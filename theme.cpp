@@ -175,9 +175,9 @@ void MainWindow::applyDarkTheme() {
         QSpinBox, QDoubleSpinBox {
             background: #1b3c53;
             color: #d2c1b6;
-            border: 1px solid #456882;
+            border: 1px solid #1b3c53;
             border-radius: 5px;
-            font-size: 9px;
+            font-size: 13px;
             selection-background-color: #456882;
         }
 
@@ -742,7 +742,7 @@ void MainWindow::applyDarkTheme() {
 
 void MainWindow::applyLightTheme() {
 #if defined(Q_OS_WIN)
-setStyleSheet(R"(
+  setStyleSheet(R"(
         QMainWindow {
             background: #f5f5f5;
             color: #4a5568;
@@ -853,9 +853,9 @@ setStyleSheet(R"(
         QSpinBox, QDoubleSpinBox {
             background: #ffffff;
             color: #4a5568;
-            border: 1px solid #e5e5e5;
+            border: 1px solid #ffffff;
             border-radius: 5px;
-            font-size: 9px;
+            font-size: 13px;
             selection-background-color: #edf2f7;
         }
 
