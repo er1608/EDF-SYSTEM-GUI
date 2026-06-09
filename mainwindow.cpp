@@ -1,20 +1,15 @@
 #include "mainwindow.h"
-#include <QtCharts>
+#include <QDateTime>
 #include <QFile>
 #include <QTextStream>
-#include <QDateTime>
+#include <QtCharts>
 
 #include <QtWidgets>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , _serialPort(nullptr)
-    , _plotting(false)
-    , _chart(nullptr)
-    , _startTime(QTime::currentTime())
-    , _isDarkMode(true)
-{
-    setStyleSheet(R"(
+    : QMainWindow(parent), _serialPort(nullptr), _plotting(false),
+      _chart(nullptr), _startTime(QTime::currentTime()), _isDarkMode(true) {
+  setStyleSheet(R"(
         QMainWindow {
             background: #0e202d;
             color: #d2c1b6;
@@ -92,7 +87,7 @@ MainWindow::MainWindow(QWidget *parent)
             );
             color: #d2c1b6;
             border: 1px solid #456882;
-            padding: 8px 16px;
+            padding: 6px 15px;
             border-radius: 6px;
             font-weight: 600;
             font-size: 11px;
@@ -122,9 +117,9 @@ MainWindow::MainWindow(QWidget *parent)
         QSpinBox, QDoubleSpinBox {
             background: #1b3c53;
             color: #d2c1b6;
-            border: 1px solid #456882;
+            border: 1px solid #1b3c53;
             border-radius: 5px;
-            font-size: 9px;
+            font-size: 15px;
             selection-background-color: #456882;
         }
 
@@ -284,7 +279,7 @@ MainWindow::MainWindow(QWidget *parent)
                                         stop:0 #456882, stop:1 #1b3c53);
             color: #d2c1b6;
             border: 1px solid #0e202d !important;
-            padding: 5px;
+            padding: 3px;
             border-radius: 4px;
         }
 
@@ -351,89 +346,95 @@ MainWindow::MainWindow(QWidget *parent)
         }
     )");
 
-    auto *mainWidget = new QWidget(this);
-    auto *mainLayout = new QHBoxLayout(mainWidget);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
-    mainLayout->setSpacing(0);
+  auto *mainWidget = new QWidget(this);
+  auto *mainLayout = new QHBoxLayout(mainWidget);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
+  mainLayout->setSpacing(0);
 
-    auto *leftPanel = new QWidget(mainWidget);
-    leftPanel->setMinimumWidth(100);
-    leftPanel->setMaximumWidth(200);
-    leftPanel->setObjectName("leftPanel");
-    leftPanel->setStyleSheet("QWidget#leftPanel { background: #f5f5f5}");
+  auto *leftPanel = new QWidget(mainWidget);
+  leftPanel->setMinimumWidth(100);
+  leftPanel->setMaximumWidth(200);
+  leftPanel->setObjectName("leftPanel");
+  leftPanel->setStyleSheet("QWidget#leftPanel { background: #f5f5f5}");
 
-    auto *leftPanelLayout = new QVBoxLayout(leftPanel);
-    leftPanelLayout->setContentsMargins(0,0,0,0);
-    leftPanelLayout->setSpacing(0);
+  auto *leftPanelLayout = new QVBoxLayout(leftPanel);
+  leftPanelLayout->setContentsMargins(0, 0, 0, 0);
+  leftPanelLayout->setSpacing(0);
 
-    _tabWidget = new QTabWidget(leftPanel);
-    _tabWidget->setTabPosition(QTabWidget::West);
+  _tabWidget = new QTabWidget(leftPanel);
+  _tabWidget->setTabPosition(QTabWidget::West);
 
-    _homeTab = new QWidget();
-    _analyzeTab = new QWidget();
-    _settingTab = new QWidget();
+  _homeTab = new QWidget();
+  _analyzeTab = new QWidget();
+  _settingTab = new QWidget();
 
-    QLabel *homeLabel = new QLabel();
-    QPixmap homePixmap(":/images/CTUAV.png");
-    homeLabel->setFixedSize(40, 35);
-    homeLabel->setPixmap(homePixmap.scaled(homeLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    homeLabel->setAlignment(Qt::AlignTop);
+  QLabel *homeLabel = new QLabel();
+  QPixmap homePixmap(":/images/CTUAV.png");
+  homeLabel->setFixedSize(40, 35);
+  homeLabel->setPixmap(homePixmap.scaled(homeLabel->size(), Qt::KeepAspectRatio,
+                                         Qt::SmoothTransformation));
+  homeLabel->setAlignment(Qt::AlignTop);
 
-    QLabel *analyzeLabel = new QLabel();
-    QPixmap analPixmap(":/images/Anal.png");
-    QPixmap smallPixmap = analPixmap.scaled(35, 35, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    QIcon analIcon(smallPixmap);
-    analyzeLabel->setPixmap(analIcon.pixmap(40, 40));
-    analyzeLabel->setFixedSize(40, 40);
-    analyzeLabel->setAlignment(Qt::AlignTop);
+  QLabel *analyzeLabel = new QLabel();
+  QPixmap analPixmap(":/images/Anal.png");
+  QPixmap smallPixmap =
+      analPixmap.scaled(35, 35, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+  QIcon analIcon(smallPixmap);
+  analyzeLabel->setPixmap(analIcon.pixmap(40, 40));
+  analyzeLabel->setFixedSize(40, 40);
+  analyzeLabel->setAlignment(Qt::AlignTop);
 
-    QLabel *settingLabel = new QLabel();
-    QPixmap settingPixmap(":/images/setting.png");
-    QPixmap smallsettingPixmap = settingPixmap.scaled(35, 35, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    QIcon settingIcon(smallsettingPixmap);
-    settingLabel->setPixmap(settingIcon.pixmap(40, 40));
-    settingLabel->setFixedSize(40, 45);
-    settingLabel->setAlignment(Qt::AlignTop);
+  QLabel *settingLabel = new QLabel();
+  QPixmap settingPixmap(":/images/setting.png");
+  QPixmap smallsettingPixmap = settingPixmap.scaled(35, 35, Qt::KeepAspectRatio,
+                                                    Qt::SmoothTransformation);
+  QIcon settingIcon(smallsettingPixmap);
+  settingLabel->setPixmap(settingIcon.pixmap(40, 40));
+  settingLabel->setFixedSize(40, 45);
+  settingLabel->setAlignment(Qt::AlignTop);
 
-    _tabWidget->addTab(_homeTab, "");
-    _tabWidget->addTab(_analyzeTab, "");
-    _tabWidget->addTab(_settingTab, "");
+  _tabWidget->addTab(_homeTab, "");
+  _tabWidget->addTab(_analyzeTab, "");
+  _tabWidget->addTab(_settingTab, "");
 
-    _tabWidget->tabBar()->setTabButton(0, QTabBar::LeftSide, homeLabel);
-    _tabWidget->tabBar()->setTabButton(1, QTabBar::LeftSide, analyzeLabel);
-    _tabWidget->tabBar()->setTabButton(2, QTabBar::LeftSide, settingLabel);
+  _tabWidget->tabBar()->setTabButton(0, QTabBar::LeftSide, homeLabel);
+  _tabWidget->tabBar()->setTabButton(1, QTabBar::LeftSide, analyzeLabel);
+  _tabWidget->tabBar()->setTabButton(2, QTabBar::LeftSide, settingLabel);
 
-    mainLayout->addWidget(_tabWidget, 1);
+  mainLayout->addWidget(_tabWidget, 1);
 
-    setCentralWidget(mainWidget);
-    resize(1400, 900);
-    setWindowTitle(tr("THRUST STAND SYSTEM"));
+  setCentralWidget(mainWidget);
+  resize(1400, 900);
+  setWindowTitle(tr("THRUST STAND SYSTEM"));
 
-    _sidebarCollapsed = false;
+  _sidebarCollapsed = false;
 
-    addThemeToggleButton();
-    addToggleSwitch();
+  addThemeToggleButton();
+  addToggleSwitch();
 
-    setupHomeTab();
-    setupAnalyzeTab();
-    setupSettingTab();
+  setupHomeTab();
+  setupAnalyzeTab();
+  setupSettingTab();
 }
 
-void MainWindow::reset()
-{
-    _thrustLabel->setText(QString("Thrust: %1 N").arg(throttleValue, 0, 'f', 1));
-    _pwmLabel->setText(QString("PWM: %1").arg(pwmValue, 0, 'f', 1));
-    _torqueLabel->setText(QString("Torque: %1 Nm").arg(torqueValue, 0, 'f', 1));
-    _voltageLabel->setText(QString("Voltage: %1 V").arg(voltageValue, 0, 'f', 1));
-    _currentLabel->setText(QString("Current: %1 A").arg(currentValue, 0, 'f', 1));
-    _RPMLabel->setText(QString("RPM: %1").arg(RPMValue, 0, 'f', 1));
+void MainWindow::reset() {
+  _thrustLabel->setText(QString("Thrust: %1 N").arg(thrustValue, 0, 'f', 1));
+  _pwmLabel->setText(QString("PWM: %1").arg(pwmValue, 0, 'f', 1));
+  _voltageLabel->setText(QString("Voltage: %1 V").arg(voltageValue, 0, 'f', 1));
+  _currentLabel->setText(QString("Current: %1 A").arg(currentValue, 0, 'f', 1));
+  _RPMLabel->setText(QString("RPM: %1").arg(RPMValue, 0, 'f', 1));
 }
 
-MainWindow::~MainWindow()
-{
-    if (_serialPort != nullptr)
-    {
-        _serialPort->close();
-        delete _serialPort;
-    }
+MainWindow::~MainWindow() {
+  if (_serialPort != nullptr) {
+    _serialPort->close();
+    delete _serialPort;
+  }
+
+  if (_vescSerialPort != nullptr) {
+    if (_vescPollTimer)
+      _vescPollTimer->stop();
+    _vescSerialPort->close();
+    delete _vescSerialPort;
+  }
 }

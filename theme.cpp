@@ -1,30 +1,28 @@
 #include "mainwindow.h"
-#include <QtCharts>
+#include <QDateTime>
 #include <QFile>
 #include <QTextStream>
-#include <QDateTime>
+#include <QtCharts>
 
 #include <QtWidgets>
 
-void MainWindow::resizeEvent(QResizeEvent* event)
-{
-    QMainWindow::resizeEvent(event);
-    emit resized();
+void MainWindow::resizeEvent(QResizeEvent *event) {
+  QMainWindow::resizeEvent(event);
+  emit resized();
 }
 
-void MainWindow::addThemeToggleButton()
-{
-    QPushButton *themeToggleBtn = new QPushButton(this);
-    themeToggleBtn->setText("🌙");
-    themeToggleBtn->setFixedSize(50, 50);
-    themeToggleBtn->setObjectName("themeToggleBtn");
+void MainWindow::addThemeToggleButton() {
+  QPushButton *themeToggleBtn = new QPushButton(this);
+  themeToggleBtn->setText("🌙");
+  themeToggleBtn->setFixedSize(50, 50);
+  themeToggleBtn->setObjectName("themeToggleBtn");
 
-    QFont font = themeToggleBtn->font();
-    font.setPointSize(30);
-    font.setBold(true);
-    themeToggleBtn->setFont(font);
+  QFont font = themeToggleBtn->font();
+  font.setPointSize(30);
+  font.setBold(true);
+  themeToggleBtn->setFont(font);
 
-    themeToggleBtn->setStyleSheet(R"(
+  themeToggleBtn->setStyleSheet(R"(
         QPushButton#themeToggleBtn {
             background: transparent;
             color: #e2e8f0;
@@ -46,34 +44,33 @@ void MainWindow::addThemeToggleButton()
         }
     )");
 
+  themeToggleBtn->move(15, this->height() - 70);
+
+  connect(themeToggleBtn, &QPushButton::clicked, this,
+          &MainWindow::toggleTheme);
+
+  connect(this, &MainWindow::resized, this, [this, themeToggleBtn]() {
     themeToggleBtn->move(15, this->height() - 70);
-
-    connect(themeToggleBtn, &QPushButton::clicked, this, &MainWindow::toggleTheme);
-
-    connect(this, &MainWindow::resized, this, [this, themeToggleBtn]() {
-        themeToggleBtn->move(15, this->height() - 70);
-    });
+  });
 }
 
-void MainWindow::toggleTheme()
-{
-    _isDarkMode = !_isDarkMode;
+void MainWindow::toggleTheme() {
+  _isDarkMode = !_isDarkMode;
 
-    if (_isDarkMode) {
-        applyDarkTheme();
-    } else {
-        applyLightTheme();
-    }
+  if (_isDarkMode) {
+    applyDarkTheme();
+  } else {
+    applyLightTheme();
+  }
 
-    QPushButton *themeBtn = findChild<QPushButton*>("themeToggleBtn");
-    if (themeBtn) {
-        themeBtn->setText(_isDarkMode ? "🌙" : "🌞");
-    }
+  QPushButton *themeBtn = findChild<QPushButton *>("themeToggleBtn");
+  if (themeBtn) {
+    themeBtn->setText(_isDarkMode ? "🌙" : "🌞");
+  }
 }
 
-void MainWindow::applyDarkTheme()
-{
-    setStyleSheet(R"(
+void MainWindow::applyDarkTheme() {
+  setStyleSheet(R"(
         QMainWindow {
             background: #0e202d;
             color: #d2c1b6;
@@ -181,9 +178,9 @@ void MainWindow::applyDarkTheme()
         QSpinBox, QDoubleSpinBox {
             background: #1b3c53;
             color: #d2c1b6;
-            border: 1px solid #456882;
+            border: 1px solid #1b3c53;
             border-radius: 5px;
-            font-size: 9px;
+            font-size: 15px;
             selection-background-color: #456882;
         }
 
@@ -343,7 +340,7 @@ void MainWindow::applyDarkTheme()
                                         stop:0 #456882, stop:1 #1b3c53);
             color: #d2c1b6;
             border: 1px solid #0e202d !important;
-            padding: 5px;
+            padding: 3px;
             border-radius: 4px;
         }
 
@@ -411,9 +408,8 @@ void MainWindow::applyDarkTheme()
     )");
 }
 
-void MainWindow::applyLightTheme()
-{
-    setStyleSheet(R"(
+void MainWindow::applyLightTheme() {
+  setStyleSheet(R"(
         QMainWindow {
             background: #f5f5f5;
             color: #4a5568;
@@ -529,9 +525,9 @@ void MainWindow::applyLightTheme()
         QSpinBox, QDoubleSpinBox {
             background: #ffffff;
             color: #4a5568;
-            border: 1px solid #e5e5e5;
+            border: 1px solid #ffffff;
             border-radius: 5px;
-            font-size: 9px;
+            font-size: 15px;
             selection-background-color: #edf2f7;
         }
 
@@ -685,7 +681,7 @@ void MainWindow::applyLightTheme()
                                             stop:0 rgba(4, 168, 173, 0.15), stop:1 rgba(4, 139, 143, 0.1));
             color: #4a5568;
             border: 1px solid rgba(4, 168, 173, 0.3) !important;
-            padding: 5px;
+            padding: 3px;
             border-radius: 4px;
         }
 
