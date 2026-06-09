@@ -109,7 +109,7 @@ QChartView *MainWindow::createAnalyzeChart(const QString &yTitle,
   axisX->setTitleBrush(QBrush(textColor));
   axisY->setTitleBrush(QBrush(textColor));
 
-  axisX->setTitleText("Time(s)");
+  axisX->setTitleText("Index");
   axisY->setRange(0, 100);
 
   series->attachAxis(axisX);

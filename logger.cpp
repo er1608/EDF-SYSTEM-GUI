@@ -159,20 +159,21 @@ void MainWindow::saveDataToPDF() {
 
   QFont tableTitleFont("Arial", 14, QFont::Bold);
   painter.setFont(tableTitleFont);
-  painter.drawText(margin, y, "Table 1: RPM Data Log");
+  painter.drawText(margin, y, "Table 1: Data Table");
   y += 150;
 
   int startX = (pageWidth - 2000) / 2;
-  int colWidths[] = {300, 500, 600, 600};
+  int colWidths[] = {250, 400, 450, 450, 450};
   int rowHeight = 80;
 
   painter.setFont(QFont("Arial", 10, QFont::Bold));
   painter.fillRect(startX, y, 2000, rowHeight, QColor(240, 240, 240));
   painter.drawRect(startX, y, 2000, rowHeight);
 
-  QString headers[] = {"Index", "Timestamp (s)", "Duty Cycle (%)", "RPM"};
+  QString headers[] = {"Index", "Timestamp (s)", "Duty Cycle (%)", "RPM",
+                       "Thrust (N)"};
   int currX = startX;
-  for (int col = 0; col < 4; ++col) {
+  for (int col = 0; col < 5; ++col) {
     painter.drawText(QRect(currX, y, colWidths[col], rowHeight),
                      Qt::AlignCenter, headers[col]);
     currX += colWidths[col];
@@ -209,6 +210,10 @@ void MainWindow::saveDataToPDF() {
     painter.drawText(QRect(currX, y, colWidths[3], rowHeight), Qt::AlignCenter,
                      QString::number(data.rpm, 'f', 0));
     currX += colWidths[3];
+
+    painter.drawText(QRect(currX, y, colWidths[4], rowHeight), Qt::AlignCenter,
+                     QString::number(data.thrust, 'f', 1));
+    currX += colWidths[4];
 
     y += rowHeight;
     rowCount++;
