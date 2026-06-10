@@ -14,7 +14,7 @@ void MainWindow::setupHomeTab() {
 
   auto *miniDashboard = new DashBoardWidget(_homeTab);
 #if defined(Q_OS_WIN)
-  miniDashboard->setMinimumSize(180, 180);
+  miniDashboard->setMinimumSize(160, 160);
 #else
   miniDashboard->setMinimumSize(230, 230);
 #endif
@@ -139,27 +139,53 @@ void MainWindow::setupHomeTab() {
   currentAct->setCheckable(true);
   rpmAct->setCheckable(true);
 
-  thrustAct->setChecked(true);
+  QLabel *placeholderLabel = new QLabel();
+  QPixmap placeholderPixmap(":/images/CTUAV.png");
+  placeholderLabel->setPixmap(placeholderPixmap);
+  placeholderLabel->setAlignment(Qt::AlignCenter);
+  placeholderLabel->setSizePolicy(QSizePolicy::Expanding,
+                                  QSizePolicy::Expanding);
+  displayLayout->addWidget(placeholderLabel, 1);
+
+  auto updatePlaceholder = [=]() {
+    bool anyVisible = thrustAct->isChecked() || voltAct->isChecked() ||
+                      currentAct->isChecked() || rpmAct->isChecked();
+    placeholderLabel->setVisible(!anyVisible);
+  };
+
+  thrustAct->setChecked(false);
   voltAct->setChecked(false);
   currentAct->setChecked(false);
-  rpmAct->setChecked(true);
+  rpmAct->setChecked(false);
 
   chartSelector->setMenu(menu);
 
-  connect(thrustAct, &QAction::toggled, this,
-          [=](bool checked) { _thrustChart->setVisible(checked); });
+  connect(thrustAct, &QAction::toggled, this, [=](bool checked) {
+    _thrustChart->setVisible(checked);
+    updatePlaceholder();
+  });
 
-  connect(voltAct, &QAction::toggled, this,
-          [=](bool checked) { _voltChart->setVisible(checked); });
+  connect(voltAct, &QAction::toggled, this, [=](bool checked) {
+    _voltChart->setVisible(checked);
+    updatePlaceholder();
+  });
 
-  connect(currentAct, &QAction::toggled, this,
-          [=](bool checked) { _currentChart->setVisible(checked); });
+  connect(currentAct, &QAction::toggled, this, [=](bool checked) {
+    _currentChart->setVisible(checked);
+    updatePlaceholder();
+  });
 
-  connect(rpmAct, &QAction::toggled, this,
-          [=](bool checked) { _rpmChart->setVisible(checked); });
+  connect(rpmAct, &QAction::toggled, this, [=](bool checked) {
+    _rpmChart->setVisible(checked);
+    updatePlaceholder();
+  });
 
+  _thrustChart->setVisible(false);
   _voltChart->setVisible(false);
   _currentChart->setVisible(false);
+  _rpmChart->setVisible(false);
+
+  updatePlaceholder();
 
   auto *topLayout = new QHBoxLayout();
   topLayout->addStretch();
