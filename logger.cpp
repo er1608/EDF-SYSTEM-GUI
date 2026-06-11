@@ -89,7 +89,7 @@ void MainWindow::saveDataToPDF() {
 
   QPixmap pix1 = chartView1.grab();
 
-  painter.drawPixmap((pageWidth - pix1.width()) / 2, y, pix1);
+  painter.drawPixmap((pageWidth - chartWidth) / 2, y, chartWidth, chartHeight, pix1);
 
   y += chartHeight + 40;
 
@@ -108,7 +108,7 @@ void MainWindow::saveDataToPDF() {
 
   QPixmap pix2 = chartView2.grab();
 
-  painter.drawPixmap((pageWidth - pix2.width()) / 2, y, pix2);
+  painter.drawPixmap((pageWidth - chartWidth) / 2, y, chartWidth, chartHeight, pix2);
 
   y += chartHeight + 40;
 
@@ -128,7 +128,7 @@ void MainWindow::saveDataToPDF() {
 
   QPixmap pix3 = chartView3.grab();
 
-  painter.drawPixmap((pageWidth - pix3.width()) / 2, y, pix3);
+  painter.drawPixmap((pageWidth - chartWidth) / 2, y, chartWidth, chartHeight, pix3);
 
   y += chartHeight + 40;
 
@@ -147,7 +147,7 @@ void MainWindow::saveDataToPDF() {
 
   QPixmap pix4 = chartView4.grab();
 
-  painter.drawPixmap((pageWidth - pix4.width()) / 2, y, pix4);
+  painter.drawPixmap((pageWidth - chartWidth) / 2, y, chartWidth, chartHeight, pix4);
 
   y += chartHeight + 40;
 
