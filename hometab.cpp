@@ -464,7 +464,9 @@ void MainWindow::setupHomeTab() {
       stopButton, &QPushButton::clicked, _homeTab,
       [this, valueSlider, valueSpinBox, miniDashboard]() {
         if (_serialPort && _serialPort->isOpen()) {
-          _autoTimer->stop();
+          if (_autoTimer) {
+            _autoTimer->stop();
+          }
           valueSlider->blockSignals(true);
           miniDashboard->setValue(0);
           valueSlider->setValue(static_cast<int>(0));
@@ -586,7 +588,9 @@ void MainWindow::setupHomeTab() {
       stopFlag = 1;
       plotButton->setText(tr("Start Plot"));
       plotButton->setStyleSheet("");
-
+      plotButton->style()->unpolish(plotButton);
+      plotButton->style()->polish(plotButton);
+      plotButton->update();
       qDebug() << "Plotting stopped";
 
       if (!_dataBuffer.isEmpty()) {
