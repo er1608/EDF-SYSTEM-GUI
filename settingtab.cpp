@@ -617,7 +617,7 @@ void MainWindow::vescParsePacket(const QByteArray &payload) {
   currentValue = getInt32(8) / 100.0;
   // skip avg_id (12-15), avg_iq (16-19)
   pwmValue = getInt16(20) / 1000.0 * 100.0;
-  RPMValue = getInt32(22) / 21;
+  RPMValue = getInt32(22) / _vescPolePairs;
   voltageValue = getInt16(26) / 10.0;
   //   double ampHours = getInt32(28) / 10000.0;
   //   double wattHours = getInt32(36) / 10000.0;
@@ -662,6 +662,17 @@ void MainWindow::setupVESCTab(QWidget *tab) {
   connGrid->addWidget(_vescBaudComboBox, 1, 1);
   connGrid->addWidget(_vescConnectBtn, 1, 2);
 
+  auto *polePairsGroup = new QGroupBox("Motor Settings");
+  polePairsGroup->setFixedWidth(420);
+  auto *polePairsForm = new QFormLayout(polePairsGroup);
+  _polePairsSpinBox = new QSpinBox();
+  _polePairsSpinBox->setRange(1, 100);
+  _polePairsSpinBox->setValue(_vescPolePairs);
+  polePairsForm->addRow("Pole Pairs:", _polePairsSpinBox);
+
+  connect(_polePairsSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this,
+          [this](int val) { _vescPolePairs = val; });
+
   auto *pollGroup = new QGroupBox("Poll Settings");
   pollGroup->setFixedWidth(420);
   auto *pollForm = new QFormLayout(pollGroup);
@@ -672,6 +683,7 @@ void MainWindow::setupVESCTab(QWidget *tab) {
   pollForm->addRow("Poll Interval:", pollInterval);
 
   layout->addWidget(connGroup, 0, Qt::AlignTop | Qt::AlignHCenter);
+  layout->addWidget(polePairsGroup, 0, Qt::AlignTop | Qt::AlignHCenter);
   layout->addWidget(pollGroup, 0, Qt::AlignTop | Qt::AlignHCenter);
   layout->addStretch();
 

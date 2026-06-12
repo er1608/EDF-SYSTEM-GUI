@@ -96,6 +96,8 @@ private:
   QPushButton *_vescConnectBtn = nullptr;
   QLabel *_vescStatusLabel = nullptr;
   bool _vescConnected = false;
+  int _vescPolePairs = 21;
+  QSpinBox *_polePairsSpinBox = nullptr;
 
   void vescSendGetValues();
   void vescReadData();
