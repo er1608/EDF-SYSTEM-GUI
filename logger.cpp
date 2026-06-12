@@ -89,7 +89,8 @@ void MainWindow::saveDataToPDF() {
 
   QPixmap pix1 = chartView1.grab();
 
-  painter.drawPixmap((pageWidth - chartWidth) / 2, y, chartWidth, chartHeight, pix1);
+  painter.drawPixmap((pageWidth - chartWidth) / 2, y, chartWidth, chartHeight,
+                     pix1);
 
   y += chartHeight + 40;
 
@@ -108,7 +109,8 @@ void MainWindow::saveDataToPDF() {
 
   QPixmap pix2 = chartView2.grab();
 
-  painter.drawPixmap((pageWidth - chartWidth) / 2, y, chartWidth, chartHeight, pix2);
+  painter.drawPixmap((pageWidth - chartWidth) / 2, y, chartWidth, chartHeight,
+                     pix2);
 
   y += chartHeight + 40;
 
@@ -128,7 +130,8 @@ void MainWindow::saveDataToPDF() {
 
   QPixmap pix3 = chartView3.grab();
 
-  painter.drawPixmap((pageWidth - chartWidth) / 2, y, chartWidth, chartHeight, pix3);
+  painter.drawPixmap((pageWidth - chartWidth) / 2, y, chartWidth, chartHeight,
+                     pix3);
 
   y += chartHeight + 40;
 
@@ -147,7 +150,8 @@ void MainWindow::saveDataToPDF() {
 
   QPixmap pix4 = chartView4.grab();
 
-  painter.drawPixmap((pageWidth - chartWidth) / 2, y, chartWidth, chartHeight, pix4);
+  painter.drawPixmap((pageWidth - chartWidth) / 2, y, chartWidth, chartHeight,
+                     pix4);
 
   y += chartHeight + 40;
 
@@ -270,12 +274,14 @@ void MainWindow::saveDataToCSV() {
   if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
     QTextStream stream(&file);
 
-    stream << "Timestamp,Thrust,RPM,Voltage,Current,PWM\n";
+    stream << "Timestamp,Thrust,RPM,Voltage,Current,PWM,WattHours,"
+              "WattHoursCharged\n";
 
     for (auto it = _dataBuffer.begin(); it != _dataBuffer.end(); ++it) {
       const auto &data = *it;
       stream << data.timestamp << "," << data.thrust << "," << data.rpm << ","
-             << data.current << "," << data.voltage << "," << data.pwm << "\n";
+             << data.current << "," << data.voltage << "," << data.pwm << ","
+             << data.watt_hours << "," << data.watt_hours_charged << "\n";
     }
 
     file.close();

@@ -35,9 +35,9 @@ void MainWindow::updateAnalyzeCharts(double thrust, double voltage,
     _series4->remove(0);
   }
 
-  _dataBuffer.append(DataPoint{key, thrust, rpm, voltage, current, pwm});
+  _dataBuffer.append(DataPoint{key, thrust, rpm, voltage, current, pwm, wattHoursValue, wattHoursChargedValue});
   if (pdf)
-    _dataPDFBuffer.append(DataPoint{key, thrust, rpm, voltage, current, pwm});
+    _dataPDFBuffer.append(DataPoint{key, thrust, rpm, voltage, current, pwm, wattHoursValue, wattHoursChargedValue});
 
   auto updateChartAxis = [key](QChart *chart, double minY, double maxY,
                                int stopFlag) {

@@ -21,6 +21,8 @@ struct DataPoint {
   double voltage;
   double current;
   double pwm;
+  double watt_hours;
+  double watt_hours_charged;
 };
 
 struct LCConfig {
@@ -72,6 +74,8 @@ private:
   double thrustValue = 0.0, pwmValue = 0.0;
   double currentValue = 0.0, voltageValue = 0.0;
   int RPMValue = 0.0;
+  double wattHoursValue = 0.0;
+  double wattHoursChargedValue = 0.0;
   bool swcurrent = false;
   int _currentLC = 0;
 
@@ -80,6 +84,8 @@ private:
   QLabel *_voltageLabel;
   QLabel *_currentLabel;
   QLabel *_RPMLabel;
+  QLabel *_wattHoursLabel = nullptr;
+  QLabel *_wattHoursChargedLabel = nullptr;
 
   QChartView *_thrustChart;
   QChartView *_voltChart;

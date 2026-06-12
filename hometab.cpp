@@ -306,6 +306,9 @@ void MainWindow::setupHomeTab() {
   auto *voltageValueLabel = new QLabel(tr("Voltage: -- V"), _homeTab);
   auto *currentValueLabel = new QLabel(tr("Current: -- A"), _homeTab);
   auto *RPMValueLabel = new QLabel(tr("RPM: --"), _homeTab);
+  auto *wattHoursValueLabel = new QLabel(tr("Consumed: -- Wh"), _homeTab);
+  auto *wattHoursChargedValueLabel =
+      new QLabel(tr("Recovered: -- Wh"), _homeTab);
 
   thrustValueLabel->setStyleSheet(
       "font-weight: bold; font-size: 13px; padding: 6px; border-radius: 3px;");
@@ -317,12 +320,18 @@ void MainWindow::setupHomeTab() {
       "font-weight: bold; font-size: 13px; padding: 6px; border-radius: 3px;");
   RPMValueLabel->setStyleSheet(
       "font-weight: bold; font-size: 13px; padding: 6px; border-radius: 3px;");
+  wattHoursValueLabel->setStyleSheet(
+      "font-weight: bold; font-size: 13px; padding: 6px; border-radius: 3px;");
+  wattHoursChargedValueLabel->setStyleSheet(
+      "font-weight: bold; font-size: 13px; padding: 6px; border-radius: 3px;");
 
   dataLayout->addWidget(thrustValueLabel, 0, 0);
   dataLayout->addWidget(currentValueLabel, 0, 1);
   dataLayout->addWidget(voltageValueLabel, 0, 2);
   dataLayout->addWidget(pwmValueLabel, 1, 0);
   dataLayout->addWidget(RPMValueLabel, 1, 1);
+  dataLayout->addWidget(wattHoursValueLabel, 1, 2);
+  dataLayout->addWidget(wattHoursChargedValueLabel, 2, 0);
 
   auto *dashboardGroup = new QGroupBox(tr("Motor Output"), _homeTab);
   auto *dashboardLayout = new QVBoxLayout(dashboardGroup);
@@ -613,6 +622,8 @@ void MainWindow::setupHomeTab() {
   _voltageLabel = voltageValueLabel;
   _currentLabel = currentValueLabel;
   _RPMLabel = RPMValueLabel;
+  _wattHoursLabel = wattHoursValueLabel;
+  _wattHoursChargedLabel = wattHoursChargedValueLabel;
 
   _logTextEdit = logTextEdit;
 

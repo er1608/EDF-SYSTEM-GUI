@@ -620,7 +620,8 @@ void MainWindow::vescParsePacket(const QByteArray &payload) {
   RPMValue = getInt32(22) / _vescPolePairs;
   voltageValue = getInt16(26) / 10.0;
   //   double ampHours = getInt32(28) / 10000.0;
-  //   double wattHours = getInt32(36) / 10000.0;
+  wattHoursValue = getInt32(36) / 10000.0;
+  wattHoursChargedValue = getInt32(40) / 10000.0;
 
   if (_voltageLabel)
     _voltageLabel->setText(
@@ -632,6 +633,12 @@ void MainWindow::vescParsePacket(const QByteArray &payload) {
     _RPMLabel->setText(QString("RPM: %1").arg(RPMValue));
   if (_pwmLabel)
     _pwmLabel->setText(QString("PWM: %1").arg(pwmValue, 0, 'f', 1));
+  if (_wattHoursLabel)
+    _wattHoursLabel->setText(
+        QString("Consumed: %1 Wh").arg(wattHoursValue, 0, 'f', 2));
+  if (_wattHoursChargedLabel)
+    _wattHoursChargedLabel->setText(
+        QString("Recovered: %1 Wh").arg(wattHoursChargedValue, 0, 'f', 2));
 
   if (_plotting) {
     updateAnalyzeCharts(thrustValue, voltageValue, currentValue, pwmValue,
