@@ -54,14 +54,14 @@ void MainWindow::readData() {
         currentValue = trimmedPart.section(':', 1).toDouble(&currentOk);
       } else if (trimmedPart.startsWith("RPM:")) {
         RPMValue = trimmedPart.section(':', 1).toDouble(&RPMOk);
-      } else if (trimmedPart.startsWith("Throttle:")) {
+      } else if (trimmedPart.startsWith("Thrust:")) {
         // thrustValue =
         //     trimmedPart.section(':', 1).toDouble(&throttleOk) * 5 / 100;
 
         thrustValue = trimmedPart.section(':', 1).toDouble(&throttleOk);
 
-        if (thrustValue > 300)
-          thrustValue = 300;
+        // if (thrustValue > 300)
+        //   thrustValue = 300;
         if (thrustValue < 0)
           thrustValue = 0;
       } else if (trimmedPart.startsWith("PWM:")) {

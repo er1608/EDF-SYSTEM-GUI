@@ -274,7 +274,7 @@ void MainWindow::saveDataToCSV() {
   if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
     QTextStream stream(&file);
 
-    stream << "Timestamp,Thrust,RPM,Voltage,Current,PWM,WattHours,"
+    stream << "Timestamp,Thrust,RPM,Current,Voltage,PWM,WattHours,"
               "WattHoursCharged\n";
 
     for (auto it = _dataBuffer.begin(); it != _dataBuffer.end(); ++it) {
