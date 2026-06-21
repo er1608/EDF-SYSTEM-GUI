@@ -79,10 +79,6 @@ void MainWindow::setupSettingTab() {
   setupPWMTab(pwmTab);
   settingTabs->addTab(pwmTab, "PWM");
 
-  auto *mavlinkTab = new QWidget();
-  setupMavlinkTab(mavlinkTab);
-  settingTabs->addTab(mavlinkTab, "MAVL");
-
   auto *fftTab = new QWidget();
   setupFFTTab(fftTab);
   settingTabs->addTab(fftTab, "FFT");
@@ -111,6 +107,48 @@ void MainWindow::setupSettingTab() {
   //     }
   //   });
 
+  auto *cornerWidget = new QWidget();
+  auto *cornerLayout = new QHBoxLayout(cornerWidget);
+  cornerLayout->setContentsMargins(0, 0, 0, 0);
+  cornerLayout->setSpacing(5);
+
+  auto *applyBtn = new QPushButton("Apply Config");
+  applyBtn->setFixedHeight(30);
+  connect(applyBtn, &QPushButton::clicked, this,
+          &MainWindow::Send_Configurations);
+
+  auto *resetBtn = new QPushButton("Reset");
+  resetBtn->setFixedHeight(30);
+
+  connect(resetBtn, &QPushButton::clicked, _settingTab, [this]() {
+    if (_serialPort && _serialPort->isOpen()) {
+      QByteArray payload;
+      payload.append(static_cast<char>(COMM_RESET_SYSTEM_CONF));
+
+      quint16 crc = vescCrc16(payload);
+
+      QByteArray packet;
+      packet.append(static_cast<char>(0x02)); // start byte (short packet)
+      packet.append(static_cast<char>(payload.size()));
+      packet.append(payload);
+      packet.append(static_cast<char>((crc >> 8) & 0xFF));
+      packet.append(static_cast<char>(crc & 0xFF));
+      packet.append(static_cast<char>(0x03)); // stop byte
+
+      _serialPort->write(packet);
+
+      QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
+      _logTextEdit->append(
+          QString("[%1] AUTO SEND: RESET CONFIG").arg(timestamp));
+      saveLogToCSV(QString("[%1] AUTO SEND: RESET CONFIG").arg(timestamp));
+    }
+  });
+
+  cornerLayout->addWidget(applyBtn);
+  cornerLayout->addWidget(resetBtn);
+
+  settingTabs->setCornerWidget(cornerWidget, Qt::TopRightCorner);
+
   settingLayout->addWidget(settingTabs);
 }
 
@@ -135,34 +173,15 @@ void MainWindow::setupSignalGeneratorTab(QWidget *tab) {
   duration->setRange(1, 60);
   duration->setValue(10);
 
-  auto *btnLayout = new QHBoxLayout();
-
-  auto *applyBtn = new QPushButton("Apply");
-
-  btnLayout->addWidget(applyBtn);
-
   form->addRow("Amplitude", amplitude);
   form->addRow("Frequency (Hz)", frequency);
   form->addRow("Duration (s)", duration);
-  form->addRow(btnLayout);
 
   layout->addWidget(group, 0, Qt::AlignTop | Qt::AlignHCenter);
-
-  connect(applyBtn, &QPushButton::clicked, this, [=]() {
-    if (_serialPort && _serialPort->isOpen()) {
-      QString cmd = QString("mode:%1:%2:%3\n")
-                        .arg(amplitude->value(), 0, 'f', 1)
-                        .arg(frequency->value(), 0, 'f', 2)
-                        .arg(duration->value(), 0, 'f', 1);
-
-      _serialPort->write(cmd.toUtf8());
-
-      QString ts = QDateTime::currentDateTime().toString("hh:mm:ss");
-      _logTextEdit->append(QString("[%1] MODE SET: %2").arg(ts, cmd.trimmed()));
-      saveLogToCSV(QString("[%1] MODE SET: %2").arg(ts, cmd.trimmed()));
-    }
-  });
 }
+
+QComboBox *freq;
+QSpinBox *minPWM, *maxPWM;
 
 void MainWindow::setupPWMTab(QWidget *tab) {
   auto *layout = new QVBoxLayout(tab);
@@ -171,38 +190,21 @@ void MainWindow::setupPWMTab(QWidget *tab) {
   group->setFixedWidth(400);
   auto *form = new QFormLayout(group);
 
-  auto *freq = new QComboBox();
+  freq = new QComboBox();
   freq->addItem("50 Hz", 50);
   freq->addItem("400 Hz", 400);
 
-  auto *minPWM = new QSpinBox();
+  minPWM = new QSpinBox();
   minPWM->setRange(800, 1100);
   minPWM->setValue(1050);
 
-  auto *maxPWM = new QSpinBox();
+  maxPWM = new QSpinBox();
   maxPWM->setRange(1600, 2200);
   maxPWM->setValue(1950);
-
-  auto *applyBtn = new QPushButton("Apply", group);
 
   form->addRow("Frequency (Hz)", freq);
   form->addRow("Min PWM (us)", minPWM);
   form->addRow("Max PWM (us)", maxPWM);
-  form->addRow(applyBtn);
-
-  connect(applyBtn, &QPushButton::clicked, this, [=]() {
-    if (_serialPort && _serialPort->isOpen()) {
-      int frequency = freq->currentData().toInt();
-
-      QString cmd = QString("pwmconf:%1:%2:%3\n")
-                        .arg(frequency)
-                        .arg(minPWM->value())
-                        .arg(maxPWM->value());
-
-      _serialPort->write(cmd.toUtf8());
-      _logTextEdit->append(cmd);
-    }
-  });
 
   layout->addWidget(group, 0, Qt::AlignTop | Qt::AlignHCenter);
   layout->addStretch();
@@ -244,8 +246,6 @@ void MainWindow::setupLCTab(QWidget *tab) {
   precision->setRange(1, 200);
   precision->setValue(100);
 
-  auto *applyBtn = new QPushButton("Apply");
-
   auto *grid = new QGridLayout(group);
   grid->setHorizontalSpacing(20);
   grid->setVerticalSpacing(12);
@@ -273,8 +273,6 @@ void MainWindow::setupLCTab(QWidget *tab) {
 
   grid->addWidget(new QLabel("Value Per Unit"), 3, 2);
   grid->addWidget(vpu, 3, 3);
-
-  grid->addWidget(applyBtn, 4, 0, 1, 4);
 
   layout->addWidget(group, 0, Qt::AlignTop | Qt::AlignHCenter);
   layout->addStretch();
@@ -326,7 +324,7 @@ void MainWindow::setupLCTab(QWidget *tab) {
   };
 
   connect(idSelect, &QComboBox::currentIndexChanged, this, [=](int index) {
-    saveCurrentLC(); // lưu LC cũ
+    saveCurrentLC();
 
     _currentLC = index;
 
@@ -353,61 +351,10 @@ void MainWindow::setupLCTab(QWidget *tab) {
       gain->addItem("32");
     }
   });
-
-  connect(applyBtn, &QPushButton::clicked, this, [=]() {
-    saveCurrentLC();
-
-    for (const auto &cfg : _lcConfigs) {
-      QString cmd = QString("lcconf:%1:%2:%3:%4:%5:%6:%7:%8\n")
-                        .arg(cfg.id)
-                        .arg(cfg.channel)
-                        .arg(cfg.gain)
-                        .arg(cfg.sign)
-                        .arg(cfg.val_per_unit)
-                        .arg(cfg.sampleAverage)
-                        .arg(cfg.quantity)
-                        .arg(cfg.tarePrecision);
-
-      if (_serialPort && _serialPort->isOpen()) {
-        _serialPort->write(cmd.toUtf8());
-      }
-    }
-  });
 }
 
-void MainWindow::setupMavlinkTab(QWidget *tab) {
-  auto *layout = new QVBoxLayout(tab);
-
-  auto *group = new QGroupBox("MAVLink Connection");
-  group->setFixedWidth(400);
-  auto *form = new QFormLayout(group);
-
-  auto *sysID = new QSpinBox();
-  sysID->setRange(1, 255);
-  sysID->setValue(1);
-
-  auto *compID = new QSpinBox();
-  compID->setRange(1, 255);
-  compID->setValue(1);
-
-  auto *baud = new QComboBox();
-  baud->addItems({"57600", "115200", "921600"});
-
-  auto *udpPort = new QSpinBox();
-  udpPort->setRange(1000, 65535);
-  udpPort->setValue(14550);
-
-  auto *connectBtn = new QPushButton("Connect");
-
-  form->addRow("System ID", sysID);
-  form->addRow("Component ID", compID);
-  form->addRow("Baudrate", baud);
-  form->addRow("UDP Port", udpPort);
-  form->addRow(connectBtn);
-
-  layout->addWidget(group, 0, Qt::AlignTop | Qt::AlignHCenter);
-  layout->addStretch();
-}
+QSpinBox *windowSize, *sampleRate, *overlap;
+QComboBox *fftWindowType;
 
 void MainWindow::setupFFTTab(QWidget *tab) {
   auto *layout = new QVBoxLayout(tab);
@@ -416,31 +363,88 @@ void MainWindow::setupFFTTab(QWidget *tab) {
   group->setFixedWidth(400);
   auto *form = new QFormLayout(group);
 
-  auto *windowSize = new QSpinBox();
+  windowSize = new QSpinBox();
   windowSize->setRange(128, 8192);
   windowSize->setValue(1024);
 
-  auto *sampleRate = new QSpinBox();
+  sampleRate = new QSpinBox();
   sampleRate->setRange(100, 10000);
   sampleRate->setValue(1000);
 
-  auto *overlap = new QSpinBox();
+  overlap = new QSpinBox();
   overlap->setRange(0, 90);
   overlap->setValue(50);
 
-  auto *windowType = new QComboBox();
-  windowType->addItems({"Hann", "Hamming", "Blackman"});
-
-  auto *applyBtn = new QPushButton("Apply");
+  fftWindowType = new QComboBox();
+  fftWindowType->addItems({"Hann", "Hamming", "Blackman"});
 
   form->addRow("Window Size", windowSize);
   form->addRow("Sample Rate (Hz)", sampleRate);
   form->addRow("Overlap (%)", overlap);
-  form->addRow("Window Type", windowType);
-  form->addRow(applyBtn);
+  form->addRow("Window Type", fftWindowType);
 
   layout->addWidget(group, 0, Qt::AlignTop | Qt::AlignHCenter);
   layout->addStretch();
+}
+
+void MainWindow::buffer_append_ui8(QByteArray &buffer, uint8_t value) {
+  buffer.append(static_cast<char>(value));
+}
+
+void MainWindow::buffer_append_ui16(QByteArray &buffer, uint16_t value) {
+  buffer.append(static_cast<char>((value >> 8) & 0xFF));
+  buffer.append(static_cast<char>(value & 0xFF));
+}
+
+void MainWindow::buffer_append_ui32(QByteArray &buffer, uint32_t value) {
+  buffer.append(static_cast<char>((value >> 24) & 0xFF));
+  buffer.append(static_cast<char>((value >> 16) & 0xFF));
+  buffer.append(static_cast<char>((value >> 8) & 0xFF));
+  buffer.append(static_cast<char>(value & 0xFF));
+}
+
+void MainWindow::Send_Configurations() {
+  // qDebug() << "Send Configurations";
+  if (!_serialPort || !_serialPort->isOpen())
+    return;
+
+  QByteArray payload;
+  payload.append(static_cast<char>(COMM_SET_SYSTEM_CONF));
+
+  buffer_append_ui16(payload, freq->currentData().toInt());
+  buffer_append_ui16(payload, minPWM->value());
+  buffer_append_ui16(payload, maxPWM->value());
+
+  buffer_append_ui8(payload, fftWindowType->currentIndex());
+  buffer_append_ui32(payload, windowSize->value());
+  buffer_append_ui8(payload, overlap->value());
+  buffer_append_ui32(payload, sampleRate->value());
+
+  buffer_append_ui8(payload, _lcConfigs.size());
+
+  for (const auto &lc : std::as_const(_lcConfigs)) {
+    buffer_append_ui8(payload, lc.id);
+    buffer_append_ui8(payload, lc.channel);
+    buffer_append_ui8(payload, lc.gain);
+    buffer_append_ui8(payload, lc.sign);
+    buffer_append_ui16(payload, lc.sampleAverage);
+    buffer_append_ui16(payload, lc.tarePrecision);
+    buffer_append_ui16(payload, lc.val_per_unit);
+  }
+
+  quint16 crc = vescCrc16(payload);
+
+  QByteArray packet;
+  packet.append(static_cast<char>(0x02)); // start byte (short packet)
+  packet.append(static_cast<char>(payload.size()));
+  packet.append(payload);
+  packet.append(static_cast<char>((crc >> 8) & 0xFF));
+  packet.append(static_cast<char>(crc & 0xFF));
+  packet.append(static_cast<char>(0x03)); // stop byte
+
+  // qDebug() << "Checksum:" << crc;
+  // qDebug() << "Payload:" << payload.toHex();
+  _serialPort->write(packet);
 }
 
 quint16 MainWindow::vescCrc16(const QByteArray &data) {

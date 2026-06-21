@@ -224,8 +224,6 @@ void MainWindow::setupHomeTab() {
   // UART Command Sending
   auto *commandGroup = new QGroupBox(tr("Test Modes"), _homeTab);
   auto *commandLayout = new QGridLayout(commandGroup);
-  auto *commandEdit = new QLineEdit(_homeTab);
-  auto *sendButton = new QPushButton(tr("Send"), _homeTab);
 
   auto *startButton = new QPushButton(tr("Start"), _homeTab);
   auto *stopButton = new QPushButton(tr("Stop"), _homeTab);
@@ -287,16 +285,8 @@ void MainWindow::setupHomeTab() {
   startButton->setText("▶ START");
   stopButton->setText("■ STOP");
 
-  commandEdit->setPlaceholderText("Enter command to send");
-  commandLayout->addWidget(new QLabel(tr("Command:")), 0, 0);
-  commandLayout->addWidget(commandEdit, 0, 1, 1, 2);
-  commandLayout->addWidget(sendButton, 0, 3);
-  commandLayout->addWidget(rampModeButton, 1, 0, 1, 2);
-  commandLayout->addWidget(sineModeButton, 1, 2, 1, 2);
-  commandLayout->setColumnStretch(0, 1);
-  commandLayout->setColumnStretch(1, 1);
-  commandLayout->setColumnStretch(2, 1);
-  commandLayout->setColumnStretch(3, 1);
+  commandLayout->addWidget(rampModeButton, 0, 0);
+  commandLayout->addWidget(sineModeButton, 0, 1);
 
   auto *dataGroup = new QGroupBox(tr("Live Telemetry"), _homeTab);
   auto *dataLayout = new QGridLayout(dataGroup);
@@ -379,13 +369,6 @@ void MainWindow::setupHomeTab() {
 
   homeLayout->addLayout(topContentLayout, 1);
 
-  sendButton->setToolTip("Send Commnad to device\n"
-                         "Available commands:\n"
-                         "   # s or start - Start Motor\n"
-                         "   # t or stop - Stop Motor\n"
-                         "   # u or up - Increase Motor Power\n"
-                         "   # d or down - Decrease Motor Power");
-
   connect(valueSlider, &QSlider::valueChanged, _homeTab,
           [miniDashboard, valueSpinBox](int value) {
             valueSpinBox->blockSignals(true);
@@ -403,95 +386,65 @@ void MainWindow::setupHomeTab() {
           });
 
   // valueSlider UART
-  connect(
-      valueSlider, &QSlider::valueChanged, _homeTab,
-      [this, minValueSpinBox, maxValueSpinBox](int value) {
-        if (_serialPort && _serialPort->isOpen()) {
-          if (swcurrent) {
-            if (value > maxValueSpinBox->value())
-              value = maxValueSpinBox->value();
-            else if (value < minValueSpinBox->value())
-              value = minValueSpinBox->value();
-          } else {
-            if (value > 50)
-              value = 50;
-            else if (value < 0)
-              value = 0;
-          }
-          QString command = QString("Power:%1\n").arg(value);
-          _serialPort->write(command.toUtf8());
+  connect(valueSlider, &QSlider::valueChanged, _homeTab,
+          [this, minValueSpinBox, maxValueSpinBox](uint16_t value) {
+            if (_serialPort && _serialPort->isOpen()) {
+              if (swcurrent) {
+                if (value > maxValueSpinBox->value())
+                  value = maxValueSpinBox->value();
+                else if (value < minValueSpinBox->value())
+                  value = minValueSpinBox->value();
+              } else {
+                if (value > 50)
+                  value = 50;
+                else if (value < 0)
+                  value = 0;
+              }
 
-          QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
-          _logTextEdit->append(
-              QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
-          saveLogToCSV(
-              QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
-        }
-      });
+              Send_PWM(value);
+            }
+          });
 
-  connect(
-      valueSpinBox, &QDoubleSpinBox::editingFinished, this,
-      [this, valueSpinBox, minValueSpinBox, maxValueSpinBox]() {
-        if (_serialPort && _serialPort->isOpen()) {
-          double value = valueSpinBox->value();
-          if (swcurrent) {
-            if (value > maxValueSpinBox->value())
-              value = maxValueSpinBox->value();
-            else if (value < minValueSpinBox->value())
-              value = minValueSpinBox->value();
-          } else {
-            if (value > 50)
-              value = 50;
-            else if (value < 0)
-              value = 0;
-          }
-          QString command = QString("Power:%1\n").arg(value, 0, 'f', 1);
-          _serialPort->write(command.toUtf8());
+  connect(valueSpinBox, &QDoubleSpinBox::editingFinished, this,
+          [this, valueSpinBox, minValueSpinBox, maxValueSpinBox]() {
+            if (_serialPort && _serialPort->isOpen()) {
+              uint16_t value = valueSpinBox->value();
+              if (swcurrent) {
+                if (value > maxValueSpinBox->value())
+                  value = maxValueSpinBox->value();
+                else if (value < minValueSpinBox->value())
+                  value = minValueSpinBox->value();
+              } else {
+                if (value > 50)
+                  value = 50;
+                else if (value < 0)
+                  value = 0;
+              }
 
-          QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
-          _logTextEdit->append(
-              QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
-          saveLogToCSV(
-              QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
-        }
-      });
+              Send_PWM(value);
+            }
+          });
 
   connect(startButton, &QPushButton::clicked, _homeTab, [this]() {
-    if (_serialPort && _serialPort->isOpen()) {
-      QString command = QString("start\n");
-      _serialPort->write(command.toUtf8());
-
-      QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
-      _logTextEdit->append(
-          QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
-      saveLogToCSV(
-          QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
-    }
+    if (_serialPort && _serialPort->isOpen())
+      Send_Start();
   });
 
-  connect(
-      stopButton, &QPushButton::clicked, _homeTab,
-      [this, valueSlider, valueSpinBox, miniDashboard]() {
-        if (_serialPort && _serialPort->isOpen()) {
-          if (_autoTimer) {
-            _autoTimer->stop();
-          }
-          valueSlider->blockSignals(true);
-          miniDashboard->setValue(0);
-          valueSlider->setValue(static_cast<int>(0));
-          valueSpinBox->setValue(static_cast<int>(0));
-          valueSlider->blockSignals(false);
+  connect(stopButton, &QPushButton::clicked, _homeTab,
+          [this, valueSlider, valueSpinBox, miniDashboard]() {
+            if (_serialPort && _serialPort->isOpen()) {
+              if (_autoTimer) {
+                _autoTimer->stop();
+              }
+              valueSlider->blockSignals(true);
+              miniDashboard->setValue(0);
+              valueSlider->setValue(static_cast<int>(0));
+              valueSpinBox->setValue(static_cast<int>(0));
+              valueSlider->blockSignals(false);
 
-          QString command = QString("stop\n");
-          _serialPort->write(command.toUtf8());
-
-          QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
-          _logTextEdit->append(
-              QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
-          saveLogToCSV(
-              QString("[%1] AUTO SEND: %2").arg(timestamp, command.trimmed()));
-        }
-      });
+              Send_Stop();
+            }
+          });
 
   connect(rampModeButton, &QPushButton::clicked, this, [this, valueSlider]() {
     if (!_serialPort || !_serialPort->isOpen())
@@ -556,27 +509,6 @@ void MainWindow::setupHomeTab() {
             }
           });
 
-  connect(sendButton, &QPushButton::clicked, _homeTab,
-          [this, commandEdit, logTextEdit]() {
-            if (_serialPort && _serialPort->isOpen()) {
-              QString command = commandEdit->text() + "\n";
-              _serialPort->write(command.toUtf8());
-
-              QString timestamp =
-                  QDateTime::currentDateTime().toString("hh:mm:ss");
-              logTextEdit->append(
-                  QString("[%1] SENT: %2").arg(timestamp, command.trimmed()));
-
-              qDebug() << "Command sent:" << command;
-              commandEdit->clear();
-            } else {
-              QMessageBox::warning(this, "Warning", "UART port not connected");
-            }
-          });
-
-  connect(commandEdit, &QLineEdit::returnPressed, _homeTab,
-          [sendButton]() { sendButton->click(); });
-
   connect(plotButton, &QPushButton::clicked, _homeTab, [this, plotButton]() {
     if (!_plotting) {
       _plotting = true;
@@ -628,4 +560,90 @@ void MainWindow::setupHomeTab() {
   _logTextEdit = logTextEdit;
 
   miniDashboard->setValue(0);
+}
+
+void MainWindow::Send_PWM(uint16_t value) {
+  if (!_serialPort && !_serialPort->isOpen()) {
+    return;
+  }
+
+  QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
+  _logTextEdit->append(QString("[%1] AUTO SEND: %2")
+                           .arg(timestamp, QString("PWM: %1").arg(value)));
+  saveLogToCSV(QString("[%1] AUTO SEND: %2")
+                   .arg(timestamp, QString("PWM: %1").arg(value)));
+
+  QByteArray payload;
+  payload.append(static_cast<char>(COMM_SET_POWER));
+  buffer_append_ui16(payload, value);
+
+  quint16 crc = vescCrc16(payload);
+
+  QByteArray packet;
+  packet.append(static_cast<char>(0x02)); // start byte (short packet)
+  packet.append(static_cast<char>(payload.size()));
+  packet.append(payload);
+  packet.append(static_cast<char>((crc >> 8) & 0xFF));
+  packet.append(static_cast<char>(crc & 0xFF));
+  packet.append(static_cast<char>(0x03)); // stop byte
+
+  // qDebug() << "Checksum:" << crc;
+  // qDebug() << "Payload:" << payload.toHex();
+  _serialPort->write(packet);
+}
+
+void MainWindow::Send_Start() {
+  if (!_serialPort && !_serialPort->isOpen()) {
+    return;
+  }
+
+  QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
+  _logTextEdit->append(
+      QString("[%1] AUTO SEND: %2").arg(timestamp, QString("START")));
+  saveLogToCSV(QString("[%1] AUTO SEND: %2").arg(timestamp, QString("START")));
+
+  QByteArray payload;
+  payload.append(static_cast<char>(COMM_START_SYSTEM));
+
+  quint16 crc = vescCrc16(payload);
+
+  QByteArray packet;
+  packet.append(static_cast<char>(0x02)); // start byte (short packet)
+  packet.append(static_cast<char>(payload.size()));
+  packet.append(payload);
+  packet.append(static_cast<char>((crc >> 8) & 0xFF));
+  packet.append(static_cast<char>(crc & 0xFF));
+  packet.append(static_cast<char>(0x03)); // stop byte
+
+  // qDebug() << "Checksum:" << crc;
+  // qDebug() << "Payload:" << payload.toHex();
+  _serialPort->write(packet);
+}
+
+void MainWindow::Send_Stop() {
+  if (!_serialPort && !_serialPort->isOpen()) {
+    return;
+  }
+
+  QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
+  _logTextEdit->append(
+      QString("[%1] AUTO SEND: %2").arg(timestamp, QString("STOP")));
+  saveLogToCSV(QString("[%1] AUTO SEND: %2").arg(timestamp, QString("STOP")));
+
+  QByteArray payload;
+  payload.append(static_cast<char>(COMM_STOP_SYSTEM));
+
+  quint16 crc = vescCrc16(payload);
+
+  QByteArray packet;
+  packet.append(static_cast<char>(0x02)); // start byte (short packet)
+  packet.append(static_cast<char>(payload.size()));
+  packet.append(payload);
+  packet.append(static_cast<char>((crc >> 8) & 0xFF));
+  packet.append(static_cast<char>(crc & 0xFF));
+  packet.append(static_cast<char>(0x03)); // stop byte
+
+  // qDebug() << "Checksum:" << crc;
+  // qDebug() << "Payload:" << payload.toHex();
+  _serialPort->write(packet);
 }

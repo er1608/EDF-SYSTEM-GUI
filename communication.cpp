@@ -17,7 +17,7 @@ void MainWindow::refreshSerialPorts() {
     portComboBox->clear();
     portComboBox->addItems(currentPorts);
 
-    qDebug() << "Ports updated:" << currentPorts;
+    // qDebug() << "Ports updated:" << currentPorts;
 
     lastPortList = currentPorts;
   }

@@ -26,14 +26,22 @@ struct DataPoint {
 };
 
 struct LCConfig {
-  int id;
-  int quantity;
-  int val_per_unit;
-  int gain;
-  int sign;
+  uint8_t id;
+  uint8_t quantity;
+  uint8_t sign;
   char channel;
-  int sampleAverage;
-  int tarePrecision;
+  uint16_t val_per_unit;
+  uint16_t gain;
+  uint16_t sampleAverage;
+  uint16_t tarePrecision;
+};
+
+enum {
+  COMM_SET_SYSTEM_CONF = 0x10,
+  COMM_RESET_SYSTEM_CONF = 0x11,
+  COMM_START_SYSTEM = 0x12,
+  COMM_STOP_SYSTEM = 0x13,
+  COMM_SET_POWER = 0x14,
 };
 
 extern QVector<LCConfig> _lcConfigs;
@@ -105,10 +113,18 @@ private:
   int _vescPolePairs = 21;
   QSpinBox *_polePairsSpinBox = nullptr;
 
+  void Send_PWM(uint16_t value);
+  void Send_Start();
+  void Send_Stop();
+
   void vescSendGetValues();
   void vescReadData();
   void vescParsePacket(const QByteArray &payload);
   void vescRefreshPorts();
+  void buffer_append_ui8(QByteArray &buffer, uint8_t value);
+  void buffer_append_ui16(QByteArray &buffer, uint16_t value);
+  void buffer_append_ui32(QByteArray &buffer, uint32_t value);
+  void buffer_append_ui64(QByteArray &buffer, uint64_t value);
   static quint16 vescCrc16(const QByteArray &data);
   bool _plotting = false;
   bool _timeReset = false;
@@ -148,6 +164,7 @@ private:
   void setupHomeTab();
   void setupAnalyzeTab();
   void setupSettingTab();
+  void Send_Configurations();
   void updateAxis(QChart *chart, double key, double minY, double maxY);
   QChartView *createAnalyzeChart(const QString &yTitle, QLineSeries *series);
 
