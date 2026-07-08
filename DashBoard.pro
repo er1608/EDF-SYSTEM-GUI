@@ -6,6 +6,7 @@ TARGET = DashboardApp
 TEMPLATE = app
 
 SOURCES += \
+    autocalib.cpp \
     analyzetab.cpp \
     chartwidget.cpp \
     communication.cpp \
@@ -19,6 +20,7 @@ SOURCES += \
     toggleswitch.cpp
 
 HEADERS += \
+    autocalib.h \
     mainwindow.h \
     dashboardwidget.h \
     toggleswitch.h

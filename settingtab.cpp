@@ -1,6 +1,11 @@
+#include "autocalib.h"
 #include "mainwindow.h"
 #include <QDateTime>
 #include <QFile>
+#include <QFileDialog>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QMessageBox>
 #include <QTextStream>
 #include <QtWidgets>
@@ -38,8 +43,6 @@ const unsigned short crc16_tab[] = {
     0xdf7c, 0xaf9b, 0xbfba, 0x8fd9, 0x9ff8, 0x6e17, 0x7e36, 0x4e55, 0x5e74,
     0x2e93, 0x3eb2, 0x0ed1, 0x1ef0};
 } // namespace
-
-QVector<LCConfig> _lcConfigs;
 
 void MainWindow::setupSettingTab() {
   auto *settingLayout = new QVBoxLayout(_settingTab);
@@ -117,6 +120,210 @@ void MainWindow::setupSettingTab() {
   connect(applyBtn, &QPushButton::clicked, this,
           &MainWindow::Send_Configurations);
 
+  auto *saveBtn = new QPushButton("Save Config");
+  saveBtn->setFixedHeight(30);
+  connect(saveBtn, &QPushButton::clicked, this, [this]() {
+    if (!_lcConfigs.isEmpty() && _currentLC >= 0 &&
+        _currentLC < _lcConfigs.size()) {
+      auto &cfg = _lcConfigs[_currentLC];
+      if (lcChannel)
+        cfg.channel = lcChannel->currentText().toLatin1()[0];
+      if (lcGain)
+        cfg.gain = lcGain->currentText().toInt();
+      if (lcSign)
+        cfg.sign = lcSign->currentText().toInt();
+      if (lcSampleAverage)
+        cfg.sampleAverage = lcSampleAverage->value();
+      if (lcPrecision)
+        cfg.tarePrecision = lcPrecision->value();
+      if (lcVpu)
+        cfg.val_per_unit = lcVpu->value();
+      if (lcQuantity)
+        cfg.quantity = lcQuantity->value();
+    }
+
+    QJsonObject root;
+
+    QJsonObject pwmObj;
+    if (freq)
+      pwmObj["freq"] = freq->currentData().toInt();
+    if (minPWM)
+      pwmObj["minPWM"] = minPWM->value();
+    if (maxPWM)
+      pwmObj["maxPWM"] = maxPWM->value();
+    root["pwm"] = pwmObj;
+
+    QJsonObject fftObj;
+    if (windowSize)
+      fftObj["windowSize"] = windowSize->value();
+    if (sampleRate)
+      fftObj["sampleRate"] = sampleRate->value();
+    if (overlap)
+      fftObj["overlap"] = overlap->value();
+    if (fftWindowType)
+      fftObj["fftWindowType"] = fftWindowType->currentIndex();
+    root["fft"] = fftObj;
+
+    QJsonObject sigObj;
+    if (sigAmplitude)
+      sigObj["amplitude"] = sigAmplitude->value();
+    if (sigFrequency)
+      sigObj["frequency"] = sigFrequency->value();
+    if (sigDuration)
+      sigObj["duration"] = sigDuration->value();
+    root["signal"] = sigObj;
+
+    QJsonObject lcObj;
+    if (lcQuantity)
+      lcObj["quantity"] = lcQuantity->value();
+    QJsonArray lcArray;
+    for (const auto &lc : std::as_const(_lcConfigs)) {
+      QJsonObject item;
+      item["id"] = lc.id;
+      item["channel"] = QString(QChar(lc.channel));
+      item["gain"] = lc.gain;
+      item["sign"] = lc.sign;
+      item["sampleAverage"] = lc.sampleAverage;
+      item["tarePrecision"] = lc.tarePrecision;
+      item["val_per_unit"] = lc.val_per_unit;
+      item["quantity"] = lc.quantity;
+      lcArray.append(item);
+    }
+    lcObj["configs"] = lcArray;
+    root["loadcell"] = lcObj;
+
+    QString defaultName =
+        "ThrustStand_Config_" +
+        QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss") + ".json";
+    QString fileName = QFileDialog::getSaveFileName(
+        this, "Save Config", defaultName, "JSON Files (*.json)");
+    if (fileName.isEmpty())
+      return;
+
+    QFile file(fileName);
+    if (file.open(QIODevice::WriteOnly)) {
+      QJsonDocument doc(root);
+      file.write(doc.toJson());
+      file.close();
+      QMessageBox::information(this, "Success",
+                               "Configuration saved successfully.");
+    } else {
+      QMessageBox::critical(this, "Error", "Failed to save configuration.");
+    }
+  });
+
+  auto *loadBtn = new QPushButton("Load Config");
+  loadBtn->setFixedHeight(30);
+  connect(loadBtn, &QPushButton::clicked, this, [this]() {
+    QString fileName = QFileDialog::getOpenFileName(this, "Load Config", "",
+                                                    "JSON Files (*.json)");
+    if (fileName.isEmpty())
+      return;
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly)) {
+      QMessageBox::critical(this, "Error",
+                            "Failed to open configuration file.");
+      return;
+    }
+
+    QByteArray data = file.readAll();
+    file.close();
+
+    QJsonDocument doc = QJsonDocument::fromJson(data);
+    if (!doc.isObject()) {
+      QMessageBox::critical(this, "Error", "Invalid JSON format.");
+      return;
+    }
+    QJsonObject root = doc.object();
+
+    if (root.contains("pwm") && root["pwm"].isObject()) {
+      QJsonObject pwmObj = root["pwm"].toObject();
+      if (freq) {
+        int val = pwmObj["freq"].toInt();
+        int idx = freq->findData(val);
+        if (idx >= 0)
+          freq->setCurrentIndex(idx);
+      }
+      if (minPWM)
+        minPWM->setValue(pwmObj["minPWM"].toInt());
+      if (maxPWM)
+        maxPWM->setValue(pwmObj["maxPWM"].toInt());
+    }
+
+    if (root.contains("fft") && root["fft"].isObject()) {
+      QJsonObject fftObj = root["fft"].toObject();
+      if (windowSize)
+        windowSize->setValue(fftObj["windowSize"].toInt());
+      if (sampleRate)
+        sampleRate->setValue(fftObj["sampleRate"].toInt());
+      if (overlap)
+        overlap->setValue(fftObj["overlap"].toInt());
+      if (fftWindowType)
+        fftWindowType->setCurrentIndex(fftObj["fftWindowType"].toInt());
+    }
+
+    if (root.contains("signal") && root["signal"].isObject()) {
+      QJsonObject sigObj = root["signal"].toObject();
+      if (sigAmplitude)
+        sigAmplitude->setValue(sigObj["amplitude"].toDouble());
+      if (sigFrequency)
+        sigFrequency->setValue(sigObj["frequency"].toDouble());
+      if (sigDuration)
+        sigDuration->setValue(sigObj["duration"].toDouble());
+    }
+
+    if (root.contains("loadcell") && root["loadcell"].isObject()) {
+      QJsonObject lcObj = root["loadcell"].toObject();
+      if (lcQuantity && lcObj.contains("quantity")) {
+        lcQuantity->setValue(lcObj["quantity"].toInt());
+      }
+      if (lcObj.contains("configs") && lcObj["configs"].isArray()) {
+        QJsonArray lcArray = lcObj["configs"].toArray();
+        for (int i = 0; i < lcArray.size() && i < _lcConfigs.size(); ++i) {
+          QJsonObject item = lcArray[i].toObject();
+          _lcConfigs[i].id = item["id"].toInt();
+          QString ch = item["channel"].toString();
+          if (!ch.isEmpty())
+            _lcConfigs[i].channel = ch.toLatin1()[0];
+          _lcConfigs[i].gain = item["gain"].toInt();
+          _lcConfigs[i].sign = item["sign"].toInt();
+          _lcConfigs[i].sampleAverage = item["sampleAverage"].toInt();
+          _lcConfigs[i].tarePrecision = item["tarePrecision"].toInt();
+          _lcConfigs[i].val_per_unit = item["val_per_unit"].toInt();
+          _lcConfigs[i].quantity = item["quantity"].toInt();
+        }
+
+        if (_currentLC >= 0 && _currentLC < _lcConfigs.size()) {
+          auto &cfg = _lcConfigs[_currentLC];
+          if (lcChannel)
+            lcChannel->setCurrentText(QString(cfg.channel));
+          if (lcGain) {
+            lcGain->clear();
+            if (cfg.channel == 'A') {
+              lcGain->addItem("128");
+              lcGain->addItem("64");
+            } else {
+              lcGain->addItem("0");
+              lcGain->addItem("32");
+            }
+            lcGain->setCurrentText(QString::number(cfg.gain));
+          }
+          if (lcSign)
+            lcSign->setCurrentText(QString::number(cfg.sign));
+          if (lcSampleAverage)
+            lcSampleAverage->setValue(cfg.sampleAverage);
+          if (lcPrecision)
+            lcPrecision->setValue(cfg.tarePrecision);
+          if (lcVpu)
+            lcVpu->setValue(cfg.val_per_unit);
+        }
+      }
+    }
+    QMessageBox::information(this, "Success",
+                             "Configuration loaded successfully.");
+  });
+
   auto *resetBtn = new QPushButton("Reset");
   resetBtn->setFixedHeight(30);
 
@@ -144,6 +351,8 @@ void MainWindow::setupSettingTab() {
     }
   });
 
+  cornerLayout->addWidget(loadBtn);
+  cornerLayout->addWidget(saveBtn);
   cornerLayout->addWidget(applyBtn);
   cornerLayout->addWidget(resetBtn);
 
@@ -159,29 +368,26 @@ void MainWindow::setupSignalGeneratorTab(QWidget *tab) {
   group->setFixedWidth(400);
   auto *form = new QFormLayout(group);
 
-  auto *amplitude = new QDoubleSpinBox();
-  amplitude->setRange(0, 100);
-  amplitude->setValue(50);
-  amplitude->setDecimals(1);
+  sigAmplitude = new QDoubleSpinBox();
+  sigAmplitude->setRange(0, 100);
+  sigAmplitude->setValue(50);
+  sigAmplitude->setDecimals(1);
 
-  auto *frequency = new QDoubleSpinBox();
-  frequency->setRange(0.1, 10);
-  frequency->setValue(1.0);
-  frequency->setDecimals(2);
+  sigFrequency = new QDoubleSpinBox();
+  sigFrequency->setRange(0.1, 10);
+  sigFrequency->setValue(1.0);
+  sigFrequency->setDecimals(2);
 
-  auto *duration = new QDoubleSpinBox();
-  duration->setRange(1, 60);
-  duration->setValue(10);
+  sigDuration = new QDoubleSpinBox();
+  sigDuration->setRange(1, 60);
+  sigDuration->setValue(10);
 
-  form->addRow("Amplitude", amplitude);
-  form->addRow("Frequency (Hz)", frequency);
-  form->addRow("Duration (s)", duration);
+  form->addRow("Amplitude", sigAmplitude);
+  form->addRow("Frequency (Hz)", sigFrequency);
+  form->addRow("Duration (s)", sigDuration);
 
   layout->addWidget(group, 0, Qt::AlignTop | Qt::AlignHCenter);
 }
-
-QComboBox *freq;
-QSpinBox *minPWM, *maxPWM;
 
 void MainWindow::setupPWMTab(QWidget *tab) {
   auto *layout = new QVBoxLayout(tab);
@@ -216,93 +422,103 @@ void MainWindow::setupLCTab(QWidget *tab) {
   auto *group = new QGroupBox("Loadcell Configuration");
   group->setFixedWidth(420);
 
-  auto *quantity = new QSpinBox();
-  quantity->setRange(1, 3);
-  quantity->setValue(1);
+  lcQuantity = new QSpinBox();
+  lcQuantity->setRange(1, 3);
+  lcQuantity->setValue(1);
 
-  auto *vpu = new QSpinBox();
-  vpu->setRange(1, 1000);
-  vpu->setValue(206);
+  lcVpu = new QSpinBox();
+  lcVpu->setRange(1, 1000);
+  lcVpu->setValue(206);
 
-  auto *idSelect = new QComboBox();
+  lcIdSelect = new QComboBox();
 
-  auto *channel = new QComboBox();
-  channel->addItem("A");
-  channel->addItem("B");
+  lcChannel = new QComboBox();
+  lcChannel->addItem("0");
+  lcChannel->addItem("A");
+  lcChannel->addItem("B");
 
-  auto *gain = new QComboBox();
-  gain->addItem("128");
-  gain->addItem("64");
+  lcGain = new QComboBox();
+  lcGain->addItem("0");
+  lcGain->addItem("128");
+  lcGain->addItem("64");
 
-  auto *sign = new QComboBox();
-  sign->addItem("1");
-  sign->addItem("-1");
+  lcSign = new QComboBox();
+  lcSign->addItem("0");
+  lcSign->addItem("1");
+  lcSign->addItem("-1");
 
-  auto *sampleAverage = new QSpinBox();
-  sampleAverage->setRange(1, 100);
-  sampleAverage->setValue(10);
+  lcSampleAverage = new QSpinBox();
+  lcSampleAverage->setRange(1, 100);
+  lcSampleAverage->setValue(1);
 
-  auto *precision = new QSpinBox();
-  precision->setRange(1, 200);
-  precision->setValue(100);
+  lcPrecision = new QSpinBox();
+  lcPrecision->setRange(1, 200);
+  lcPrecision->setValue(100);
 
   auto *grid = new QGridLayout(group);
   grid->setHorizontalSpacing(20);
   grid->setVerticalSpacing(12);
 
   grid->addWidget(new QLabel("Loadcell Quantity"), 0, 0);
-  grid->addWidget(quantity, 0, 1);
+  grid->addWidget(lcQuantity, 0, 1);
 
   grid->addWidget(new QLabel("Loadcell ID"), 0, 2);
-  grid->addWidget(idSelect, 0, 3);
+  grid->addWidget(lcIdSelect, 0, 3);
 
   grid->addWidget(new QLabel("Channel"), 1, 0);
-  grid->addWidget(channel, 1, 1);
+  grid->addWidget(lcChannel, 1, 1);
 
   grid->addWidget(new QLabel("Gain"), 1, 2);
-  grid->addWidget(gain, 1, 3);
+  grid->addWidget(lcGain, 1, 3);
 
   grid->addWidget(new QLabel("Sign"), 2, 0);
-  grid->addWidget(sign, 2, 1);
+  grid->addWidget(lcSign, 2, 1);
 
   grid->addWidget(new QLabel("Sample Average"), 2, 2);
-  grid->addWidget(sampleAverage, 2, 3);
+  grid->addWidget(lcSampleAverage, 2, 3);
 
   grid->addWidget(new QLabel("Tare Precision"), 3, 0);
-  grid->addWidget(precision, 3, 1);
+  grid->addWidget(lcPrecision, 3, 1);
 
   grid->addWidget(new QLabel("Value Per Unit"), 3, 2);
-  grid->addWidget(vpu, 3, 3);
+  grid->addWidget(lcVpu, 3, 3);
+
+  auto *btnAutoCalib = new QPushButton("Auto Calibrate");
+  grid->addWidget(btnAutoCalib, 4, 0, 1, 4);
+  connect(btnAutoCalib, &QPushButton::clicked, this, [=]() {
+    AutoCalibDialog dlg(this, lcIdSelect->currentText(), this);
+    dlg.exec();
+  });
 
   layout->addWidget(group, 0, Qt::AlignTop | Qt::AlignHCenter);
   layout->addStretch();
 
   auto updateQuantity = [=]() {
-    int q = quantity->value();
+    int q = lcQuantity->value();
 
     _lcConfigs.clear();
-    idSelect->clear();
+    lcIdSelect->clear();
 
     for (int i = 0; i < q; i++) {
       LCConfig cfg;
       cfg.id = i + 1;
-      cfg.channel = 'A';
-      cfg.gain = 128;
-      cfg.sign = 1;
-      cfg.sampleAverage = 10;
+      cfg.channel = '0';
+      cfg.gain = 0;
+      cfg.sign = 0;
+      cfg.sampleAverage = 1;
       cfg.tarePrecision = 100;
       cfg.val_per_unit = 206;
       cfg.quantity = 1;
 
       _lcConfigs.append(cfg);
 
-      idSelect->addItem(QString("LC%1").arg(i + 1));
+      lcIdSelect->addItem(QString("LC%1").arg(i + 1));
     }
   };
 
   updateQuantity();
 
-  connect(quantity, QOverload<int>::of(&QSpinBox::valueChanged), this,
+  connect(lcQuantity, QOverload<int>::of(&QSpinBox::valueChanged), this,
           [=](int) { updateQuantity(); });
 
   auto saveCurrentLC = [=]() {
@@ -314,16 +530,16 @@ void MainWindow::setupLCTab(QWidget *tab) {
 
     auto &cfg = _lcConfigs[_currentLC];
 
-    cfg.channel = channel->currentText().toLatin1()[0];
-    cfg.gain = gain->currentText().toInt();
-    cfg.sign = sign->currentText().toInt();
-    cfg.sampleAverage = sampleAverage->value();
-    cfg.tarePrecision = precision->value();
-    cfg.val_per_unit = vpu->value();
-    cfg.quantity = quantity->value();
+    cfg.channel = lcChannel->currentText().toLatin1()[0];
+    cfg.gain = lcGain->currentText().toInt();
+    cfg.sign = lcSign->currentText().toInt();
+    cfg.sampleAverage = lcSampleAverage->value();
+    cfg.tarePrecision = lcPrecision->value();
+    cfg.val_per_unit = lcVpu->value();
+    cfg.quantity = lcQuantity->value();
   };
 
-  connect(idSelect, &QComboBox::currentIndexChanged, this, [=](int index) {
+  connect(lcIdSelect, &QComboBox::currentIndexChanged, this, [=](int index) {
     saveCurrentLC();
 
     _currentLC = index;
@@ -333,28 +549,26 @@ void MainWindow::setupLCTab(QWidget *tab) {
 
     auto &cfg = _lcConfigs[index];
 
-    channel->setCurrentText(QString(cfg.channel));
-    gain->setCurrentText(QString::number(cfg.gain));
-    sign->setCurrentText(QString::number(cfg.sign));
-    sampleAverage->setValue(cfg.sampleAverage);
-    precision->setValue(cfg.tarePrecision);
-    vpu->setValue(cfg.val_per_unit);
+    lcChannel->setCurrentText(QString(cfg.channel));
+    lcGain->setCurrentText(QString::number(cfg.gain));
+    lcSign->setCurrentText(QString::number(cfg.sign));
+    lcSampleAverage->setValue(cfg.sampleAverage);
+    lcPrecision->setValue(cfg.tarePrecision);
+    lcVpu->setValue(cfg.val_per_unit);
   });
 
-  connect(channel, &QComboBox::currentTextChanged, this, [=](QString ch) {
-    gain->clear();
+  connect(lcChannel, &QComboBox::currentTextChanged, this, [=](QString ch) {
+    lcGain->clear();
 
     if (ch == "A") {
-      gain->addItem("128");
-      gain->addItem("64");
+      lcGain->addItem("128");
+      lcGain->addItem("64");
     } else {
-      gain->addItem("32");
+      lcGain->addItem("0");
+      lcGain->addItem("32");
     }
   });
 }
-
-QSpinBox *windowSize, *sampleRate, *overlap;
-QComboBox *fftWindowType;
 
 void MainWindow::setupFFTTab(QWidget *tab) {
   auto *layout = new QVBoxLayout(tab);
@@ -404,9 +618,11 @@ void MainWindow::buffer_append_ui32(QByteArray &buffer, uint32_t value) {
 }
 
 void MainWindow::Send_Configurations() {
-  // qDebug() << "Send Configurations";
-  if (!_serialPort || !_serialPort->isOpen())
+  qDebug() << "Apply Config button clicked!";
+  if (!_serialPort || !_serialPort->isOpen()) {
+    qDebug() << "Serial port is not open! Cannot send configuration.";
     return;
+  }
 
   QByteArray payload;
   payload.append(static_cast<char>(COMM_SET_SYSTEM_CONF));
@@ -442,8 +658,9 @@ void MainWindow::Send_Configurations() {
   packet.append(static_cast<char>(crc & 0xFF));
   packet.append(static_cast<char>(0x03)); // stop byte
 
-  // qDebug() << "Checksum:" << crc;
-  // qDebug() << "Payload:" << payload.toHex();
+  qDebug() << "Checksum:" << crc;
+  qDebug() << "Payload:" << payload.toHex();
+  qDebug() << "Writing packet to serial port, size:" << packet.size();
   _serialPort->write(packet);
 }
 

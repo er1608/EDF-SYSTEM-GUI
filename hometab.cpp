@@ -394,12 +394,7 @@ void MainWindow::setupHomeTab() {
                   value = maxValueSpinBox->value();
                 else if (value < minValueSpinBox->value())
                   value = minValueSpinBox->value();
-              } else {
-                if (value > 50)
-                  value = 50;
-                else if (value < 0)
-                  value = 0;
-              }
+              } else if (value > 50) value = 50;
 
               Send_PWM(value);
             }
@@ -414,12 +409,7 @@ void MainWindow::setupHomeTab() {
                   value = maxValueSpinBox->value();
                 else if (value < minValueSpinBox->value())
                   value = minValueSpinBox->value();
-              } else {
-                if (value > 50)
-                  value = 50;
-                else if (value < 0)
-                  value = 0;
-              }
+              } else if (value > 50) value = 50;
 
               Send_PWM(value);
             }
@@ -563,7 +553,7 @@ void MainWindow::setupHomeTab() {
 }
 
 void MainWindow::Send_PWM(uint16_t value) {
-  if (!_serialPort && !_serialPort->isOpen()) {
+  if (!_serialPort) {
     return;
   }
 
@@ -593,7 +583,7 @@ void MainWindow::Send_PWM(uint16_t value) {
 }
 
 void MainWindow::Send_Start() {
-  if (!_serialPort && !_serialPort->isOpen()) {
+  if (!_serialPort) {
     return;
   }
 
@@ -621,7 +611,7 @@ void MainWindow::Send_Start() {
 }
 
 void MainWindow::Send_Stop() {
-  if (!_serialPort && !_serialPort->isOpen()) {
+  if (!_serialPort) {
     return;
   }
 

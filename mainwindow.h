@@ -2,10 +2,13 @@
 #define MAINWINDOW_H
 #define Q_OS_LINUX
 
+#include <QComboBox>
+#include <QDoubleSpinBox>
 #include <QLabel>
 #include <QMainWindow>
 #include <QSerialPort>
 #include <QSerialPortInfo>
+#include <QSpinBox>
 #include <QTextEdit>
 #include <QTime>
 #include <QTimer>
@@ -42,9 +45,8 @@ enum {
   COMM_START_SYSTEM = 0x12,
   COMM_STOP_SYSTEM = 0x13,
   COMM_SET_POWER = 0x14,
+  COMM_CALIB_LOADCELL = 0x15,
 };
-
-extern QVector<LCConfig> _lcConfigs;
 
 namespace Ui {
 class MainWindow;
@@ -60,6 +62,18 @@ public:
   explicit MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
   void resizeEvent(QResizeEvent *event) override;
+  static quint16 vescCrc16(const QByteArray &data);
+
+  QSerialPort *getSerialPort() const { return _serialPort; }
+  double getThrustValue() const { return thrustValue; }
+  void setLCValuePerUnit(int value) {
+    if (lcVpu)
+      lcVpu->setValue(value);
+    if (!_lcConfigs.isEmpty() && _currentLC >= 0 &&
+        _currentLC < _lcConfigs.size()) {
+      _lcConfigs[_currentLC].val_per_unit = value;
+    }
+  }
 
 private slots:
   void readData();
@@ -125,7 +139,6 @@ private:
   void buffer_append_ui16(QByteArray &buffer, uint16_t value);
   void buffer_append_ui32(QByteArray &buffer, uint32_t value);
   void buffer_append_ui64(QByteArray &buffer, uint64_t value);
-  static quint16 vescCrc16(const QByteArray &data);
   bool _plotting = false;
   bool _timeReset = false;
   QChart *_chart;
@@ -192,6 +205,21 @@ private:
 
   void setupPlotTab(QWidget *tab);
   void setupTableTab(QWidget *tab);
+
+  QComboBox *freq = nullptr;
+  QSpinBox *minPWM = nullptr, *maxPWM = nullptr;
+
+  QSpinBox *windowSize = nullptr, *sampleRate = nullptr, *overlap = nullptr;
+  QComboBox *fftWindowType = nullptr;
+
+  QDoubleSpinBox *sigAmplitude = nullptr, *sigFrequency = nullptr,
+                 *sigDuration = nullptr;
+
+  QSpinBox *lcQuantity = nullptr, *lcVpu = nullptr, *lcSampleAverage = nullptr,
+           *lcPrecision = nullptr;
+  QComboBox *lcIdSelect = nullptr, *lcChannel = nullptr, *lcGain = nullptr,
+            *lcSign = nullptr;
+  QVector<LCConfig> _lcConfigs;
 };
 
 #endif // MAINWANT
